@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="styles.css" />
+  <title th:text="|${title}|">Title</title>
+</head>
+<body>
+
+    <span id="header" th:text="|${title}|"></span>
+
+    <h1 th:text="|${title}|">Title</h1>
+
+    <p th:text="|Report date is ${new java.util.Date().toString()}|">Report date is ...</p>
+    <p th:text="|Trivy scan conducted ${scanDate}.|">Today is ...</p>
+    <p th:text="|Artefact ${artefactName} of type ${artefactType}|"></p>
+
+    <a id="openVulnerabilities"/>
+    <h2>Open vulnerabilities</h2>
+
+    <p>
+        <table th:with="severities = ${ { { 'UNKNOWN', 'vulnSevCritical' }, { 'CRITICAL', 'vulnSevCritical' }, { 'HIGH', 'vulnSevHigh' }, { 'MEDIUM', 'vulnSevMedium' }, { 'LOW', 'vulnSevLow' } } }">
+            <tr>
+                <td th:each="severity : ${severities}" th:if="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0])} != null" th:class="|${severity[1]} severityCountBox|">
+                        <span th:text="${severity[0]}"></span>
+                        <br/>
+                        <span class="severityCount" th:text="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0])}">???</span>
+                </td>
+            </tr>
+        </table>
+    </p>
+
+    <table class="mainTableVulnerabilities">
+        <caption>
+            Open vulnerabilities - Details
+        </caption>
+        <thead class="mainTableHeader" >
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Title</th>
+                <th scope="col">Packages affected</th>
+            </tr>
+        </thead>
+        <tbody class="mainTableBody" >
+            <tr class="mainTableBodyRow" th:if="${openVulnerabilities.vulnerabilities.empty}">
+                <td colspan="4"> No vulnerabilities </td>
+            </tr>
+            <tr class="mainTableBodyRow" th:each="vulnerability : ${openVulnerabilities.vulnerabilities}">
+                <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a></td>
+                <td th:if="${vulnerability.severity.name()} == 'LOW'" class="vulnSevLow">LOW</td>
+                <td th:if="${vulnerability.severity.name()} == 'MEDIUM'" class="vulnSevMedium">MEDIUM</td>
+                <td th:if="${vulnerability.severity.name()} == 'HIGH'" class="vulnSevHigh">HIGH</td>
+                <td th:if="${vulnerability.severity.name()} == 'CRITICAL'" class="vulnSevCritical">CRITICAL</td>
+                <td th:if="${vulnerability.severity.name()} == 'UNKNOWN'" class="vulnSevCritical">UNKNOWN</td>
+                <td><span th:text="${vulnerability.title}">This is the vulnerability title</span></td>
+                <td>
+                    <table class="subTablePackageVulnerabilities">
+                        <thead class="subTableHeader" >
+                            <tr>
+                                <th>Package</th>
+                                <th>Installed version</th>
+                                <th>Fixed in version(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="subTableBody" >
+                            <tr th:each="packageVuln : ${vulnerability.packageVulnerabilities}">
+                                <td><span th:text="${packageVuln.pkgName}">ABCD123</span></td>
+                                <td><span th:text="${packageVuln.installedVersion}">vXXXX</span></td>
+                                <td><span th:text="${packageVuln.fixedVersion}">vYYYY</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

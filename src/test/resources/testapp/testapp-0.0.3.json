@@ -1,0 +1,136 @@
+{
+  "SchemaVersion": 2,
+  "CreatedAt": "2024-02-13T15:59:07.1565934Z",
+  "ArtifactName": "testapp/test:0.0.3",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "OS": {
+      "Family": "alpine",
+      "Name": "3.19.1"
+    },
+    "ImageID": "sha256:0a6506395fe9d6c5a9bc900f0e1044462aaa33664c95cde05be0f3487add05fa",
+    "DiffIDs": [
+      "sha256:d4fc045c9e3a848011de66f34b81f052d4f2c15a17bb196d637e526349601820",
+      "sha256:f37c660d8a06d662318a05c65e69b8093a2da86443d06f6500e223c61cbb4edc",
+      "sha256:da3ed1f34840450a3cfc64b9cc5f6225e15d1807b33ee073dea9a3f74efc1887",
+      "sha256:65c1fa0c590f3e2f7e5dd60c4d1db930438c2b30c16f8d64a7ef8da9bd0525a9",
+      "sha256:0e05bd310a1d069562597d9acd3fa8cb3380c6b3eea34df834b6e616c114bd27",
+      "sha256:f510292afd8f78ff0d7c7cb9776c8c28236cb3cbebe993cedb39b21537dbc465"
+    ],
+    "RepoTags": [
+      "testapp/test:0.0.3"
+    ],
+    "ImageConfig": {
+      "architecture": "amd64",
+      "container": "ad95d37e97c43bdd57ad50307c9ed208313945a815184dc9d576267819db2abb",
+      "created": "2024-02-13T15:55:27.558452138Z",
+      "docker_version": "23.0.6",
+      "history": [
+        {
+          "created": "2024-01-27T00:30:48.624602109Z",
+          "created_by": "/bin/sh -c #(nop) ADD file:37a76ec18f9887751cd8473744917d08b7431fc4085097bb6a09d81b41775473 in / "
+        },
+        {
+          "created": "2024-01-27T00:30:48.743965523Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"/bin/sh\"]",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-01-27T03:22:47.967382677Z",
+          "created_by": "/bin/sh -c #(nop)  ARG version=21.0.2.13.1",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-01-27T03:22:53.563860247Z",
+          "created_by": "|1 version=21.0.2.13.1 /bin/sh -c wget -O /THIRD-PARTY-LICENSES-20200824.tar.gz https://corretto.aws/downloads/resources/licenses/alpine/THIRD-PARTY-LICENSES-20200824.tar.gz \u0026\u0026     echo \"82f3e50e71b2aee21321b2b33de372feed5befad6ef2196ddec92311bc09becb  /THIRD-PARTY-LICENSES-20200824.tar.gz\" | sha256sum -c - \u0026\u0026     tar x -ovzf THIRD-PARTY-LICENSES-20200824.tar.gz \u0026\u0026     rm -rf THIRD-PARTY-LICENSES-20200824.tar.gz \u0026\u0026     wget -O /etc/apk/keys/amazoncorretto.rsa.pub https://apk.corretto.aws/amazoncorretto.rsa.pub \u0026\u0026     SHA_SUM=\"6cfdf08be09f32ca298e2d5bd4a359ee2b275765c09b56d514624bf831eafb91\" \u0026\u0026     echo \"${SHA_SUM}  /etc/apk/keys/amazoncorretto.rsa.pub\" | sha256sum -c - \u0026\u0026     echo \"https://apk.corretto.aws\" \u003e\u003e /etc/apk/repositories \u0026\u0026     apk add --no-cache amazon-corretto-21=$version-r0 \u0026\u0026     rm -rf /usr/lib/jvm/java-21-amazon-corretto/lib/src.zip"
+        },
+        {
+          "created": "2024-01-27T03:22:54.22941008Z",
+          "created_by": "/bin/sh -c #(nop)  ENV LANG=C.UTF-8",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-01-27T03:22:54.31291924Z",
+          "created_by": "/bin/sh -c #(nop)  ENV JAVA_HOME=/usr/lib/jvm/default-jvm",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-01-27T03:22:54.396673852Z",
+          "created_by": "/bin/sh -c #(nop)  ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/default-jvm/bin",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-02-13T15:55:26.231674949Z",
+          "created_by": "/bin/sh -c #(nop)  LABEL maintainer=PhilP",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-02-13T15:55:26.436658563Z",
+          "created_by": "/bin/sh -c #(nop) WORKDIR /app"
+        },
+        {
+          "created": "2024-02-13T15:55:26.752063984Z",
+          "created_by": "/bin/sh -c #(nop) COPY dir:6a6168cc8cb79a88db30279fbf534fe658579aeace29d6a18b2a2d7c476c12f9 in libs/ "
+        },
+        {
+          "created": "2024-02-13T15:55:27.0017189Z",
+          "created_by": "/bin/sh -c #(nop) COPY dir:1ab2ddb6a410952bc95b945bf313d80ba4e7919012afdcd53487d9e05edf7add in resources/ "
+        },
+        {
+          "created": "2024-02-13T15:55:27.173625612Z",
+          "created_by": "/bin/sh -c #(nop) COPY dir:880c2c900001dfd35b19d89d6d94df307c876fc32f1cc620cbcc7ead3877da87 in classes/ "
+        },
+        {
+          "created": "2024-02-13T15:55:27.349451824Z",
+          "created_by": "/bin/sh -c #(nop)  ENTRYPOINT [\"java\" \"-cp\" \"/app/resources:/app/classes:/app/libs/*\" \"testapp.test.TestApplication\"]",
+          "empty_layer": true
+        },
+        {
+          "created": "2024-02-13T15:55:27.558452138Z",
+          "created_by": "/bin/sh -c #(nop)  EXPOSE 8080",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:d4fc045c9e3a848011de66f34b81f052d4f2c15a17bb196d637e526349601820",
+          "sha256:f37c660d8a06d662318a05c65e69b8093a2da86443d06f6500e223c61cbb4edc",
+          "sha256:da3ed1f34840450a3cfc64b9cc5f6225e15d1807b33ee073dea9a3f74efc1887",
+          "sha256:65c1fa0c590f3e2f7e5dd60c4d1db930438c2b30c16f8d64a7ef8da9bd0525a9",
+          "sha256:0e05bd310a1d069562597d9acd3fa8cb3380c6b3eea34df834b6e616c114bd27",
+          "sha256:f510292afd8f78ff0d7c7cb9776c8c28236cb3cbebe993cedb39b21537dbc465"
+        ]
+      },
+      "config": {
+        "Entrypoint": [
+          "java",
+          "-cp",
+          "/app/resources:/app/classes:/app/libs/*",
+          "testapp.test.TestApplication"
+        ],
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/default-jvm/bin",
+          "LANG=C.UTF-8",
+          "JAVA_HOME=/usr/lib/jvm/default-jvm"
+        ],
+        "Image": "sha256:ad324a6103f3df9c049642ec05e6b87f92ba7c76d1cd59510b7592e59c5607e1",
+        "Labels": {
+          "maintainer": "PhilP"
+        },
+        "WorkingDir": "/app",
+        "ExposedPorts": {
+          "8080/tcp": {}
+        }
+      }
+    }
+  },
+  "Results": [
+    {
+      "Target": "testapp/test:0.0.3 (alpine 3.19.1)",
+      "Class": "os-pkgs",
+      "Type": "alpine"
+    }
+  ]
+}
