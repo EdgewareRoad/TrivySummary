@@ -11,10 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
-import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefact;
+import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
@@ -39,7 +38,7 @@ class TrivyScanLoaderTests {
 
 
 	@Test
-	void testTrivyTestAppScanLoad() throws IOException, TrivyScanHistoryNotDeepEnoughException, TrivyScanHistoryMustBeForSameArtefact {
+	void testTrivyTestAppScanLoad() throws IOException, TrivyScanHistoryNotDeepEnoughException, TrivyScanHistoryMustBeForSameArtefactType {
 		Logger logger = LoggerFactory.getLogger(TrivyScanLoaderTests.class);
 
 		TrivyScanHistory history = new TrivyScanHistory();

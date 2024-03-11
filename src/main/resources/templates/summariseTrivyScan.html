@@ -15,7 +15,7 @@
 
     <p th:text="|Report date is ${new java.util.Date().toString()}|">Report date is ...</p>
     <p th:text="|Trivy scan conducted ${scanDate}.|">Today is ...</p>
-    <p th:text="|Artefact ${artefactName} of type ${artefactType}|"></p>
+    <p>Artefact scanned is <b><span th:text="${artefactName}" /></b> of type <b><span th:text="${artefactType}" /></b></p>
 
     <a id="openVulnerabilities"/>
     <h2>Open vulnerabilities</h2>

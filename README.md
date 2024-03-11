@@ -11,7 +11,6 @@ It also can aid CI/CD pipelines by exiting with an error if there are open vulne
 
 ### TODO
 
-* Add full artefact names to reporting output. Will need to water down the history check to compensate (before first digit?)
 * Add threshold fail severity (i.e. fail if this severity or above)
 * Copy GitHub versioning and publishing aspects from PDFRepair to this project
 * Complete publication on GitHub including auto-build and releases

@@ -2,13 +2,15 @@ package com.fujitsu.edgewareroad.trivyutils.dto.history;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
 
 public class TrivyTwoScanComparison {
     private String title;
-    private String artefactName;
+    private List<String> artefactNames;
     private String artefactType;
+    private boolean historyMayNotBeForSameArtefact = false;
     private Date fromScanDate;
     private Date toScanDate;
     private TrivyScanVulnerabilitySummary vulnerabilitiesOpen;
@@ -16,8 +18,9 @@ public class TrivyTwoScanComparison {
 
     public TrivyTwoScanComparison(
         String title,
-        String artefactName,
+        List<String> artefactNames,
         String artefactType,
+        boolean historyMayNotBeForSameArtefact,
         Date fromScanDate,
         Date toScanDate,
         TrivyScanVulnerabilitySummary vulnerabilitiesOpen,
@@ -25,13 +28,21 @@ public class TrivyTwoScanComparison {
 
         if (title == null)
         {
-            DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM);
-            title = String.format("Artefact %s of type %s, between %s and %s", artefactName, artefactType, format.format(fromScanDate), format.format(toScanDate));
+            if (artefactNames.size() >= 2)
+            {
+                DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM);
+                title = String.format("Artefacts %s - %s of type %s, between %s and %s", artefactNames.get(0), artefactNames.get(1), artefactType, format.format(fromScanDate), format.format(toScanDate));
+            }
+            else
+            {
+                title = "SYSTEM ERROR: Need two scans to compare";
+            }
         }
 
         this.title = title;
-        this.artefactName = artefactName;
+        this.artefactNames = artefactNames;
         this.artefactType = artefactType;
+        this.historyMayNotBeForSameArtefact = historyMayNotBeForSameArtefact;
         this.fromScanDate = fromScanDate;
         this.toScanDate = toScanDate;
         this.vulnerabilitiesOpen = vulnerabilitiesOpen;
@@ -42,12 +53,21 @@ public class TrivyTwoScanComparison {
         return title;
     }
 
-    public String getArtefactName() {
-        return artefactName;
+    public String getEarlierArtefactName() {
+        return artefactNames.get(0);
+    }
+
+    public String getLaterArtefactName() {
+        return artefactNames.get(1);
     }
 
     public String getArtefactType() {
         return artefactType;
+    }
+
+    public boolean historyMayNotBeForSameArtefact()
+    {
+        return historyMayNotBeForSameArtefact;
     }
 
     public Date getFromScanDate() {

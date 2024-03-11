@@ -15,7 +15,10 @@
 
     <p th:text="|Report date is ${new java.util.Date().toString()}|">Report date is ...</p>
     <p th:text="|Trivy scans spanning ${fromDate} to ${toDate}.|">Today is ...</p>
-    <p th:text="|Artefact ${artefactName} of type ${artefactType}|"></p>
+    <p>Artefacts scanned are <b><span th:text="${earlierArtefactName}" /></b> to <b><span th:text="${laterArtefactName}" /></b> of type <b><span th:text="${artefactType}" /></b></p>
+    <span th:if="${comparisonMayNotBeForSameArtefact}">
+        <p><b>WARNING: Artefact names do not indicate these are scans of the same component - comparison may not be valid</b></p>
+    </span>
 
     <p>
         <ul>

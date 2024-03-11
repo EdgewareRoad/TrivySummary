@@ -13,7 +13,7 @@ import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyOneScanSummary;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
-import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefact;
+import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.openhtmltopdf.slf4j.Slf4jLogger;
@@ -121,7 +121,7 @@ public class TrivySummaryApp implements ApplicationRunner {
 				output("ERROR: Could not read input file %s", filePath.toString());
 				output("");
 				displayHelp();
-			} catch (TrivyScanHistoryMustBeForSameArtefact e) {
+			} catch (TrivyScanHistoryMustBeForSameArtefactType e) {
 				output("ERROR: %s", e.getMessage());
 				output("");
 				displayHelp();
@@ -193,8 +193,10 @@ public class TrivySummaryApp implements ApplicationRunner {
 			{
 				Map<String, Object> variables = new HashMap<>();
 				variables.put("title", comparison.getTitle());
-				variables.put("artefactName", comparison.getArtefactName());
+				variables.put("earlierArtefactName", comparison.getEarlierArtefactName());
+				variables.put("laterArtefactName", comparison.getLaterArtefactName());
 				variables.put("artefactType", comparison.getArtefactType());
+				variables.put("comparisonMayNotBeForSameArtefact", comparison.historyMayNotBeForSameArtefact());
 				variables.put("fromDate", comparison.getFromScanDate());
 				variables.put("toDate", comparison.getToScanDate());
 				variables.put("openVulnerabilities", comparison.getOpenVulnerabilities());
@@ -245,7 +247,7 @@ public class TrivySummaryApp implements ApplicationRunner {
 		}
 	}
 
-	private void addTrivyScanFileToHistory(TrivyScanHistory history, Path inputScan) throws IOException, TrivyScanHistoryMustBeForSameArtefact
+	private void addTrivyScanFileToHistory(TrivyScanHistory history, Path inputScan) throws IOException, TrivyScanHistoryMustBeForSameArtefactType
 	{
 		try (InputStream in = Files.newInputStream(inputScan))
 		{

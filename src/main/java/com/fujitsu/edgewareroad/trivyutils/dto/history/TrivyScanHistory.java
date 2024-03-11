@@ -2,6 +2,8 @@ package com.fujitsu.edgewareroad.trivyutils.dto.history;
 
 import java.time.LocalDate;
 import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
@@ -12,17 +14,25 @@ public class TrivyScanHistory {
     @JsonProperty("scanHistory")
     private TreeMap<LocalDate, TrivyScan> scanHistory = new TreeMap<>();
 
+    @JsonProperty
+    private boolean historyMayNotBeForSameArtefact = false;
+
     public TrivyScanHistory()
     {
     }
 
-    public void addScan(LocalDate dateOfScan, TrivyScan scan) throws TrivyScanHistoryMustBeForSameArtefact
+    public void addScan(LocalDate dateOfScan, TrivyScan scan) throws TrivyScanHistoryMustBeForSameArtefactType
     {
         if (scan != null)
         {
-            if (scanHistory.size() > 0 && (!getArtefactName().equals(getArtefactNameFromArtefactNameAndVersion(scan.getArtifactName())) || !getArtefactType().equals(scan.getArtifactType())))
+            if (scanHistory.size() > 0
+                    && (!getArtefactNameWithoutVersion(getArtefactNames().get(0)).equals(getArtefactNameWithoutVersion(scan.getArtifactName())) || !getArtefactType ().equals(scan.getArtifactType())))
             {
-                throw new TrivyScanHistoryMustBeForSameArtefact(this, scan);
+                historyMayNotBeForSameArtefact = true;
+                if (!getArtefactType().equals(scan.getArtifactType()))
+                {
+                    throw new TrivyScanHistoryMustBeForSameArtefactType(this, scan);
+                }
             }
 
             scanHistory.put(dateOfScan, scan);
@@ -36,34 +46,33 @@ public class TrivyScanHistory {
         }
     }
 
-    public class TrivyScanHistoryMustBeForSameArtefact extends Exception {
-        public TrivyScanHistoryMustBeForSameArtefact(TrivyScanHistory history, TrivyScan scan)
+    public class TrivyScanHistoryMustBeForSameArtefactType extends Exception {
+        public TrivyScanHistoryMustBeForSameArtefactType(TrivyScanHistory history, TrivyScan scan)
         {
-            super(String.format("Could not compare scan for %s of type %s with scan of %s of type %s", getArtefactNameFromArtefactNameAndVersion(scan.getArtifactName()), scan.getArtifactType(), history.getArtefactName(), history.getArtefactType()));
+            super("Scan history must be for artefacts of the same type");
         }
     }
 
-    public String getArtefactName()
+    public List<String> getArtefactNames()
     {
-        if (scanHistory.size() > 0)
+        ArrayList<String> artefactNames = new ArrayList<>();
+        for (TrivyScan scan : scanHistory.values())
         {
-            return getArtefactNameFromArtefactNameAndVersion(scanHistory.values().iterator().next().getArtifactName());
+            artefactNames.add(scan.getArtifactName());
         }
-        else
-        {
-            return null;
-        }
+        return artefactNames;
     }
 
-    private String getArtefactNameFromArtefactNameAndVersion(String input)
+    private String getArtefactNameWithoutVersion(String input)
     {
-        if (input.contains(":"))
+        if (input != null)
         {
-            return input.substring(0, input.indexOf(":"));
+            String[] splitByDigits = input.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+            return splitByDigits[0];
         }
         else
         {
-            return input;
+            return "";
         }
     }
 
@@ -91,7 +100,7 @@ public class TrivyScanHistory {
 
         TrivyScanVulnerabilities lastVulnerabilities = trivyScanTo.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
 
-        return new TrivyOneScanSummary(title, getArtefactName(), getArtefactType(), trivyScanTo.getCreatedAt(),
+        return new TrivyOneScanSummary(title, trivyScanTo.getArtifactName(), trivyScanTo.getArtifactType(), trivyScanTo.getCreatedAt(),
             new TrivyScanVulnerabilitySummary(lastVulnerabilities));
     }
 
@@ -126,7 +135,7 @@ public class TrivyScanHistory {
         TrivyScanVulnerabilities fixedVulnerabilities = new TrivyScanVulnerabilities(previousVulnerabilities);
         fixedVulnerabilities.removeAll(lastVulnerabilities);
 
-        return new TrivyTwoScanComparison(title, getArtefactName(), getArtefactType(), trivyScanFrom.getCreatedAt(), trivyScanTo.getCreatedAt(),
+        return new TrivyTwoScanComparison(title, getArtefactNames(), getArtefactType(), historyMayNotBeForSameArtefact, trivyScanFrom.getCreatedAt(), trivyScanTo.getCreatedAt(),
             new TrivyScanVulnerabilitySummary(newVulnerabilities, unfixedVulnerabilities), new TrivyScanVulnerabilitySummary(fixedVulnerabilities));
     }
 
