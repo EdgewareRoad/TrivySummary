@@ -11,7 +11,6 @@ It also can aid CI/CD pipelines by exiting with an error if there are open vulne
 
 ### TODO
 
-* Add threshold fail severity (i.e. fail if this severity or above)
 * Copy GitHub versioning and publishing aspects from PDFRepair to this project
 * Complete publication on GitHub including auto-build and releases
 

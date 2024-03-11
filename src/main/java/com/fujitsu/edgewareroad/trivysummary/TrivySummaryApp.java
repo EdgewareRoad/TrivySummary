@@ -2,6 +2,7 @@ package com.fujitsu.edgewareroad.trivysummary;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -16,6 +17,7 @@ import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
 import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.util.XRLog;
 
@@ -32,20 +34,24 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 @SpringBootApplication
-public class TrivySummaryApp implements ApplicationRunner {
+public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
+
+	private int exitCode; // initialised with 0
 
 	public static void main(String[] args) {
 		// Suppress logging and banner output that otherwise we can't control
 		System.setProperty("spring.main.banner-mode", "off");
 		XRLog.setLoggerImpl(new Slf4jLogger());
 
-		SpringApplication.run(TrivySummaryApp.class, args);
+		System.exit(SpringApplication.exit(SpringApplication.run(TrivySummaryApp.class, args)));
 	}
 
 	@Override
 	public void run(ApplicationArguments args) {
 		Path workingDirectory = Path.of(System.getProperty("user.dir"));
 		Path outputFile = Paths.get(System.getProperty("user.dir"), "output.json");
+
+		VulnerabilitySeverity failThreshold = VulnerabilitySeverity.LOW;
 
 		if (args.containsOption("help"))
 		{
@@ -61,6 +67,7 @@ public class TrivySummaryApp implements ApplicationRunner {
 				output("ERROR: outputFile option specified with empty path");
 				output("");
 				displayHelp();
+				this.exitCode = -1;
 				return;
 			}
 			if (inputValues.size() > 1)
@@ -68,6 +75,7 @@ public class TrivySummaryApp implements ApplicationRunner {
 				output("ERROR: outputFile option specified with multiple paths");
 				output("");
 				displayHelp();
+				this.exitCode = -1;
 				return;
 			}
 			outputFile = workingDirectory.resolve(inputValues.getFirst());
@@ -77,6 +85,7 @@ public class TrivySummaryApp implements ApplicationRunner {
 				output("ERROR: outputFile %s is not in a readable folder", outputFile.toString());
 				output("");
 				displayHelp();
+				this.exitCode = -1;
 				return;
 			}
 		}
@@ -85,13 +94,15 @@ public class TrivySummaryApp implements ApplicationRunner {
 		if (inputFiles.size() == 0)
 		{
 			output("ERROR: no input files specified");
+			this.exitCode = -1;
 			return;
-		}
+	}
 		if (inputFiles.size() > 2)
 		{
 			output("ERROR: too many input files specified");
+			this.exitCode = -1;
 			return;
-		}
+	}
 
 		String title = null;
 		List<String> inputValues = args.getOptionValues("title");
@@ -99,15 +110,21 @@ public class TrivySummaryApp implements ApplicationRunner {
 		{
 			title = inputValues.getFirst();
 		}
-/* 		else if (inputFiles.size() == 2)
+
+		List<String> intendedFailThresholdAsStrings = args.getOptionValues("failThreshold");
+		if (intendedFailThresholdAsStrings != null && intendedFailThresholdAsStrings.size() > 0)
 		{
-			title = String.format("Comparing %s with %s", inputFiles.get(0), inputFiles.get(1));
+			try {
+				failThreshold = VulnerabilitySeverity.valueOf(intendedFailThresholdAsStrings.getFirst());
+			}
+			catch (IllegalArgumentException e)
+			{
+				output("ERROR: unknown vulnerability severity %s. Must be one of LOW, MEDIUM, HIGH or CRITICAL.");
+				displayHelp();
+				this.exitCode = -1;
+				return;
+			}
 		}
-		else
-		{
-			title = String.format("Summary of %s", inputFiles.get(0));
-		}
-*/
 
 		TrivyScanHistory history = new TrivyScanHistory();
 		List<Path> paths = new ArrayList<>();
@@ -121,22 +138,40 @@ public class TrivySummaryApp implements ApplicationRunner {
 				output("ERROR: Could not read input file %s", filePath.toString());
 				output("");
 				displayHelp();
+				this.exitCode = -1;
+				return;
 			} catch (TrivyScanHistoryMustBeForSameArtefactType e) {
 				output("ERROR: %s", e.getMessage());
 				output("");
 				displayHelp();
+				this.exitCode = -1;
+				return;
 			}
 		}
 
 		try {
-			summariseTrivyHistory(title, history, outputFile);
+			boolean thereAreOutstandingVulnerabilitiesAboveThreshold = summariseTrivyHistory(title, history, outputFile, failThreshold);
+
+			if (thereAreOutstandingVulnerabilitiesAboveThreshold)
+			{
+				this.exitCode = -1;
+			}
 		} catch (IOException e) {
 			output("ERROR: Could not write output file %s", outputFile.toString());
 			output("");
 			displayHelp();
+			this.exitCode = -1;
+			return;
 		} catch (TrivyScanHistoryNotDeepEnoughException e) {
 			output("ERROR: System error - Trivy Scan History not deep enough - should never reach this");
+			this.exitCode = -1;
+			return;
 		}
+	}
+
+	@Override
+	public int getExitCode() {
+		return this.exitCode;
 	}
 
 	private void displayHelp()
@@ -171,18 +206,27 @@ public class TrivySummaryApp implements ApplicationRunner {
 		output("  --help");
 		output("    Displays this help message");
 		output("");
-		output("  --title");
+		output("  --title=...");
 		output("    Sets a report title. If unset, a default title is used containing");
 		output("    the input file path(s) provided");
 		output("");
-		output("  --outputFile");
+		output("  --outputFile=...");
 		output("    The required output file name. If the filename ends in .pdf then the");
 		output("    output is a PDF report. If not, a JSON format is used. Defaults to");
 		output("    \"trivysummary.pdf\" in the current working directory.");
+		output("");
+		output("  --failThreshold=...");
+		output("    The severity threshold at or above which any open vulnerabilities");
+		output("    will cause this app to return an error (returns -1, rather than 0).");
+		output("    Must be one of LOW, MEDIUM, HIGH or CRITICAL.");
+		output("    If unset, defaults to LOW, i.e. any vulnerability is a fail condition.");
 	}
 
-	private void summariseTrivyHistory(String title, TrivyScanHistory history, Path outputFile) throws IOException, TrivyScanHistoryNotDeepEnoughException
+	private boolean summariseTrivyHistory(String title, TrivyScanHistory history, Path outputFile, VulnerabilitySeverity severityFailThreshold) throws IOException, TrivyScanHistoryNotDeepEnoughException
 	{
+		TrivyOneScanSummary summary = null;
+		summary = history.getLatestScanSummary(title);
+
 		if (history.getScanHistory().size() == 2)
 		{
 			// We have some meaningful history
@@ -219,8 +263,6 @@ public class TrivySummaryApp implements ApplicationRunner {
 		if (history.getScanHistory().size() == 1)
 		{
 			// We have some meaningful history
-			TrivyOneScanSummary summary = null;
-			summary = history.getLatestScanSummary(title);
 
 			if (outputFile.toString().endsWith(".pdf"))
 			{
@@ -245,6 +287,18 @@ public class TrivySummaryApp implements ApplicationRunner {
 				Files.writeString(outputFile, mapper.writeValueAsString(summary));
 			}
 		}
+
+		// Now we look at the most recent scan results and examine the severity of open vulnerabilities, returning true if there are vulnerabilities above the fail threshold
+		for (VulnerabilitySeverity severity : VulnerabilitySeverity.values())
+		{
+			if (severity.ordinal() < severityFailThreshold.ordinal()) continue; // Below the threshold
+
+			Integer countVulns = summary.getOpenVulnerabilities().getCountOfVulnerabilitiesAtSeverity(severity);
+
+			if (countVulns != null && countVulns.intValue() > 0) return true;
+		}
+		// We've got this far, so we've no open vulnerabilities above the threshold.
+		return false;
 	}
 
 	private void addTrivyScanFileToHistory(TrivyScanHistory history, Path inputScan) throws IOException, TrivyScanHistoryMustBeForSameArtefactType
