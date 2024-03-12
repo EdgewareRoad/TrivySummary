@@ -11,4 +11,5 @@ It also can aid CI/CD pipelines by exiting with an error if there are open vulne
 ## Usage
 
 Requires Java Runtime Environment 17 or higher
+
 Run _bin/trivysummary_ with the _--help_ attribute to see full usage guidelines
