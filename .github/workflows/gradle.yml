@@ -27,7 +27,7 @@ jobs:
         keys: 'trivysummary.version'
     - name: Get the Read properties
       run: |
-        echo "version: ${{ steps.read-properties.outputs.trivysummary.version }}"
+        echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
     - name: Build with Gradle
       run: gradle distZip publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
     - name: release
@@ -36,7 +36,7 @@ jobs:
       with:
         draft: false
         prerelease: false
-        release_name: ${{ steps.read-properties.outputs.trivysummary.version }}
+        release_name: ${{ steps.read-properties.outputs.trivysummary_version }}
         tag_name: ${{ github.ref }}
         body_path: CHANGELOG.md
       env:
