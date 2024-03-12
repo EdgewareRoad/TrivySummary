@@ -1,5 +1,6 @@
 package com.fujitsu.edgewareroad.trivysummary;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.ExitCodeGenerator;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -46,6 +49,9 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		System.exit(SpringApplication.exit(SpringApplication.run(TrivySummaryApp.class, args)));
 	}
 
+	@Autowired
+	private TrivySummaryConfiguration config;
+
 	@Override
 	public void run(ApplicationArguments args) {
 		Path workingDirectory = Path.of(System.getProperty("user.dir"));
@@ -56,6 +62,12 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		if (args.containsOption("help"))
 		{
 			displayHelp();
+			return;
+		}
+
+		if (args.containsOption("version"))
+		{
+			output(config.getVersion());
 			return;
 		}
 
@@ -78,7 +90,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				this.exitCode = -1;
 				return;
 			}
-			outputFile = workingDirectory.resolve(inputValues.getFirst());
+			outputFile = workingDirectory.resolve(inputValues.iterator().next());
 			Path outputDir = outputFile.getParent();
 			if (!Files.isDirectory(outputDir) || !Files.isReadable(outputDir))
 			{
@@ -94,12 +106,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		if (inputFiles.size() == 0)
 		{
 			output("ERROR: no input files specified");
+			displayHelp();
 			this.exitCode = -1;
 			return;
 	}
 		if (inputFiles.size() > 2)
 		{
 			output("ERROR: too many input files specified");
+			displayHelp();
 			this.exitCode = -1;
 			return;
 	}
@@ -108,14 +122,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		List<String> inputValues = args.getOptionValues("title");
 		if (inputValues != null && inputValues.size() > 0)
 		{
-			title = inputValues.getFirst();
+			title = inputValues.iterator().next();
 		}
 
 		List<String> intendedFailThresholdAsStrings = args.getOptionValues("failThreshold");
 		if (intendedFailThresholdAsStrings != null && intendedFailThresholdAsStrings.size() > 0)
 		{
 			try {
-				failThreshold = VulnerabilitySeverity.valueOf(intendedFailThresholdAsStrings.getFirst());
+				failThreshold = VulnerabilitySeverity.valueOf(intendedFailThresholdAsStrings.iterator().next());
 			}
 			catch (IllegalArgumentException e)
 			{
@@ -176,8 +190,10 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 
 	private void displayHelp()
 	{
-		output("TrivySummary usage");
-		output("==================");
+		String title = String.format("TrivySummary %s", config.getVersion());
+		output(title);
+		// String of equals signs used to underline the above title
+		output(IntStream.range(0, title.length()).mapToObj(index -> "=").collect(Collectors.joining()));
 		output("");
 		output("Either:");
 		output("  trivysummary <trivyScanOutput>.json <args>");

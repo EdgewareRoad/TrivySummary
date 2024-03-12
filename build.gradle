@@ -8,7 +8,11 @@ plugins {
 }
 
 group = 'com.fujitsu.edgewareroad'
-version = '1.0.0'
+
+def appProps = new Properties()
+file("src/main/resources/application.properties").withInputStream { appProps.load(it) }
+
+version = appProps.getProperty("trivysummary.version")
 
 repositories {
 	mavenCentral()
