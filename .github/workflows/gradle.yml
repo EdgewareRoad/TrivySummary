@@ -18,28 +18,25 @@ jobs:
       with:
         java-version: 21
         distribution: corretto
-    - name: Build with Gradle
-      run: gradle distZip publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
     - name: Read/Write Properties File
       uses: kurt-code/gha-properties@v0.0.2
       id: read-properties
       with:
         operation: 'read'
-        file-path: 'path/to/properties/file'
+        file-path: 'src/main/resources/application.properties'
         keys: 'trivysummary.version'
     - name: Get the Read properties
       run: |
         echo "version: ${{ steps.read-properties.outputs.trivysummary.version }}"
-    - name: version
-      run: echo "::set-output name=version::$(./bin/trivysummary --version)"
-      id: version
+    - name: Build with Gradle
+      run: gradle distZip publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
     - name: release
       uses: actions/create-release@v1
       id: create_release
       with:
         draft: false
         prerelease: false
-        release_name: ${{ steps.version.outputs.version }}
+        release_name: ${{ steps.read-properties.outputs.trivysummary.version }}
         tag_name: ${{ github.ref }}
         body_path: CHANGELOG.md
       env:
