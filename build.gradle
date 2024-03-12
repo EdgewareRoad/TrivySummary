@@ -4,6 +4,7 @@ plugins {
 	id 'jvm-test-suite'
 	id 'org.springframework.boot' version '3.2.2'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'maven-publish'
 }
 
 group = 'com.fujitsu.edgewareroad'
@@ -13,12 +14,32 @@ repositories {
 	mavenCentral()
 }
 
+sourceSets {
+        main {
+                java {
+                        srcDirs= ["src/main/java"]
+                }
+                resources {
+                        srcDirs= ["src/main/resources"]
+                }
+        }
+        test {
+                java {
+                        srcDirs= ["src/test/java"]
+                }
+                resources {
+                        srcDirs= ["src/test/resources"]
+                }
+        }
+}
 
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
-	sourceCompatibility = '21'
+	// Note, building on Java 21 but Spring Boot 6 still allows JDK 17 compatibility, so allow for this.
+	sourceCompatibility = '17'
+	targetCompatibility = '17'
 }
 
 application {
@@ -41,7 +62,6 @@ dependencies {
 	implementation 'com.openhtmltopdf:openhtmltopdf-slf4j:1.0.10'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
 }
 
 jar {
@@ -58,10 +78,49 @@ jar {
 	from(configurations.runtimeClasspath.files.collect { it.isDirectory() ? it : zipTree(it) }) {}
 }
 
+//create a Jar of the sources
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+    archiveClassifier = "sources"
+}
+
 testing {
 	suites {
 		test {
 			useJUnitJupiter()
+		}
+	}
+}
+
+// Publishing the output to GitHub (standard JAR, sources plus POM file, distribution ZIP)
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId 'com.fujitsu.edgewareroad'
+			artifacts = [ jar, sourcesJar, distZip ]
+			pom {
+				name = 'trivysummary'
+				description = 'Reporting app to summarise Trivy JSON output, either for single scans or to compare two scans. Also useful in CI/CD pipelines to auto-fail if vulnerabilities above a stated severity are in a component'
+			}
+			pom.withXml {
+			    def dependenciesNode = asNode().appendNode('dependencies')
+			    configurations.implementation.allDependencies.each {
+			        def dependencyNode = dependenciesNode.appendNode('dependency')
+			        dependencyNode.appendNode('groupId', "com.fujitsu.edgewareroad")
+			        dependencyNode.appendNode('artifactId', "trivysummary")
+			        dependencyNode.appendNode('version', it.version)
+			    }
+			}
+		}
+	}
+	repositories {
+		maven {
+			name = 'GitHubPackages'
+			credentials {
+				username = project.findProperty("mvnpub.user") ?: System.getenv("USERNAME")
+				password = project.findProperty("mvnpub.key") ?: System.getenv("PASSWORD")
+			}
+			url = uri('https://maven.pkg.github.com/EdgewareRoad/TrivySummary')
 		}
 	}
 }

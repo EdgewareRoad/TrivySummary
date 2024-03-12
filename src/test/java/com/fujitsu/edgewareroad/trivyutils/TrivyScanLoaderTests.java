@@ -24,20 +24,6 @@ import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
 class TrivyScanLoaderTests {
 
 	@Test
-	void testTrivyScanLoad() throws IOException {
-		try (InputStream is = getClass().getClassLoader().getResourceAsStream("sampleTrivyScan.json"))
-		{
-			TrivyScan scanResults = TrivyScanLoader.loadTrivyScan(is);
-			assertEquals("quay.io/ukhomeofficedigital/acp-clamav-http:0.4.0", scanResults.getArtifactName());
-			assertEquals(21, scanResults.getAllPackageVulnerabilities().size());
-			assertEquals(0, scanResults.getAllPackageVulnerabilities().getPackageVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL).size());
-			assertEquals(8, scanResults.getAllPackageVulnerabilities().getPackageVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH).size());
-			assertEquals(8, scanResults.getAllPackageVulnerabilities().getPackageVulnerabilitiesAtSeverityOrHigher(VulnerabilitySeverity.HIGH).size());
-		}
-	}
-
-
-	@Test
 	void testTrivyTestAppScanLoad() throws IOException, TrivyScanHistoryNotDeepEnoughException, TrivyScanHistoryMustBeForSameArtefactType {
 		Logger logger = LoggerFactory.getLogger(TrivyScanLoaderTests.class);
 

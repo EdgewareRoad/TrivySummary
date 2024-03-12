@@ -8,10 +8,8 @@ The tool has a number of options to aid reporting.
 
 It also can aid CI/CD pipelines by exiting with an error if there are open vulnerabilities at that severity or above (e.g. fail if at least one CRITICAL or HIGH vulnerability has been found)
 
+## Usage
 
-### TODO
-
-* Copy GitHub versioning and publishing aspects from PDFRepair to this project
-* Complete publication on GitHub including auto-build and releases
+Requires JDK 21 or higher
 
 
