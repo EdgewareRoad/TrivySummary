@@ -15,5 +15,6 @@ jobs:
       uses: actions/setup-java@v4.1.0
       with:
         java-version: 21
+        distribution: corretto
     - name: Build with Gradle
       run: gradle distZip publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
