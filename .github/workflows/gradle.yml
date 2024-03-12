@@ -2,6 +2,8 @@ name: Java CI
 
 on:
   push:
+    tags:
+      - '*'
   workflow_dispatch:
 
 jobs:
@@ -18,3 +20,17 @@ jobs:
         distribution: corretto
     - name: Build with Gradle
       run: gradle distZip publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
+    - name: version
+      run: echo "::set-output name=version::$(./bin/trivysummary --version)"
+      id: version
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ steps.version.outputs.version }}
+        tag_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ github.token }}      
