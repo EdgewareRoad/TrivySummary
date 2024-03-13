@@ -28,4 +28,13 @@ jobs:
         echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
     - name: Build with Gradle
       run: gradle distZip publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
- 
+    - name: "Create Release"
+      id: create_release
+      uses: softprops/action-gh-release@v2.0.2
+      if: startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version)
+      with:
+        tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
+        name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
+        body_path: CHANGELOG.txt
+        token: ${{ secrets.MAVENREPO_TOKEN }}
+        files: TrivySummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
