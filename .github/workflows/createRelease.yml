@@ -25,7 +25,7 @@ jobs:
       uses: softprops/action-gh-release@v2.0.2
       with:
         tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
-        release_name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
+        name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
         body: |
           The first release
         draft: false
