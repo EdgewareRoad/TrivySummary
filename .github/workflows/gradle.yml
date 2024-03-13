@@ -26,6 +26,7 @@ jobs:
     - name: Get the Read properties
       run: |
         echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
+        echo "github.ref: ${{ github.ref }}"
     - name: Build with Gradle
       run: gradle distZip --warning-mode all
     - name: Publish with Gradle
