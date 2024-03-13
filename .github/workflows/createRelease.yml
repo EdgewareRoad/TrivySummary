@@ -22,7 +22,7 @@ jobs:
           echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
     - name: "Create Release"
       id: create_release
-      uses: softprops/action-gh-release@latest
+      uses: softprops/action-gh-release@v2.0.2
       with:
         tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
         release_name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
