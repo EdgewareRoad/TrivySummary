@@ -28,29 +28,25 @@ For scan dates, this application uses the createdAt property added by later vers
 
 Arguments:
 ```
-	--help
-	    Displays this help message
+--help
+    Displays this help message
 
-	--title=...
-	    Sets a report title. If unset, a default title is used containing
-	    the input file path(s) provided
+--title=...
+    Sets a report title. If unset, a default title is used containing the input file path(s) provided
 	  
-    --outputFile=...
-	    The required output file name. If the filename ends in .pdf then the
-	    output is a PDF report. If not, a JSON format is used. Defaults to
-	    "trivysummary.pdf" in the current working directory.
+--outputFile=...
+    The required output file name. If the filename ends in .pdf then the output is a PDF report.
+    If not, a JSON format is used. Defaults to   "trivysummary.pdf" in the current working directory.
 
-    --failThreshold=...
-        The severity threshold at or above which any open vulnerabilities
-        will cause this app to return an error (returns -1, rather than 0).
-        Must be one of LOW, MEDIUM, HIGH or CRITICAL.
-        If unset, defaults to LOW, i.e. any vulnerability is a fail condition.
+--failThreshold=...
+    The severity threshold at or above which any open vulnerabilities will cause this app to return
+    an error (returns -1, rather than 0).  Must be one of LOW, MEDIUM, HIGH or CRITICAL.
+    If unset, defaults to LOW, i.e. any vulnerability is a fail condition.
 
-    --whitelist=...
-        If set, one or more files in JSON format listing CVEs which should be
-        whitelisted in the output.
-        You can specify this argument more than once if you need to input
-        multiple whitelists (e.g. if managing separate whitelists for your
-        code vs. those for base images from other suppliers)
-        For sample JSON to whitelist [see here](src/test/resources/sampleWhitelist1.json)
+--whitelist=...
+    If set, one or more files in JSON format listing CVEs which should be whitelisted in the output.
+    You can specify this argument more than once if you need to input multiple whitelists
+    (e.g. if managing separate whitelists for your code vs. those for base images from other suppliers)
 ```
+For sample JSON to whitelist [see here](src/test/resources/sampleWhitelist1.json)
+
