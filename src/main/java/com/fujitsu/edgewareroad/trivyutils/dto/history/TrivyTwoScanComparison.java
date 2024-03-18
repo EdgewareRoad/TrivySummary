@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
 public class TrivyTwoScanComparison {
     private String title;
@@ -15,6 +16,7 @@ public class TrivyTwoScanComparison {
     private Date toScanDate;
     private TrivyScanVulnerabilitySummary vulnerabilitiesOpen;
     private TrivyScanVulnerabilitySummary vulnerabilitiesClosed;
+    private TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted;
 
     public TrivyTwoScanComparison(
         String title,
@@ -24,7 +26,8 @@ public class TrivyTwoScanComparison {
         Date fromScanDate,
         Date toScanDate,
         TrivyScanVulnerabilitySummary vulnerabilitiesOpen,
-        TrivyScanVulnerabilitySummary vulnerabilitiesClosed) {
+        TrivyScanVulnerabilitySummary vulnerabilitiesClosed,
+        TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted) {
 
         if (title == null)
         {
@@ -47,6 +50,7 @@ public class TrivyTwoScanComparison {
         this.toScanDate = toScanDate;
         this.vulnerabilitiesOpen = vulnerabilitiesOpen;
         this.vulnerabilitiesClosed = vulnerabilitiesClosed;
+        this.vulnerabilitiesWhitelisted = vulnerabilitiesWhitelisted;
     }
 
     public String getTitle() {
@@ -84,5 +88,9 @@ public class TrivyTwoScanComparison {
 
     public TrivyScanVulnerabilitySummary getClosedVulnerabilities() {
         return vulnerabilitiesClosed;
+    }
+
+    public TrivyScanWhitelistedVulnerabilities getWhitelistedVulnerabilities() {
+        return vulnerabilitiesWhitelisted;
     }
 }

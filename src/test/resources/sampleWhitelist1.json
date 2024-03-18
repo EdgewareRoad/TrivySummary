@@ -1,0 +1,14 @@
+[
+    {
+        "vulnerabilityID": "CVE-2022-00001",
+        "reason": "This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.",
+        "nextReviewDate": "2024-06-13"
+    },
+    {
+        "vulnerabilityID": "CVE-2022-00002",
+        "reason": "Bob said it was OK.",
+        "nextReviewDate": "2024-07-13",
+        "approvalDate": "2024-03-14",
+        "approvedBy": "Bob"
+    }
+]

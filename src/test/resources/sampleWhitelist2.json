@@ -1,0 +1,7 @@
+[
+    {
+        "vulnerabilityID": "CVE-2022-00003",
+        "reason": "The application depending upon this component does not enable the feature which exposes the vulnerability.",
+        "nextReviewDate": "2024-03-13"
+    }
+]

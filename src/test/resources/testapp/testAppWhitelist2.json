@@ -1,0 +1,9 @@
+[
+    {
+        "vulnerabilityID": "CVE-2023-2602",
+        "reason": "Test entry in separate whitelisting file. This reason is also considerably longer than other justification texts just to validate formatting of the output.",
+        "nextReviewDate": "2035-03-18",
+        "approvalDate": "2024-03-18",
+        "approvedBy": "Fujitsu"
+    }
+]

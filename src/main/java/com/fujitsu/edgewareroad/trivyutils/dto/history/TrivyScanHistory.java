@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
+import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
 public class TrivyScanHistory {
     @JsonProperty("scanHistory")
@@ -16,6 +18,9 @@ public class TrivyScanHistory {
 
     @JsonProperty
     private boolean historyMayNotBeForSameArtefact = false;
+
+    @JsonProperty
+    private WhitelistEntries whitelistEntries = new WhitelistEntries();
 
     public TrivyScanHistory()
     {
@@ -98,10 +103,12 @@ public class TrivyScanHistory {
 
         TrivyScan trivyScanTo = scanHistory.lastEntry().getValue();
 
+        TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities = new TrivyScanWhitelistedVulnerabilities();
         TrivyScanVulnerabilities lastVulnerabilities = trivyScanTo.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
+        lastVulnerabilities  = whitelistedVulnerabilities.filterWhitelistedVulnerabilities(lastVulnerabilities, whitelistEntries);
 
         return new TrivyOneScanSummary(title, trivyScanTo.getArtifactName(), trivyScanTo.getArtifactType(), trivyScanTo.getCreatedAt(),
-            new TrivyScanVulnerabilitySummary(lastVulnerabilities));
+            new TrivyScanVulnerabilitySummary(lastVulnerabilities), whitelistedVulnerabilities);
     }
 
     public TrivyTwoScanComparison compareLatestScanWithPrevious(String title) throws TrivyScanHistoryNotDeepEnoughException
@@ -120,23 +127,26 @@ public class TrivyScanHistory {
         TrivyScan trivyScanFrom = scanHistory.lowerEntry(scanHistory.lastKey()).getValue();
         TrivyScan trivyScanTo = scanHistory.lastEntry().getValue();
 
+        TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities = new TrivyScanWhitelistedVulnerabilities();
         TrivyScanVulnerabilities lastVulnerabilities = trivyScanTo.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
         TrivyScanVulnerabilities previousVulnerabilities = trivyScanFrom.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
 
         // Get the list of new vulnerabilities introduced since the previous scan
         TrivyScanVulnerabilities newVulnerabilities = new TrivyScanVulnerabilities(lastVulnerabilities);
         newVulnerabilities.removeAll(previousVulnerabilities);
+        newVulnerabilities = whitelistedVulnerabilities.filterWhitelistedVulnerabilities(newVulnerabilities, whitelistEntries);
 
         // Get the list of unfixed vulnerabilities
         TrivyScanVulnerabilities unfixedVulnerabilities = new TrivyScanVulnerabilities(lastVulnerabilities);
         unfixedVulnerabilities.retainAll(previousVulnerabilities);
+        unfixedVulnerabilities = whitelistedVulnerabilities.filterWhitelistedVulnerabilities(unfixedVulnerabilities, whitelistEntries);
 
         // Get the list of fixed vulnerabilities
         TrivyScanVulnerabilities fixedVulnerabilities = new TrivyScanVulnerabilities(previousVulnerabilities);
         fixedVulnerabilities.removeAll(lastVulnerabilities);
 
         return new TrivyTwoScanComparison(title, getArtefactNames(), getArtefactType(), historyMayNotBeForSameArtefact, trivyScanFrom.getCreatedAt(), trivyScanTo.getCreatedAt(),
-            new TrivyScanVulnerabilitySummary(newVulnerabilities, unfixedVulnerabilities), new TrivyScanVulnerabilitySummary(fixedVulnerabilities));
+            new TrivyScanVulnerabilitySummary(newVulnerabilities, unfixedVulnerabilities), new TrivyScanVulnerabilitySummary(fixedVulnerabilities), whitelistedVulnerabilities);
     }
 
     public TreeMap<LocalDate, TrivyScan> getScanHistory() {
@@ -145,5 +155,9 @@ public class TrivyScanHistory {
 
     protected void setScanHistory(TreeMap<LocalDate, TrivyScan> scanHistory) {
         this.scanHistory = scanHistory;
+    }
+
+    public WhitelistEntries getWhitelistEntries() {
+        return whitelistEntries;
     }
 }

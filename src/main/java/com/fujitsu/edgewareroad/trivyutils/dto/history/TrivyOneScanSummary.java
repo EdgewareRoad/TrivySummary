@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
 public class TrivyOneScanSummary {
     private String title;
@@ -11,13 +12,15 @@ public class TrivyOneScanSummary {
     private String artefactType;
     private Date scanDate;
     private TrivyScanVulnerabilitySummary vulnerabilitiesOpen;
+    private TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted;
 
     public TrivyOneScanSummary(
         String title,
         String artefactName,
         String artefactType,
         Date scanDate,
-        TrivyScanVulnerabilitySummary vulnerabilitiesOpen) {
+        TrivyScanVulnerabilitySummary vulnerabilitiesOpen,
+        TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted) {
 
         if (title == null)
         {
@@ -30,6 +33,7 @@ public class TrivyOneScanSummary {
         this.artefactType = artefactType;
         this.scanDate = scanDate;
         this.vulnerabilitiesOpen = vulnerabilitiesOpen;
+        this.vulnerabilitiesWhitelisted = vulnerabilitiesWhitelisted;
     }
 
     public String getTitle() {
@@ -50,5 +54,9 @@ public class TrivyOneScanSummary {
 
     public TrivyScanVulnerabilitySummary getOpenVulnerabilities() {
         return vulnerabilitiesOpen;
+    }
+
+    public TrivyScanWhitelistedVulnerabilities getWhitelistedVulnerabilities() {
+        return vulnerabilitiesWhitelisted;
     }
 }

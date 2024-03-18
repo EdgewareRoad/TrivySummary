@@ -124,6 +124,63 @@ thead.subTableHeader tr th {
     vertical-align: text-top;
 }
   
+table.whitelistTableVulnerabilities {
+    table-layout: fixed;
+    width: 90%;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+thead.whitelistTableHeader tr th:nth-child(1)
+{
+    width: 15%;
+}
+
+thead.whitelistTableHeader tr th:nth-child(2)
+{
+    width: 15%;
+}
+
+thead.whitelistTableHeader tr th:nth-child(3)
+{
+    width: 20%;
+}
+
+thead.whitelistTableHeader tr th:nth-child(4)
+{
+    width: 20%;
+}
+
+thead.whitelistTableHeader tr th:nth-child(5)
+{
+    width: 15%;
+}
+
+thead.whitelistTableHeader tr th:nth-child(6)
+{
+    width: 15%;
+}
+
+thead.whitelistTableHeader {
+    background-color: #8d8d8d;
+    color: white;
+}
+
+thead.whitelistTableHeader tr th {
+    padding: 0.5em;
+    font-size: 1.2em;
+    page-break-inside: avoid;
+}
+  
+tbody.whitelistTableBody tr.whitelistTableBodyRow:nth-child(even) {
+    background-color: #bbbbbb;
+}
+
+tbody.whitelistTableBody tr.whitelistTableBodyRow:nth-child(odd) {
+    background-color: #dddddd;
+}
+
 td {
     padding: 0.5em;
     font-weight: 100;

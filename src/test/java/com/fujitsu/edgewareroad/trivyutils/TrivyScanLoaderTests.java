@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
@@ -20,7 +19,6 @@ import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitie
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerability;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
 
-@SpringBootTest
 class TrivyScanLoaderTests {
 
 	@Test

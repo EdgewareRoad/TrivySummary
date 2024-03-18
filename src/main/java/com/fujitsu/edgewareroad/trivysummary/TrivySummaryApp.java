@@ -8,8 +8,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fujitsu.edgewareroad.trivyutils.RenderToPDF;
 import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyOneScanSummary;
@@ -19,6 +22,7 @@ import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivySca
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
+import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.util.XRLog;
 
@@ -28,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -109,14 +114,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			displayHelp();
 			this.exitCode = -1;
 			return;
-	}
+		}
 		if (inputFiles.size() > 2)
 		{
 			output("ERROR: too many input files specified");
 			displayHelp();
 			this.exitCode = -1;
 			return;
-	}
+		}
 
 		String title = null;
 		List<String> inputValues = args.getOptionValues("title");
@@ -141,6 +146,29 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		}
 
 		TrivyScanHistory history = new TrivyScanHistory();
+		List<String> whitelistFileNames = args.getOptionValues("whitelist");
+		if (whitelistFileNames != null && whitelistFileNames.size() > 0)
+		{
+			// We must create our whitelist
+			for (String whiteListFileName : whitelistFileNames)
+			{
+				Path whiteListFilePath = workingDirectory.resolve(whiteListFileName);
+
+				ObjectMapper mapper = new ObjectMapper();
+		        mapper.registerModule(new JavaTimeModule());
+	            try {
+					WhitelistEntries newEntries = mapper.readValue(whiteListFilePath.toFile(), WhitelistEntries.class);
+					history.getWhitelistEntries().addAll(newEntries);
+				} catch (StreamReadException e) {
+					output("ERROR: JSON Parsing exception for whitelist file %s: %s", whiteListFilePath.toString(), e.getMessage());
+				} catch (DatabindException e) {
+					output("ERROR: JSON Mapping exception for whitelist file %s: %s", whiteListFilePath.toString(), e.getMessage());
+				} catch (IOException e) {
+					output("ERROR: File IO exception for whitelist file %s", whiteListFilePath.toString());
+				}
+			}
+		}
+
 		List<Path> paths = new ArrayList<>();
 		for (String inputFileName : inputFiles) {
 			Path filePath = workingDirectory.resolve(inputFileName);
@@ -236,6 +264,11 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		output("    will cause this app to return an error (returns -1, rather than 0).");
 		output("    Must be one of LOW, MEDIUM, HIGH or CRITICAL.");
 		output("    If unset, defaults to LOW, i.e. any vulnerability is a fail condition.");
+		output("");
+		output("  --whitelist=...");
+		output("    If set, one or more files in JSON format listing CVEs which should be");
+		output("    whitelisted in the output. You can specify this argument multiple times");
+		output("    if you wish to load multiple whitelists");
 	}
 
 	private boolean summariseTrivyHistory(String title, TrivyScanHistory history, Path outputFile, VulnerabilitySeverity severityFailThreshold) throws IOException, TrivyScanHistoryNotDeepEnoughException
@@ -261,6 +294,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("toDate", comparison.getToScanDate());
 				variables.put("openVulnerabilities", comparison.getOpenVulnerabilities());
 				variables.put("closedVulnerabilities", comparison.getClosedVulnerabilities());
+				variables.put("whitelistedVulnerabilities", comparison.getWhitelistedVulnerabilities());
 
 				new RenderToPDF().renderToPDF(variables, "compareTrivyScans", outputFile);
 			}
@@ -288,6 +322,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("artefactType", summary.getArtefactType());
 				variables.put("scanDate", summary.getScanDate());
 				variables.put("openVulnerabilities", summary.getOpenVulnerabilities());
+				variables.put("whitelistedVulnerabilities", summary.getWhitelistedVulnerabilities());
 
 				new RenderToPDF().renderToPDF(variables, "summariseTrivyScan", outputFile);
 			}

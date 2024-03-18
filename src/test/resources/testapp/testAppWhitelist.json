@@ -1,0 +1,21 @@
+[
+    {
+        "vulnerabilityID": "CVE-2023-38546",
+        "reason": "Test whitelist with full approval and future review date.",
+        "nextReviewDate": "2035-03-18",
+        "approvalDate": "2024-03-18",
+        "approvedBy": "Fujitsu"
+    },
+    {
+        "vulnerabilityID": "CVE-2022-0158",
+        "reason": "Test whitelist with no approval and review overdue.",
+        "nextReviewDate": "2022-03-18"
+    },
+    {
+        "vulnerabilityID": "CVE-2015-8390",
+        "reason": "Test whitelist with review date in the future, but so is the approval date.",
+        "nextReviewDate": "2035-03-18",
+        "approvalDate": "2035-03-18",
+        "approvedBy": "Fujitsu"
+    }
+]
