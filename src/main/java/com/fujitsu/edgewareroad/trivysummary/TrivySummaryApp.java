@@ -295,6 +295,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("openVulnerabilities", comparison.getOpenVulnerabilities());
 				variables.put("closedVulnerabilities", comparison.getClosedVulnerabilities());
 				variables.put("whitelistedVulnerabilities", comparison.getWhitelistedVulnerabilities());
+				variables.put("trivySummaryVersion", config.getVersion());
 
 				new RenderToPDF().renderToPDF(variables, "compareTrivyScans", outputFile);
 			}
@@ -323,6 +324,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("scanDate", summary.getScanDate());
 				variables.put("openVulnerabilities", summary.getOpenVulnerabilities());
 				variables.put("whitelistedVulnerabilities", summary.getWhitelistedVulnerabilities());
+				variables.put("trivySummaryVersion", config.getVersion());
 
 				new RenderToPDF().renderToPDF(variables, "summariseTrivyScan", outputFile);
 			}

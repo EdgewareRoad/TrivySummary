@@ -1,4 +1,2 @@
-Full whitelisting support (see README.md)
-
-Documentation update.
+Added TrivySummary version and link into the PDF output file footer
 
