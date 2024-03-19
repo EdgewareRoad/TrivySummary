@@ -27,4 +27,22 @@ public class TrivyScanWhitelistedVulnerabilities extends TreeSet<TrivyScanWhitel
         }
         return filteredVulnerabilities;
     }
+
+    public boolean hasUnapprovedEntries()
+    {
+        for (TrivyScanWhitelistedVulnerability whitelisting : this)
+        {
+            if (!whitelisting.isApproved()) return true;
+        }
+        return false;
+    }
+
+    public boolean hasEntriesRequiringReview()
+    {
+        for (TrivyScanWhitelistedVulnerability whitelisting : this)
+        {
+            if (whitelisting.requiresReview()) return true;
+        }
+        return false;
+    }
 }

@@ -1,2 +1,4 @@
-The first release.
+Full whitelisting support (see README.md)
+
+Documentation update.
 
