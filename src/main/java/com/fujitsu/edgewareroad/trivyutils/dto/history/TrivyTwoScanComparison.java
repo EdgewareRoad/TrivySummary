@@ -34,7 +34,16 @@ public class TrivyTwoScanComparison {
             if (artefactNames.size() >= 2)
             {
                 DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM);
-                title = String.format("Artefacts %s - %s of type %s, between %s and %s", artefactNames.get(0), artefactNames.get(1), artefactType, format.format(fromScanDate), format.format(toScanDate));
+                if (artefactNames.get(0).equals(artefactNames.get(1)))
+                {
+                    // We're comparing the same artefact on different dates
+                    title = String.format("Comparing scans of %s (%s to %s) of type %s", artefactNames.get(0), format.format(fromScanDate), format.format(toScanDate), artefactType);
+                }
+                else
+                {
+                    // We're comparing scans of different artefacts (expected to be different versions of the same logical component)
+                    title = String.format("Comparing %s (scan %s) with %s (scan %s) of type %s", artefactNames.get(0), format.format(fromScanDate), artefactNames.get(1), format.format(toScanDate), artefactType);
+                }
             }
             else
             {

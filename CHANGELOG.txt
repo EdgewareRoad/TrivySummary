@@ -1,2 +1,1 @@
-Added TrivySummary version and link into the PDF output file footer
-
+Improved the appearance of comparing two Trivy scans of the same exact artefact
