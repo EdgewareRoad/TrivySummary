@@ -1,1 +1,5 @@
-Improved the appearance of comparing two Trivy scans of the same exact artefact
+Formatting improvements.
+
+Now will hyphenate very long words properly, avoiding table overflow
+Tries to avoid wrapping of the CVE title where possible (but will wrap for very long IDs we've not seen yet)
+Closed vulnerabilities now in a much compressed format as there's no need to list the affected packages. Can save a huge amount of space.

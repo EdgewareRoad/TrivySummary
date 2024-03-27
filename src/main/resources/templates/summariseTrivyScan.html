@@ -66,7 +66,7 @@
                 <td th:if="${vulnerability.severity.name()} == 'HIGH'" class="vulnSevHigh">HIGH</td>
                 <td th:if="${vulnerability.severity.name()} == 'CRITICAL'" class="vulnSevCritical">CRITICAL</td>
                 <td th:if="${vulnerability.severity.name()} == 'UNKNOWN'" class="vulnSevCritical">UNKNOWN</td>
-                <td><span th:text="${vulnerability.title}">This is the vulnerability title</span></td>
+                <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
                 <td>
                     <table class="subTablePackageVulnerabilities">
                         <thead class="subTableHeader" >
@@ -78,7 +78,7 @@
                         </thead>
                         <tbody class="subTableBody" >
                             <tr th:each="packageVuln : ${vulnerability.packageVulnerabilities}">
-                                <td><span th:text="${packageVuln.pkgName}">ABCD123</span></td>
+                                <td><span th:text="${stringUtils.getHyphenated(packageVuln.pkgName)}">ABCD123</span></td>
                                 <td><span th:text="${packageVuln.installedVersion}">vXXXX</span></td>
                                 <td><span th:text="${packageVuln.fixedVersion}">vYYYY</span></td>
                             </tr>
@@ -114,12 +114,12 @@
                 <td th:if="${vulnerability.severity.name()} == 'HIGH'" class="vulnSevHigh">HIGH</td>
                 <td th:if="${vulnerability.severity.name()} == 'CRITICAL'" class="vulnSevCritical">CRITICAL</td>
                 <td th:if="${vulnerability.severity.name()} == 'UNKNOWN'" class="vulnSevCritical">UNKNOWN</td>
-                <td><span th:text="${vulnerability.title}">This is the vulnerability title</span></td>
-                <td><span th:text="${vulnerability.whitelistingReason}">This is the whitelisting justification</span></td>
+                <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
+                <td><span th:text="${stringUtils.getHyphenated(vulnerability.whitelistingReason)}">This is the whitelisting justification</span></td>
                 <td th:if="${vulnerability.requiresReview()}"><b>OVERDUE</b></td>
                 <td th:if="${!vulnerability.requiresReview()}"><span th:text="${vulnerability.nextReviewDate}">Review date</span></td>
                 <td th:if="${!vulnerability.isApproved()}"><b>REQUIRES APPROVAL</b></td>
-                <td th:if="${vulnerability.isApproved()}"><span th:text="${vulnerability.approvedBy}">Approver</span><br/><span th:text="${vulnerability.approvalDate}">Approval date</span></td>
+                <td th:if="${vulnerability.isApproved()}"><span th:text="${stringUtils.getHyphenated(vulnerability.approvedBy)}">Approver</span><br/><span th:text="${vulnerability.approvalDate}">Approval date</span></td>
             </tr>
         </tbody>
     </table>

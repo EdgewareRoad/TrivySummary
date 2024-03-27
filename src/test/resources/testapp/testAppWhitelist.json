@@ -1,7 +1,7 @@
 [
     {
         "vulnerabilityID": "CVE-2023-38546",
-        "reason": "Test whitelist with full approval and future review date.",
+        "reason": "Test whitelist with full approval and future review date. Thereisalsoaverylongwordinheretotestthehyphenationandwordwrap.",
         "nextReviewDate": "2035-03-18",
         "approvalDate": "2024-03-18",
         "approvedBy": "Fujitsu"

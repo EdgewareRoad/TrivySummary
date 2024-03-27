@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fujitsu.edgewareroad.trivyutils.RenderToPDF;
 import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
+import com.fujitsu.edgewareroad.trivyutils.TrivySummaryStringUtils;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyOneScanSummary;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
@@ -296,6 +297,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("closedVulnerabilities", comparison.getClosedVulnerabilities());
 				variables.put("whitelistedVulnerabilities", comparison.getWhitelistedVulnerabilities());
 				variables.put("trivySummaryVersion", config.getVersion());
+				variables.put("stringUtils", new TrivySummaryStringUtils());
 
 				new RenderToPDF().renderToPDF(variables, "compareTrivyScans", outputFile);
 			}
@@ -325,6 +327,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("openVulnerabilities", summary.getOpenVulnerabilities());
 				variables.put("whitelistedVulnerabilities", summary.getWhitelistedVulnerabilities());
 				variables.put("trivySummaryVersion", config.getVersion());
+				variables.put("stringUtils", new TrivySummaryStringUtils());
 
 				new RenderToPDF().renderToPDF(variables, "summariseTrivyScan", outputFile);
 			}
