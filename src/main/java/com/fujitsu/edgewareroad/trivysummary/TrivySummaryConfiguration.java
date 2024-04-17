@@ -10,7 +10,17 @@ public class TrivySummaryConfiguration {
     @Value("${trivysummary.version}")
     private String version;
 
+    private int lpssMode = 1;
+
     public String getVersion() {
         return version;
+    }
+
+    public int getLPSSMode() {
+        return lpssMode;
+    }
+
+    protected void setLPSSMode(int value) {
+        lpssMode = value;
     }
 }

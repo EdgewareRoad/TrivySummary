@@ -2,9 +2,13 @@ package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan;
 
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.HashSet;
 
-public class TrivyScanVulnerabilities extends TreeSet<TrivyScanVulnerability> {
-    protected TrivyScanVulnerabilities()
+import com.fujitsu.edgewareroad.trivyutils.dto.VulnerabilityScorePriorityThresholds;
+
+public class TrivyScanVulnerabilities extends HashSet<TrivyScanVulnerability> {
+
+    public TrivyScanVulnerabilities()
     {
         super();
     }
@@ -50,17 +54,27 @@ public class TrivyScanVulnerabilities extends TreeSet<TrivyScanVulnerability> {
         }
     }
 
+    public void prioritiseForRemediation(VulnerabilityScorePriorityThresholds priorityThresholds)
+    {
+        for (TrivyScanVulnerability vulnerability : this)
+        {
+            vulnerability.prioritiseForRemediation(priorityThresholds);
+        }
+    }
+
     /**
      * Gets vulnerabilities filtered by chosen severity
+     * @param severity The target severity to filter by
+     * @param priorityFilter Optional priority filter. If true, returns only those vulnerabilities marked as priority for remediation; if false, returns only those which are not. If null, no priority filter is applied
      * @return Vulnerabilities at the chosen severity
      */
-    public TrivyScanVulnerabilities getVulnerabilitiesAtSeverity(VulnerabilitySeverity severity)
+    public TrivyScanVulnerabilities getVulnerabilitiesAtSeverity(VulnerabilitySeverity severity, Boolean priorityFilter)
     {
         TrivyScanVulnerabilities vulnerabilitiesToReturn = new TrivyScanVulnerabilities();
 
         for(TrivyScanVulnerability vulnerability : this)
         {
-            if (vulnerability.getSeverity().equals(severity))
+            if (vulnerability.getSeverity().equals(severity) && (priorityFilter == null || vulnerability.getIsPriorityForRemediation() == priorityFilter.booleanValue()))
             {
                 vulnerabilitiesToReturn.add(vulnerability);
             }
@@ -86,5 +100,15 @@ public class TrivyScanVulnerabilities extends TreeSet<TrivyScanVulnerability> {
         }
 
         return vulnerabilitiesToReturn;
+    }
+
+    public TreeSet<TrivyScanVulnerability> getSorted()
+    {
+        TreeSet<TrivyScanVulnerability> sortedSet = new TreeSet<>();
+        for(TrivyScanVulnerability vuln : this)
+        {
+            sortedSet.add(new TrivyScanVulnerability(vuln));
+        }
+        return sortedSet;
     }
 }

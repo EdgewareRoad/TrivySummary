@@ -1,5 +1,10 @@
 package com.fujitsu.edgewareroad.trivysummary;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,15 +18,21 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fujitsu.edgewareroad.trivyutils.GenerateGraph;
 import com.fujitsu.edgewareroad.trivyutils.RenderToPDF;
 import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
 import com.fujitsu.edgewareroad.trivyutils.TrivySummaryStringUtils;
+import com.fujitsu.edgewareroad.trivyutils.dto.VulnerabilityScorePriorityThresholds;
+import com.fujitsu.edgewareroad.trivyutils.dto.firstapiv1.EPSSData;
+import com.fujitsu.edgewareroad.trivyutils.dto.firstapiv1.EPSSResponse;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyOneScanSummary;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerability;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 import com.openhtmltopdf.slf4j.Slf4jLogger;
@@ -58,12 +69,16 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 	@Autowired
 	private TrivySummaryConfiguration config;
 
+    private static HttpClient client = HttpClient.newHttpClient();
+	private boolean offlineMode = false;
+
 	@Override
 	public void run(ApplicationArguments args) {
 		Path workingDirectory = Path.of(System.getProperty("user.dir"));
 		Path outputFile = Paths.get(System.getProperty("user.dir"), "output.json");
+		Double minimumCVSSToPrioritise = null, minimumEPSSToPrioritise = null;
 
-		VulnerabilitySeverity failThreshold = VulnerabilitySeverity.LOW;
+		VulnerabilitySeverity failSeverityThreshold = null;
 
 		if (args.containsOption("help"))
 		{
@@ -74,6 +89,12 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		if (args.containsOption("version"))
 		{
 			output(config.getVersion());
+			return;
+		}
+
+		if (args.containsOption("offline"))
+		{
+			offlineMode = true;
 			return;
 		}
 
@@ -108,6 +129,64 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			}
 		}
 
+		if (args.containsOption("minimumCVSSToPrioritise"))
+		{
+			List<String> inputValues = args.getOptionValues("minimumCVSSToPrioritise");
+			if (inputValues.size() > 1)
+			{
+				output("ERROR: minimumCVSSToPrioritise option specified multiple times. Only one value is permitted");
+				output("");
+				displayHelp();
+				this.exitCode = -1;
+				return;
+			}
+			if (inputValues.size() == 1)
+			{
+				try {
+					minimumCVSSToPrioritise = Double.parseDouble(inputValues.iterator().next());
+					if (minimumCVSSToPrioritise < 0.0d || minimumCVSSToPrioritise > 10.0d) throw new IllegalArgumentException();
+				}
+				catch(Exception e)
+				{
+					// Wasn't a valid string
+					output("ERROR: minimumCVSSToPrioritise value was not a valid decimal number between 0 and 10.");
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+			}
+		}
+
+		if (args.containsOption("minimumEPSSToPrioritise"))
+		{
+			List<String> inputValues = args.getOptionValues("minimumEPSSToPrioritise");
+			if (inputValues.size() > 1)
+			{
+				output("ERROR: minimumEPSSToPrioritise option specified multiple times. Only one value is permitted");
+				output("");
+				displayHelp();
+				this.exitCode = -1;
+				return;
+			}
+			if (inputValues.size() == 1)
+			{
+				try {
+					minimumEPSSToPrioritise = Double.parseDouble(inputValues.iterator().next());
+					if (minimumEPSSToPrioritise < 0.0d || minimumEPSSToPrioritise > 1.0d) throw new IllegalArgumentException();
+				}
+				catch(Exception e)
+				{
+					// Wasn't a valid string
+					output("ERROR: minimumEPSSToPrioritise value was not a valid decimal number between 0 and 1");
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+			}
+		}
+
 		List<String> inputFiles = args.getNonOptionArgs();
 		if (inputFiles.size() == 0)
 		{
@@ -131,11 +210,11 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			title = inputValues.iterator().next();
 		}
 
-		List<String> intendedFailThresholdAsStrings = args.getOptionValues("failThreshold");
-		if (intendedFailThresholdAsStrings != null && intendedFailThresholdAsStrings.size() > 0)
+		List<String> intendedfailSeverityThresholdAsStrings = args.getOptionValues("failSeverityThreshold");
+		if (intendedfailSeverityThresholdAsStrings != null && intendedfailSeverityThresholdAsStrings.size() > 0)
 		{
 			try {
-				failThreshold = VulnerabilitySeverity.valueOf(intendedFailThresholdAsStrings.iterator().next());
+				failSeverityThreshold = VulnerabilitySeverity.valueOf(intendedfailSeverityThresholdAsStrings.iterator().next());
 			}
 			catch (IllegalArgumentException e)
 			{
@@ -146,7 +225,11 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			}
 		}
 
+		VulnerabilityScorePriorityThresholds priorityThresholds
+			= new VulnerabilityScorePriorityThresholds(minimumCVSSToPrioritise, minimumEPSSToPrioritise);
+			
 		TrivyScanHistory history = new TrivyScanHistory();
+
 		List<String> whitelistFileNames = args.getOptionValues("whitelist");
 		if (whitelistFileNames != null && whitelistFileNames.size() > 0)
 		{
@@ -193,7 +276,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		}
 
 		try {
-			boolean thereAreOutstandingVulnerabilitiesAboveThreshold = summariseTrivyHistory(title, history, outputFile, failThreshold);
+			boolean thereAreOutstandingVulnerabilitiesAboveThreshold = summariseTrivyHistory(title, history, outputFile, failSeverityThreshold, priorityThresholds);
 
 			if (thereAreOutstandingVulnerabilitiesAboveThreshold)
 			{
@@ -239,10 +322,8 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		output("Note that, on Windows, trivysummary.bat should be used as the command.");
 
 		output("");
-		output("For scan dates, this application uses the createdAt property added by");
-		output("later versions of Trivy (since v0.48.0). If this property is not present,");
-		output("the file last modified timestamp will be used (so be careful if copying");
-		output("JSON files between systems before running this app).");
+		output("For scan dates, this application relies on the createdAt property added by");
+		output("later versions of Trivy (since v0.48.0).");
 
 		output("");
 		output("Arguments");
@@ -260,29 +341,81 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		output("    output is a PDF report. If not, a JSON format is used. Defaults to");
 		output("    \"trivysummary.pdf\" in the current working directory.");
 		output("");
-		output("  --failThreshold=...");
+		output("  --failSeverityThreshold=...");
 		output("    The severity threshold at or above which any open vulnerabilities");
 		output("    will cause this app to return an error (returns -1, rather than 0).");
 		output("    Must be one of LOW, MEDIUM, HIGH or CRITICAL.");
-		output("    If unset, defaults to LOW, i.e. any vulnerability is a fail condition.");
+		output("    If unset, an error won't be returned for any set minimum severity");
+		output("    but, if prioritisation is in use (see below), any open high priority");
+		output("    vulnerabilities will generate an error.");
 		output("");
 		output("  --whitelist=...");
 		output("    If set, one or more files in JSON format listing CVEs which should be");
 		output("    whitelisted in the output. You can specify this argument multiple times");
 		output("    if you wish to load multiple whitelists");
+		output("");
+		output("  --offline");
+		output("    If set, TrivySummary will not attempt to access EPSS scores to assess");
+		output("    the exploitability of CVEs. This will bypass graphing and prioritisation");
+		output("    but is useful if using this tool from airgapped environments.");
+		output("");
+		output("  --minimumCVSSToPrioritise");
+		output("    If this is set, TrivySummary will categorise CVEs into high priority and");
+		output("    lower priority bands. This should be a CVE CVSSv3 score, i.e. between");
+		output("    0.0 and 10.0.");
+		output("    If this isn't set but --minimumEPSSToPrioritise is set, then defaults to 0.0");
+		output("");
+		output("  --minimumEPSSToPrioritise");
+		output("    If this is set, TrivySummary will categorise CVEs into high priority and");
+		output("    lower priority bands. This should be an EPSS score, i.e. between");
+		output("    0.0 and 1.0.");
+		output("    If this isn't set but --minimumCVSSToPrioritise is set, then defaults to 0.0");
 	}
 
-	private boolean summariseTrivyHistory(String title, TrivyScanHistory history, Path outputFile, VulnerabilitySeverity severityFailThreshold) throws IOException, TrivyScanHistoryNotDeepEnoughException
+	private boolean summariseTrivyHistory(String title, TrivyScanHistory history, Path outputFile, VulnerabilitySeverity severityfailSeverityThreshold, VulnerabilityScorePriorityThresholds priorityThresholds) throws IOException, TrivyScanHistoryNotDeepEnoughException
 	{
+		String statusMessage = null;
+		boolean statusIsWarning = false;
+
 		TrivyOneScanSummary summary = null;
 		summary = history.getLatestScanSummary(title);
+		if (offlineMode)
+		{
+			statusMessage = "Offline mode. No EPSS or prioritisation applied";
+		}
+		else
+		{
+			TrivyScanVulnerabilities openVulnerabilities = summary.getOpenVulnerabilities().getVulnerabilities();
+			try {
+				updateEPSSScores(openVulnerabilities, false);
+				openVulnerabilities.prioritiseForRemediation(priorityThresholds);
+			} catch (Exception e)
+			{
+				statusMessage = "Could not retrieve EPSS scores. No graph or prioritisation applied.";
+				statusIsWarning = true;
+				offlineMode = true;	// Set this flag so we don't work with incomplete data
+			}
+		}
 
 		if (history.getScanHistory().size() == 2)
 		{
 			// We have some meaningful history
 			TrivyTwoScanComparison comparison = null;
 			comparison = history.compareLatestScanWithPrevious(title);
-
+			if (!offlineMode)
+			{
+				TrivyScanVulnerabilities openVulnerabilities = comparison.getOpenVulnerabilities().getVulnerabilities();
+				try {
+					updateEPSSScores(openVulnerabilities, false);
+					openVulnerabilities.prioritiseForRemediation(priorityThresholds);
+				} catch (Exception e)
+				{
+					statusMessage = "Could not retrieve EPSS scores. No graph or prioritisation applied.";
+					statusIsWarning = true;
+					offlineMode = true;	// Set this flag so we don't work with incomplete data
+				}
+			}
+	
 			if (outputFile.toString().endsWith(".pdf"))
 			{
 				Map<String, Object> variables = new HashMap<>();
@@ -298,6 +431,10 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("whitelistedVulnerabilities", comparison.getWhitelistedVulnerabilities());
 				variables.put("trivySummaryVersion", config.getVersion());
 				variables.put("stringUtils", new TrivySummaryStringUtils());
+				variables.put("hasPriorityBands", !offlineMode && priorityThresholds.supportsDeprioritisation());
+				variables.put("svgGraph", offlineMode ? "" : GenerateGraph.GetSVG(comparison.getOpenVulnerabilities().getVulnerabilities(), priorityThresholds));
+				variables.put("statusMessage", statusMessage);
+				variables.put("statusIsWarning", statusIsWarning);
 
 				new RenderToPDF().renderToPDF(variables, "compareTrivyScans", outputFile);
 			}
@@ -328,6 +465,10 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				variables.put("whitelistedVulnerabilities", summary.getWhitelistedVulnerabilities());
 				variables.put("trivySummaryVersion", config.getVersion());
 				variables.put("stringUtils", new TrivySummaryStringUtils());
+				variables.put("hasPriorityBands", !offlineMode && priorityThresholds.supportsDeprioritisation());
+				variables.put("svgGraph", offlineMode ? "" : GenerateGraph.GetSVG(summary.getOpenVulnerabilities().getVulnerabilities(), priorityThresholds));
+				variables.put("statusMessage", statusMessage);
+				variables.put("statusIsWarning", statusIsWarning);
 
 				new RenderToPDF().renderToPDF(variables, "summariseTrivyScan", outputFile);
 			}
@@ -345,13 +486,25 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		}
 
 		// Now we look at the most recent scan results and examine the severity of open vulnerabilities, returning true if there are vulnerabilities above the fail threshold
-		for (VulnerabilitySeverity severity : VulnerabilitySeverity.values())
+		if (severityfailSeverityThreshold != null)
 		{
-			if (severity.ordinal() < severityFailThreshold.ordinal()) continue; // Below the threshold
+			for (VulnerabilitySeverity severity : VulnerabilitySeverity.values())
+			{
+				if (severity.ordinal() < severityfailSeverityThreshold.ordinal()) continue; // Below the threshold
 
-			Integer countVulns = summary.getOpenVulnerabilities().getCountOfVulnerabilitiesAtSeverity(severity);
+				Integer countVulns = summary.getOpenVulnerabilities().getCountOfVulnerabilitiesAtSeverity(severity, null);
 
-			if (countVulns != null && countVulns.intValue() > 0) return true;
+				if (countVulns != null && countVulns.intValue() > 0) return true;
+			}
+		}
+		else if (priorityThresholds.supportsDeprioritisation())
+		{
+			// If we support prioritisation, and haven't specified a severity fail threshold then we should fail if there are any high priority
+			// vulnerabilities to fix
+			for (TrivyScanVulnerability vulnerability : summary.getOpenVulnerabilities().getVulnerabilities())
+			{
+				if (vulnerability.getIsPriorityForRemediation()) return true;
+			}
 		}
 		// We've got this far, so we've no open vulnerabilities above the threshold.
 		return false;
@@ -372,6 +525,76 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			history.addScan(dateOfScan, scan);
 		}
 	}
+
+    private final int MAX_BATCH_SIZE_FOR_EPSS_API = 50;
+
+    private void updateEPSSScores(TrivyScanVulnerabilities vulnerabilities, boolean force) throws IOException, InterruptedException
+    {
+        TrivyScanVulnerabilities vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();
+
+        for (TrivyScanVulnerability vulnerability : vulnerabilities)
+        {
+            if (force || vulnerability.getEPSSScore() == null)
+            {
+                vulnerabilitiesRequiringLPSSScores.add(vulnerability);
+
+                if (vulnerabilitiesRequiringLPSSScores.size() >= MAX_BATCH_SIZE_FOR_EPSS_API)
+                {
+                    retrieveEPSSScores(vulnerabilitiesRequiringLPSSScores);
+                    vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();
+                }
+            }
+        }
+
+        if (vulnerabilitiesRequiringLPSSScores.size() > 0)
+        {
+            retrieveEPSSScores(vulnerabilitiesRequiringLPSSScores);
+        }
+    }
+
+    private void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities) throws IOException, InterruptedException
+    {
+        StringBuffer urlString = null;
+        for (TrivyScanVulnerability vulnerability : vulnerabilities)
+        {
+            if (urlString == null)
+            {
+                urlString = new StringBuffer("https://api.first.org/data/v1/epss?cve=");
+                urlString.append(vulnerability.getVulnerabilityID());
+            }
+            else
+            {
+                urlString.append(",");
+                urlString.append(vulnerability.getVulnerabilityID());
+            }
+        }
+
+        if (urlString == null) return;
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(urlString.toString()))
+            .build();
+
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		String responseBody = response.body();
+	
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		EPSSResponse epssResponse = mapper.readValue(responseBody, EPSSResponse.class);
+
+		for (EPSSData epssData : epssResponse.getData())
+		{
+			// We find the corresponding TrivyScanVulnerability and update the EPSS score
+			for (TrivyScanVulnerability vulnerability : vulnerabilities)
+			{
+				if (vulnerability.getVulnerabilityID().equalsIgnoreCase(epssData.getVulnerabilityID()))
+				{
+					vulnerability.setEPSSScore(epssData.getEpssScore());
+					break;
+				}
+			}
+		}
+    }
 
 	private void output(String messageTemplate, Object... args)
 	{

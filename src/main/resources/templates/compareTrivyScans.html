@@ -18,12 +18,15 @@
     <p th:text="|Trivy scans spanning ${fromDate} to ${toDate}.|">Today is ...</p>
     <p th:if="${earlierArtefactName == laterArtefactName}">Artefact scanned is <b><span th:text="${earlierArtefactName}" /></b> of type <b><span th:text="${artefactType}" /></b></p>
     <p th:if="${earlierArtefactName != laterArtefactName}">Artefacts scanned are <b><span th:text="${earlierArtefactName}" /></b> to <b><span th:text="${laterArtefactName}" /></b> of type <b><span th:text="${artefactType}" /></b></p>
-    <span th:if="${comparisonMayNotBeForSameArtefact}">
-        <p><b>WARNING: Artefact names do not indicate these are scans of the same component - comparison may not be valid</b></p>
-    </span>
-    <span th:if="${whitelistedVulnerabilities.hasUnapprovedEntries() || whitelistedVulnerabilities.hasEntriesRequiringReview()}">
-        <p><b>WARNING: Some <a href="#whitelistedVulnerabilities">whitelisted vulnerabilities</a> require review and/or approval.</b></p>
-    </span>
+    <p th:if="${comparisonMayNotBeForSameArtefact}">
+        <b>WARNING: </b>Artefact names do not indicate these are scans of the same component - comparison may not be valid</p>
+    </p>
+    <p th:if="${whitelistedVulnerabilities.hasUnapprovedEntries() || whitelistedVulnerabilities.hasEntriesRequiringReview()}">
+        <b>WARNING: </b>Some <a href="#whitelistedVulnerabilities">whitelisted vulnerabilities</a> require review and/or approval.
+    </p>
+    <p th:if="${statusMessage != null}">
+        <b th:if="${statusIsWarning == true}">WARNING: </b><b th:if="${statusIsWarning == false}">INFO: </b><span th:text="${statusMessage}"/>
+    </p>
 
     <p>
         <ul>
@@ -36,19 +39,32 @@
     <a id="openVulnerabilities"/>
     <h2>Open vulnerabilities</h2>
 
+    <p th:if="${svgGraph != ''}" class="pagebreakafter" th:utext="${svgGraph}"></p>
+
     <p>
+        <h3 th:if="${hasPriorityBands == true}">Higher Priority (More Severe and Exploitable) Vulnerabilities</h3>
         <table th:with="severities = ${ { { 'UNKNOWN', 'vulnSevCritical' }, { 'CRITICAL', 'vulnSevCritical' }, { 'HIGH', 'vulnSevHigh' }, { 'MEDIUM', 'vulnSevMedium' }, { 'LOW', 'vulnSevLow' } } }">
             <tr>
-                <td th:each="severity : ${severities}" th:if="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0])} != null" th:class="|${severity[1]} severityCountBox|">
+                <td th:each="severity : ${severities}" th:if="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], true)} != null" th:class="|${severity[1]} severityCountBox|">
                         <span th:text="${severity[0]}"></span>
                         <br/>
-                        <span class="severityCount" th:text="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0])}">???</span>
+                        <span class="severityCount" th:text="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], true)}">???</span>
+                </td>
+            </tr>
+        </table>
+        <h3 th:if="${hasPriorityBands == true}">Lower Priority (Less Severe and/or Exploitable) Vulnerabilities</h3>
+        <table th:if="${hasPriorityBands == true}" th:with="severities = ${ { { 'UNKNOWN', 'vulnSevUnknownNonPriority' }, { 'CRITICAL', 'vulnSevCriticalNonPriority' }, { 'HIGH', 'vulnSevHighNonPriority' }, { 'MEDIUM', 'vulnSevMediumNonPriority' }, { 'LOW', 'vulnSevLowNonPriority' } } }">
+            <tr>
+                <td th:each="severity : ${severities}" th:if="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], false)} != null" th:class="|${severity[1]} severityCountBox|">
+                        <span class="vulnSeverity" th:text="${severity[0]}"></span>
+                        <br/>
+                        <span class="severityCount" th:text="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], false)}">???</span>
                 </td>
             </tr>
         </table>
     </p>
 
-    <table class="mainTableVulnerabilities">
+    <table class="mainTableVulnerabilities pagebreakafter">
         <caption>
             Open vulnerabilities - Details<br/>New vulnerabilities in this scan marked with <span class="newVulnerabilityMarker">&nbsp;NEW&nbsp;</span>
         </caption>
@@ -64,15 +80,14 @@
             <tr class="mainTableBodyRow" th:if="${openVulnerabilities.vulnerabilities.empty}">
                 <td colspan="4"> No vulnerabilities </td>
             </tr>
-            <tr class="mainTableBodyRow" th:each="vulnerability : ${openVulnerabilities.vulnerabilities}">
+            <tr class="mainTableBodyRow" th:each="vulnerability : ${openVulnerabilities.vulnerabilities.sorted}" th:with="severities = ${ { { 'UNKNOWN', 'vulnSevUnknown' }, { 'CRITICAL', 'vulnSevCritical' }, { 'HIGH', 'vulnSevHigh' }, { 'MEDIUM', 'vulnSevMedium' }, { 'LOW', 'vulnSevLow' } } }">
                 <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
+                    <span th:if="${vulnerability.nvdReference} != null"> <a class="secondaryRef" th:href="${vulnerability.nvdReference}">NVD</a></span>
+                    <span th:if="${vulnerability.redhatReference} != null"> <a class="secondaryRef" th:href="${vulnerability.redhatReference}">RedHat</a></span>
                     <p th:if="${vulnerability.wasInPreviousScan == false}" class="newVulnerabilityMarker">&nbsp;NEW&nbsp;</p>
+                    <p th:if="${vulnerability.isPriorityForRemediation == false}" class="secondaryRef">Lower priority - less severe and/or exploitable</p>
                 </td>
-                <td th:if="${vulnerability.severity.name()} == 'LOW'" class="vulnSevLow">LOW</td>
-                <td th:if="${vulnerability.severity.name()} == 'MEDIUM'" class="vulnSevMedium">MEDIUM</td>
-                <td th:if="${vulnerability.severity.name()} == 'HIGH'" class="vulnSevHigh">HIGH</td>
-                <td th:if="${vulnerability.severity.name()} == 'CRITICAL'" class="vulnSevCritical">CRITICAL</td>
-                <td th:if="${vulnerability.severity.name()} == 'UNKNOWN'" class="vulnSevCritical">UNKNOWN</td>
+                <td th:class="|vulnSev${stringUtils.toUpperCamelCase(vulnerability.severity.name())}${stringUtils.conditional(vulnerability.isPriorityForRemediation,'','NonPriority')}|"><span class="vulnSeverity" th:text="${vulnerability.severity.name()}"/><p><span class="vulnScore" th:text="|CVSS: ${vulnerability.cvssScore}|"/><br class="vulnScore" /><span class="vulnScore" th:if="${vulnerability.epssScore} != null" th:text="|EPSS: ${stringUtils.displayDouble(vulnerability.epssScore)}|"/></p></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
                 <td>
                     <table class="subTablePackageVulnerabilities">
@@ -99,7 +114,7 @@
     <a id="whitelistedVulnerabilities"/>
     <h2>Whitelisted vulnerabilities</h2>
 
-    <table class="whitelistTableVulnerabilities">
+    <table class="whitelistTableVulnerabilities pagebreakafter">
         <thead class="whitelistTableHeader" >
             <tr>
                 <th scope="col"> ID </th>
@@ -115,12 +130,11 @@
                 <td colspan="6"> No whitelisted vulnerabilities present </td>
             </tr>
             <tr class="whitelistTableBodyRow" th:each="vulnerability : ${whitelistedVulnerabilities}">
-                <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a></td>
-                <td th:if="${vulnerability.severity.name()} == 'LOW'" class="vulnSevLow">LOW</td>
-                <td th:if="${vulnerability.severity.name()} == 'MEDIUM'" class="vulnSevMedium">MEDIUM</td>
-                <td th:if="${vulnerability.severity.name()} == 'HIGH'" class="vulnSevHigh">HIGH</td>
-                <td th:if="${vulnerability.severity.name()} == 'CRITICAL'" class="vulnSevCritical">CRITICAL</td>
-                <td th:if="${vulnerability.severity.name()} == 'UNKNOWN'" class="vulnSevCritical">UNKNOWN</td>
+                <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
+                    <span th:if="${vulnerability.nvdReference} != null"> <a class="secondaryRef" th:href="${vulnerability.nvdReference}">NVD</a></span>
+                    <span th:if="${vulnerability.redhatReference} != null"> <a class="secondaryRef" th:href="${vulnerability.redhatReference}">RedHat</a></span>
+                </td>
+                <td th:class="|vulnSev${stringUtils.toUpperCamelCase(vulnerability.severity.name())}|"><span class="vulnSeverity" th:text="${vulnerability.severity.name()}"/></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.whitelistingReason)}">This is the whitelisting justification</span></td>
                 <td th:if="${vulnerability.requiresReview()}"><b>OVERDUE</b></td>
@@ -161,13 +175,12 @@
             <tr class="mainTableBodyRow" th:if="${closedVulnerabilities.vulnerabilities.empty}">
                 <td colspan="4"> No vulnerabilities closed between Trivy scans </td>
             </tr>
-            <tr class="mainTableBodyRow" th:each="vulnerability : ${closedVulnerabilities.vulnerabilities}">
-                <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a></td>
-                <td th:if="${vulnerability.severity.name()} == 'LOW'" class="vulnSevLow">LOW</td>
-                <td th:if="${vulnerability.severity.name()} == 'MEDIUM'" class="vulnSevMedium">MEDIUM</td>
-                <td th:if="${vulnerability.severity.name()} == 'HIGH'" class="vulnSevHigh">HIGH</td>
-                <td th:if="${vulnerability.severity.name()} == 'CRITICAL'" class="vulnSevCritical">CRITICAL</td>
-                <td th:if="${vulnerability.severity.name()} == 'UNKNOWN'" class="vulnSevCritical">UNKNOWN</td>
+            <tr class="mainTableBodyRow" th:each="vulnerability : ${closedVulnerabilities.vulnerabilities.sorted}">
+                <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
+                    <span th:if="${vulnerability.nvdReference} != null"> <a class="secondaryRef" th:href="${vulnerability.nvdReference}">NVD</a></span>
+                    <span th:if="${vulnerability.redhatReference} != null"> <a class="secondaryRef" th:href="${vulnerability.redhatReference}">RedHat</a></span>
+                </td>
+                <td th:class="|vulnSev${stringUtils.toUpperCamelCase(vulnerability.severity.name())}|"><span class="vulnSeverity" th:text="${vulnerability.severity.name()}"/></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
             </tr>
         </tbody>

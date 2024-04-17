@@ -1,5 +1,17 @@
-Release 1.2 - Formatting improvements.
+Release 2.0.
 
-Now will hyphenate very long words intelligently (new in 1.2.1), avoiding table overflow
-Tries to avoid wrapping of the CVE title where possible (but will wrap for very long IDs we've not seen yet)
-Closed vulnerabilities now in a much compressed format as there's no need to list the affected packages. Can save a huge amount of space.
+Massive update...
+
+TrivySummary will now attempt to download EPSS scores for each CVE and graph each CVE,
+CVSS (severity) against EPSS (exploitability), unless asked to operate in offline mode.
+
+TrivySummary can be given minimum CVSS and EPSS thresholds above which CVEs should be
+marked as high priority for remediation.
+
+TrivySummary will now show applicable NVD and RedHat links for each CVE, aiding 
+assessment.
+
+BREAKING CHANGE: --failThreshold parameter now renamed --failSeverityThreshold and the
+default is no longer to fail on any severity.  In return, if this isn't set and
+prioritisation is in effect (as above), then any high priority CVEs would return an
+error code.

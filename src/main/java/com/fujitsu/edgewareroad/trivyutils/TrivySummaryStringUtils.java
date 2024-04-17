@@ -2,6 +2,8 @@ package com.fujitsu.edgewareroad.trivyutils;
 
 import java.util.regex.Pattern;
 
+import org.springframework.util.StringUtils;
+
 public class TrivySummaryStringUtils {
     private final Pattern whitespaceSplitter = Pattern.compile("\s+");
     private final Pattern longWordSplitter = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])|(?<!^)(?=[:\\-/.])");
@@ -47,5 +49,25 @@ public class TrivySummaryStringUtils {
         }
 
         return builder.toString();
+    }
+
+    public String displayDouble(Double value)
+    {
+        return String.format("%f", value);
+    }
+
+    public String toUpperCamelCase(String input)
+    {
+        StringBuilder builder = new StringBuilder();
+        for (String word : input.split("/s"))
+        {
+            builder.append(StringUtils.capitalize(word.toLowerCase()));
+        }
+        return builder.toString();
+    }
+
+    public String conditional(boolean conditional, String ifTrue, String ifFalse)
+    {
+        return conditional ? ifTrue : ifFalse;
     }
 }

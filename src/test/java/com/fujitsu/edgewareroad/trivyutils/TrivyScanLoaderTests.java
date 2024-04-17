@@ -37,9 +37,8 @@ class TrivyScanLoaderTests {
 
 			TrivyScanVulnerabilities vulnerabilitiesWithoutPackages = scanResults.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
 			assertEquals(398, vulnerabilitiesWithoutPackages.size());
-			assertEquals(17, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL).size());
-			assertEquals(213, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH).size());
-			assertEquals(230, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverityOrHigher(VulnerabilitySeverity.HIGH).size());
+			assertEquals(17, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL, null).size());
+			assertEquals(213, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH, null).size());
 
 			for (TrivyScanVulnerability vuln : vulnerabilitiesWithoutPackages)
 			{
@@ -59,9 +58,8 @@ class TrivyScanLoaderTests {
 
 			TrivyScanVulnerabilities vulnerabilitiesWithoutPackages = scanResults.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
 			assertEquals(94, vulnerabilitiesWithoutPackages.size());
-			assertEquals(2, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL).size());
-			assertEquals(33, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH).size());
-			assertEquals(35, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverityOrHigher(VulnerabilitySeverity.HIGH).size());
+			assertEquals(2, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL, null).size());
+			assertEquals(33, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH, null).size());
 
 			for (TrivyScanVulnerability vuln : vulnerabilitiesWithoutPackages)
 			{

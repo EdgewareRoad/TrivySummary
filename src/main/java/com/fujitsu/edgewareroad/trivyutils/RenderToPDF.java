@@ -1,6 +1,7 @@
 package com.fujitsu.edgewareroad.trivyutils;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import com.openhtmltopdf.util.Diagnostic;
 
 import java.io.File;
@@ -78,6 +79,7 @@ public class RenderToPDF {
             builder.withUri(outputPath.toString());
             builder.toStream(os);
             builder.withW3cDocument(getXHTMLDocument(variables, templateName, baseURIAsString), baseURIAsString);
+            builder.useSVGDrawer(new BatikSVGDrawer());
             builder.run();
         }
         catch(Exception ex)

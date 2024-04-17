@@ -57,9 +57,18 @@ h2 {
     font-weight: 600;
 }
 
+h3 {
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
 caption {
     font-size: 1.2em;
     font-weight: 400;
+}
+
+.pagebreakafter {
+    page-break-after: always;
 }
 
 table.mainTableVulnerabilities {
@@ -227,33 +236,72 @@ tr {
     page-break-inside: avoid;
 }
 
-.vulnSevLow {
+.vulnSeverity {
     font-weight: 800;
+}
+
+.vulnSevUnknown {
+    background-color: grey;
+}
+
+.vulnSevUnknownNonPriority {
+    color: white;
+    background-color: #585858
+}
+
+.vulnSevLow {
     background-color: lawngreen;
 }
 
+.vulnSevLowNonPriority {
+    color: white;
+    background-color: darkgreen;
+}
+
 .vulnSevMedium {
-    font-weight: 800;
     background-color: orange;
 }
 
+.vulnSevMediumNonPriority {
+    color: white;
+    background-color: #904000;
+}
+
 .vulnSevHigh {
-    font-weight: 800;
     background-color: orangered;
 }
 
+.vulnSevHighNonPriority {
+    color: white;
+    background-color: #603000;
+}
+
 .vulnSevCritical {
-    font-weight: 800;
     color: white;
     background-color: darkred;
+}
+
+.vulnSevCriticalNonPriority {
+    color: white;
+    background-color: #400000;
 }
 
 .severityCountBox {
     min-width: 6em;
 }
 
+.secondaryRef {
+    font-size: 0.7em;
+    font-weight: 800;
+}
+
+.vulnScore {
+    font-size: 0.7em;
+}
+
 .severityCount {
     font-size: 4em;
+    font-weight: 800;
     white-space: nowrap;
     overflow: hidden;
 }

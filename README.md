@@ -1,6 +1,7 @@
 # TrivySummary
 
-A simple tool to summarise Trivy scan JSON output for reporting purposes. Package vulnerabilities are collapsed down to the respective CVE, and headline counts of vulnerabilities at different severities (using CVSS v3).
+TrivySummary summarises Trivy scan JSON output for reporting purposes. Package vulnerabilities are collapsed down to the respective CVE, and headline counts of vulnerabilities at different severities (using CVSS v3). In addition, EPSS scores can also be retrieved, allowing
+the exploitability and severity of all vulnerabilities to be graphed and optionally prioritised.
 
 The tool has a number of options to aid reporting.
 * It can take a single Trivy scan JSON file and summarise it to PDF or to JSON
@@ -24,30 +25,53 @@ To summarise and compare two Trivy JSON files for the same component, use the fo
 trivysummary <previousTrivyOutput>.json <latestTrivyOutput>.json <args>
 ```
 
-For scan dates, this application uses the createdAt property added by later versions of Trivy (since v0.48.0). If this property is not present, the file last modified timestamp will be used (so be careful if copying	output JSON files between systems before running this app).
+For scan dates, this application relies on the createdAt property added by
+later versions of Trivy (since v0.48.0).
 
 ### Arguments
 
 ```
---help
+  --help
     Displays this help message
 
---title=...
-    Sets a report title. If unset, a default title is used containing the input file path(s) provided
-	  
---outputFile=...
-    The required output file name. If the filename ends in .pdf then the output is a PDF report.
-    If not, a JSON format is used. Defaults to   "trivysummary.pdf" in the current working directory.
+  --title=...
+    Sets a report title. If unset, a default title is used containing
+    the input file path(s) provided
 
---failThreshold=...
-    The severity threshold at or above which any open vulnerabilities will cause this app to return
-    an error (returns -1, rather than 0).  Must be one of LOW, MEDIUM, HIGH or CRITICAL.
-    If unset, defaults to LOW, i.e. any vulnerability is a fail condition.
+  --outputFile=...
+    The required output file name. If the filename ends in .pdf then the
+    output is a PDF report. If not, a JSON format is used. Defaults to
+    "trivysummary.pdf" in the current working directory.
 
---whitelist=...
-    If set, one or more files in JSON format listing CVEs which should be whitelisted in the output.
-    You can specify this argument more than once if you need to input multiple whitelists
-    (e.g. if managing separate whitelists for your code vs. those for base images from other suppliers)
+  --failSeverityThreshold=...
+    The severity threshold at or above which any open vulnerabilities
+    will cause this app to return an error (returns -1, rather than 0).
+    Must be one of LOW, MEDIUM, HIGH or CRITICAL.
+    If unset, an error won't be returned for any set minimum severity
+    but, if prioritisation is in use (see below), any open high priority
+    vulnerabilities will generate an error.
+
+  --whitelist=...
+    If set, one or more files in JSON format listing CVEs which should be
+    whitelisted in the output. You can specify this argument multiple times
+    if you wish to load multiple whitelists
+
+  --offline
+    If set, TrivySummary will not attempt to access EPSS scores to assess
+    the exploitability of CVEs. This will bypass graphing and prioritisation
+    but is useful if using this tool from airgapped environments.
+
+  --minimumCVSSToPrioritise
+    If this is set, TrivySummary will categorise CVEs into high priority and
+    lower priority bands. This should be a CVE CVSSv3 score, i.e. between
+    0.0 and 10.0.
+    If this isn't set but --minimumEPSSToPrioritise is set, then defaults to 0.0
+
+  --minimumEPSSToPrioritise
+    If this is set, TrivySummary will categorise CVEs into high priority and
+    lower priority bands. This should be an EPSS score, i.e. between
+    0.0 and 1.0.
+    If this isn't set but --minimumCVSSToPrioritise is set, then defaults to 0.0
 ```
 
 ### Whitelisting
@@ -90,3 +114,19 @@ Each JSON file is an array of whitelisting entries. Each whitelisting entry has 
 
 For sample JSON to whitelist [see here](src/test/resources/sampleWhitelist1.json)
 
+### Better remediation prioritisation through EPSS (exploitability scoring) and priority bands
+The open source version of [Trivy](https://github.com/aquasecurity/trivy) only supports assessment against
+severity (more properly, emphasising vendor assessment of severity). There are other means of scoring CVEs
+including [EPSS](https://www.first.org/epss/), the Exploit Prediction Scoring System.
+
+TrivySummary will, by default, add EPSS scores to each CVE (unless overridden by the _--offline_ flag) and
+graph the results. CVEs which are of the highest combination of CVSS and EPSS will be labelled.
+
+In addition, through the _--minimumCVSSToPrioritise_ and _--minimumEPSSToPrioritise_ flags, the user can
+also set minimum thresholds for CVEs to be marked in the report as high priority or low priority.
+
+**Please note** that a CVE's marked severity and CVSS score may not correspond, as vendors such as RedHat
+often set a different vendor severity from that implied by the CVSS due to their assessment of the wider 
+circumstances and how software is deployed and used. Trivy takes this into account and prefers the vendor
+assessment (see [Severity Selection](https://aquasecurity.github.io/trivy/dev/docs/scanner/vulnerability/)
+section).
