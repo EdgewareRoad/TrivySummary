@@ -1,4 +1,8 @@
-Release 2.0.
+Release 2.0.1:
+
+Fixed offline mode
+
+Release 2.0:
 
 Massive update...
 

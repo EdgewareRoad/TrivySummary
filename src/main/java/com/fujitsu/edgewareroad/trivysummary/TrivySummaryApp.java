@@ -95,7 +95,6 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		if (args.containsOption("offline"))
 		{
 			offlineMode = true;
-			return;
 		}
 
 		if (args.containsOption("outputFile"))
