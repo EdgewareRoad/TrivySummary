@@ -1,3 +1,7 @@
+Release 2.0.2:
+
+Fixed generated POM file in published Maven package
+
 Release 2.0.1:
 
 Fixed offline mode
