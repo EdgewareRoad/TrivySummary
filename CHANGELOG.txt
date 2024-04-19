@@ -1,3 +1,7 @@
+Release 2.0.3:
+
+Fixed null pointer exception in the happy case that you have no vulnerabilities in your code.
+
 Release 2.0.2:
 
 Fixed generated POM file in published Maven package

@@ -84,14 +84,16 @@ public class TrivyScan
     {
         TrivyScanPackageVulnerabilities vulnerabilitiesToReturn = new TrivyScanPackageVulnerabilities();
 
-        for(TrivyScanResult result : results)
+        if (results != null)
         {
-            for(TrivyScanPackageVulnerability vulnerability : result.getVulnerabilities())
+            for(TrivyScanResult result : results)
             {
-                vulnerabilitiesToReturn.add(vulnerability);
+                for(TrivyScanPackageVulnerability vulnerability : result.getVulnerabilities())
+                {
+                    vulnerabilitiesToReturn.add(vulnerability);
+                }
             }
         }
-
         return vulnerabilitiesToReturn;
     }
 }
