@@ -116,8 +116,8 @@ publishing {
 			    def dependenciesNode = asNode().appendNode('dependencies')
 			    configurations.implementation.allDependencies.each {
 			        def dependencyNode = dependenciesNode.appendNode('dependency')
-			        dependencyNode.appendNode('groupId', "com.fujitsu.edgewareroad")
-			        dependencyNode.appendNode('artifactId', "trivysummary")
+			        dependencyNode.appendNode('groupId', it.groupId)
+			        dependencyNode.appendNode('artifactId', it.artifactId)
 			        dependencyNode.appendNode('version', it.version)
 			    }
 			}
