@@ -2,8 +2,8 @@ plugins {
 	id 'java'
 	id 'application'
 	id 'jvm-test-suite'
-	id 'org.springframework.boot' version '3.2.3'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot' version '3.2.5'
+	id 'io.spring.dependency-management' version '1.1.5'
 	id 'maven-publish'
 }
 
@@ -58,9 +58,9 @@ configurations {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
-	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.16.1'
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
 	implementation 'org.thymeleaf:thymeleaf:3.1.2.RELEASE'
 	implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
 	implementation 'com.openhtmltopdf:openhtmltopdf-slf4j:1.0.10'

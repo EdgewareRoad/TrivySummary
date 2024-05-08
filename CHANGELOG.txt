@@ -1,29 +1,26 @@
-Release 2.0.3:
-
-Fixed null pointer exception in the happy case that you have no vulnerabilities in your code.
-
-Release 2.0.2:
-
-Fixed generated POM file in published Maven package
-
-Release 2.0.1:
-
-Fixed offline mode
-
-Release 2.0:
+Release 3.0:
 
 Massive update...
 
-TrivySummary will now attempt to download EPSS scores for each CVE and graph each CVE,
-CVSS (severity) against EPSS (exploitability), unless asked to operate in offline mode.
+Simple EPSS/CVSS thresholds now replaced with a configurable priority model. Each 
+CVE is now prioritised based on one of three models:
+  1. SEVERITYONLY
+     As in previous versions, priority is simple the stated vendor severity
+  2. RECTANGULAR
+     Each of CRITICAL, HIGH or MEDIUM priorities set by minimum CVSS and EPSS values.
+     Shown as colour bands on the graph view.
+  3. ELLIPTICAL
+     Similar to RECTANGULAR but based on an ellipse bounded by the stated CVSS / EPSS
+     thresholds, giving a much more elegant view of distance from the top right hand
+     corner of the graph.
 
-TrivySummary can be given minimum CVSS and EPSS thresholds above which CVEs should be
-marked as high priority for remediation.
+Now defaults to querying for EPSS scores based on the scan date.
+Supports --useTodayForEPSSQuery attribute to override this and force loading EPSS 
+scores for the report date.
 
-TrivySummary will now show applicable NVD and RedHat links for each CVE, aiding 
-assessment.
-
-BREAKING CHANGE: --failThreshold parameter now renamed --failSeverityThreshold and the
-default is no longer to fail on any severity.  In return, if this isn't set and
-prioritisation is in effect (as above), then any high priority CVEs would return an
+BREAKING CHANGE: --failSeverityThreshold parameter now renamed --failPriorityThreshold 
+to reflect the change from a severity-only world to the new priority models
 error code.
+
+BREAKING CHANGE: --minimumCVSSToPrioritise and --minimumEPSSToPrioritise now removed,
+replaced by the --priorityModel parameter

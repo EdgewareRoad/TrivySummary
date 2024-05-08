@@ -44,7 +44,6 @@ body {
     font-family: sans-serif;
     font-size: 0.8em;
     font-weight: 400;
-    hyphens: auto;
 }
 
 h1 {
@@ -229,64 +228,34 @@ td {
     padding: 0.5em;
     font-weight: 100;
     vertical-align: top;
-    hyphens: auto;
 }
 
 tr {
     page-break-inside: avoid;
 }
 
-.vulnSeverity {
+.vulnPriority {
     font-weight: 800;
 }
 
-.vulnSevUnknown {
-    background-color: grey;
-}
-
-.vulnSevUnknownNonPriority {
-    color: white;
-    background-color: #585858
-}
-
-.vulnSevLow {
+.vulnPriorityLow {
     background-color: lawngreen;
 }
 
-.vulnSevLowNonPriority {
-    color: white;
-    background-color: darkgreen;
-}
-
-.vulnSevMedium {
+.vulnPriorityMedium {
     background-color: orange;
 }
 
-.vulnSevMediumNonPriority {
-    color: white;
-    background-color: #904000;
-}
-
-.vulnSevHigh {
+.vulnPriorityHigh {
     background-color: orangered;
 }
 
-.vulnSevHighNonPriority {
-    color: white;
-    background-color: #603000;
-}
-
-.vulnSevCritical {
+.vulnPriorityCritical {
     color: white;
     background-color: darkred;
 }
 
-.vulnSevCriticalNonPriority {
-    color: white;
-    background-color: #400000;
-}
-
-.severityCountBox {
+.priorityCountBox {
     min-width: 6em;
 }
 
@@ -299,7 +268,7 @@ tr {
     font-size: 0.7em;
 }
 
-.severityCount {
+.priorityCount {
     font-size: 4em;
     font-weight: 800;
     white-space: nowrap;

@@ -1,10 +1,11 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.history;
 
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
-import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
 public class TrivyTwoScanComparison {
@@ -12,10 +13,10 @@ public class TrivyTwoScanComparison {
     private List<String> artefactNames;
     private String artefactType;
     private boolean historyMayNotBeForSameArtefact = false;
-    private Date fromScanDate;
-    private Date toScanDate;
-    private TrivyScanVulnerabilitySummary vulnerabilitiesOpen;
-    private TrivyScanVulnerabilitySummary vulnerabilitiesClosed;
+    private LocalDate fromScanDate;
+    private LocalDate toScanDate;
+    private TrivyScanVulnerabilities vulnerabilitiesOpen;
+    private TrivyScanVulnerabilities vulnerabilitiesClosed;
     private TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted;
 
     public TrivyTwoScanComparison(
@@ -23,26 +24,26 @@ public class TrivyTwoScanComparison {
         List<String> artefactNames,
         String artefactType,
         boolean historyMayNotBeForSameArtefact,
-        Date fromScanDate,
-        Date toScanDate,
-        TrivyScanVulnerabilitySummary vulnerabilitiesOpen,
-        TrivyScanVulnerabilitySummary vulnerabilitiesClosed,
+        LocalDate fromScanDate,
+        LocalDate toScanDate,
+        TrivyScanVulnerabilities vulnerabilitiesOpen,
+        TrivyScanVulnerabilities vulnerabilitiesClosed,
         TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted) {
 
         if (title == null)
         {
             if (artefactNames.size() >= 2)
             {
-                DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM);
+                DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
                 if (artefactNames.get(0).equals(artefactNames.get(1)))
                 {
                     // We're comparing the same artefact on different dates
-                    title = String.format("Comparing scans of %s (%s to %s) of type %s", artefactNames.get(0), format.format(fromScanDate), format.format(toScanDate), artefactType);
+                    title = String.format("Comparing scans of %s (%s to %s) of type %s", artefactNames.get(0), fromScanDate.format(formatter), toScanDate.format(formatter), artefactType);
                 }
                 else
                 {
                     // We're comparing scans of different artefacts (expected to be different versions of the same logical component)
-                    title = String.format("Comparing %s (scan %s) with %s (scan %s) of type %s", artefactNames.get(0), format.format(fromScanDate), artefactNames.get(1), format.format(toScanDate), artefactType);
+                    title = String.format("Comparing %s (scan %s) with %s (scan %s) of type %s", artefactNames.get(0), fromScanDate.format(formatter), artefactNames.get(1), toScanDate.format(formatter), artefactType);
                 }
             }
             else
@@ -83,19 +84,19 @@ public class TrivyTwoScanComparison {
         return historyMayNotBeForSameArtefact;
     }
 
-    public Date getFromScanDate() {
+    public LocalDate getFromScanDate() {
         return fromScanDate;
     }
 
-    public Date getToScanDate() {
+    public LocalDate getToScanDate() {
         return toScanDate;
     }
 
-    public TrivyScanVulnerabilitySummary getOpenVulnerabilities() {
+    public TrivyScanVulnerabilities getOpenVulnerabilities() {
         return vulnerabilitiesOpen;
     }
 
-    public TrivyScanVulnerabilitySummary getClosedVulnerabilities() {
+    public TrivyScanVulnerabilities getClosedVulnerabilities() {
         return vulnerabilitiesClosed;
     }
 

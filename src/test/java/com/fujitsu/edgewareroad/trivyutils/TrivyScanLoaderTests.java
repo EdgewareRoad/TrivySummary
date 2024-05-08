@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
-import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryNotDeepEnoughException;
+import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEnoughException;
+import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.VulnerabilityPriority;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerability;
@@ -37,8 +38,8 @@ class TrivyScanLoaderTests {
 
 			TrivyScanVulnerabilities vulnerabilitiesWithoutPackages = scanResults.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
 			assertEquals(398, vulnerabilitiesWithoutPackages.size());
-			assertEquals(17, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL, null).size());
-			assertEquals(213, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH, null).size());
+			assertEquals(17, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtPriority(VulnerabilityPriority.CRITICAL).size());
+			assertEquals(213, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtPriority(VulnerabilityPriority.HIGH).size());
 
 			for (TrivyScanVulnerability vuln : vulnerabilitiesWithoutPackages)
 			{
@@ -58,8 +59,8 @@ class TrivyScanLoaderTests {
 
 			TrivyScanVulnerabilities vulnerabilitiesWithoutPackages = scanResults.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
 			assertEquals(94, vulnerabilitiesWithoutPackages.size());
-			assertEquals(2, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.CRITICAL, null).size());
-			assertEquals(33, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtSeverity(VulnerabilitySeverity.HIGH, null).size());
+			assertEquals(2, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtPriority(VulnerabilityPriority.CRITICAL).size());
+			assertEquals(33, vulnerabilitiesWithoutPackages.getVulnerabilitiesAtPriority(VulnerabilityPriority.HIGH).size());
 
 			for (TrivyScanVulnerability vuln : vulnerabilitiesWithoutPackages)
 			{
@@ -69,8 +70,8 @@ class TrivyScanLoaderTests {
 			history.addScan(LocalDate.of(2023, 6, 1), scanResults);
 
 			TrivyTwoScanComparison comparison = history.compareLatestScanWithPrevious("");
-			assertEquals(305, comparison.getClosedVulnerabilities().getVulnerabilities().size());
-			assertEquals(94, comparison.getOpenVulnerabilities().getVulnerabilities().size());
+			assertEquals(305, comparison.getClosedVulnerabilities().size());
+			assertEquals(94, comparison.getOpenVulnerabilities().size());
 		}
 		try (InputStream is = getClass().getClassLoader().getResourceAsStream("testapp/testapp-0.0.3.json"))
 		{

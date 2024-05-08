@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource("classpath:application.properties")
-public class TrivySummaryConfiguration {
+public class TrivySummaryAppProperties {
     @Value("${trivysummary.version}")
     private String version;
 

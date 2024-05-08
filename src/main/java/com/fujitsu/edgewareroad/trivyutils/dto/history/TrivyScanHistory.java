@@ -8,7 +8,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
-import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
@@ -41,13 +40,6 @@ public class TrivyScanHistory {
             }
 
             scanHistory.put(dateOfScan, scan);
-        }
-    }
-
-    public class TrivyScanHistoryNotDeepEnoughException extends Exception {
-        public TrivyScanHistoryNotDeepEnoughException(String message)
-        {
-            super(message);
         }
     }
 
@@ -108,7 +100,7 @@ public class TrivyScanHistory {
         lastVulnerabilities  = whitelistedVulnerabilities.filterWhitelistedVulnerabilities(lastVulnerabilities, whitelistEntries);
 
         return new TrivyOneScanSummary(title, trivyScanTo.getArtifactName(), trivyScanTo.getArtifactType(), trivyScanTo.getCreatedAt(),
-            new TrivyScanVulnerabilitySummary(lastVulnerabilities), whitelistedVulnerabilities);
+            lastVulnerabilities, whitelistedVulnerabilities);
     }
 
     public TrivyTwoScanComparison compareLatestScanWithPrevious(String title) throws TrivyScanHistoryNotDeepEnoughException
@@ -141,12 +133,15 @@ public class TrivyScanHistory {
         unfixedVulnerabilities.retainAll(previousVulnerabilities);
         unfixedVulnerabilities = whitelistedVulnerabilities.filterWhitelistedVulnerabilities(unfixedVulnerabilities, whitelistEntries);
 
+        TrivyScanVulnerabilities openVulnerabilities = new TrivyScanVulnerabilities(unfixedVulnerabilities, Boolean.TRUE);
+        openVulnerabilities.addAll(new TrivyScanVulnerabilities(newVulnerabilities, Boolean.FALSE));
+
         // Get the list of fixed vulnerabilities
         TrivyScanVulnerabilities fixedVulnerabilities = new TrivyScanVulnerabilities(previousVulnerabilities);
         fixedVulnerabilities.removeAll(lastVulnerabilities);
 
         return new TrivyTwoScanComparison(title, getArtefactNames(), getArtefactType(), historyMayNotBeForSameArtefact, trivyScanFrom.getCreatedAt(), trivyScanTo.getCreatedAt(),
-            new TrivyScanVulnerabilitySummary(newVulnerabilities, unfixedVulnerabilities), new TrivyScanVulnerabilitySummary(fixedVulnerabilities), whitelistedVulnerabilities);
+            openVulnerabilities, fixedVulnerabilities, whitelistedVulnerabilities);
     }
 
     public TreeMap<LocalDate, TrivyScan> getScanHistory() {

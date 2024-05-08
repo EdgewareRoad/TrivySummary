@@ -14,8 +14,10 @@
 
     <h1 th:text="|${title}|">Title</h1>
 
-    <p th:text="|Report date is ${new java.util.Date().toString()}|">Report date is ...</p>
-    <p th:text="|Trivy scans spanning ${fromDate} to ${toDate}.|">Today is ...</p>
+    <p th:text="|Report date is ${stringUtils.displayTodaysDate()}|">Report date is ...</p>
+    <p th:if="${offlineMode}" th:text="|Trivy scans spanning ${stringUtils.displayDate(fromDate)} to ${stringUtils.displayDate(toDate)}.|">Today is ...</p>
+    <p th:if="${!offlineMode && useTodayForEPSSQuery}" th:text="|Trivy scans spanning ${stringUtils.displayDate(fromDate)} to ${stringUtils.displayDate(toDate)}. EPSS scores for ${stringUtils.displayTodaysDate()}.|">Today is ...</p>
+    <p th:if="${!offlineMode && !useTodayForEPSSQuery}" th:text="|Trivy scans spanning ${stringUtils.displayDate(fromDate)} to ${stringUtils.displayDate(toDate)}. EPSS scores for ${stringUtils.displayDate(toDate)}.|">Today is ...</p>
     <p th:if="${earlierArtefactName == laterArtefactName}">Artefact scanned is <b><span th:text="${earlierArtefactName}" /></b> of type <b><span th:text="${artefactType}" /></b></p>
     <p th:if="${earlierArtefactName != laterArtefactName}">Artefacts scanned are <b><span th:text="${earlierArtefactName}" /></b> to <b><span th:text="${laterArtefactName}" /></b> of type <b><span th:text="${artefactType}" /></b></p>
     <p th:if="${comparisonMayNotBeForSameArtefact}">
@@ -33,36 +35,26 @@
             <li><a href="#openVulnerabilities">Open vulnerabilities</a></li>
             <li><a href="#whitelistedVulnerabilities">Whitelisted vulnerabilities</a></li>
             <li><a href="#closedVulnerabilities">Closed vulnerabilities</a></li>
+            <li><a href="#configuration">Report configuration</a></li>
         </ul>
     </p>
 
     <a id="openVulnerabilities"/>
     <h2>Open vulnerabilities</h2>
 
-    <p th:if="${svgGraph != ''}" class="pagebreakafter" th:utext="${svgGraph}"></p>
-
     <p>
-        <h3 th:if="${hasPriorityBands == true}">Higher Priority (More Severe and Exploitable) Vulnerabilities</h3>
-        <table th:with="severities = ${ { { 'UNKNOWN', 'vulnSevCritical' }, { 'CRITICAL', 'vulnSevCritical' }, { 'HIGH', 'vulnSevHigh' }, { 'MEDIUM', 'vulnSevMedium' }, { 'LOW', 'vulnSevLow' } } }">
+        <table th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
             <tr>
-                <td th:each="severity : ${severities}" th:if="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], true)} != null" th:class="|${severity[1]} severityCountBox|">
-                        <span th:text="${severity[0]}"></span>
+                <td th:each="priority : ${priorities}" th:if="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()} != null" th:class="|${priority[1]} priorityCountBox|">
+                        <span class="vulnPriority" th:text="${priority[0]}"></span>
                         <br/>
-                        <span class="severityCount" th:text="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], true)}">???</span>
-                </td>
-            </tr>
-        </table>
-        <h3 th:if="${hasPriorityBands == true}">Lower Priority (Less Severe and/or Exploitable) Vulnerabilities</h3>
-        <table th:if="${hasPriorityBands == true}" th:with="severities = ${ { { 'UNKNOWN', 'vulnSevUnknownNonPriority' }, { 'CRITICAL', 'vulnSevCriticalNonPriority' }, { 'HIGH', 'vulnSevHighNonPriority' }, { 'MEDIUM', 'vulnSevMediumNonPriority' }, { 'LOW', 'vulnSevLowNonPriority' } } }">
-            <tr>
-                <td th:each="severity : ${severities}" th:if="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], false)} != null" th:class="|${severity[1]} severityCountBox|">
-                        <span class="vulnSeverity" th:text="${severity[0]}"></span>
-                        <br/>
-                        <span class="severityCount" th:text="${openVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0], false)}">???</span>
+                        <span class="priorityCount" th:text="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()}">???</span>
                 </td>
             </tr>
         </table>
     </p>
+
+    <p th:if="${svgGraph != ''}" class="pagebreakafter" th:utext="${svgGraph}"></p>
 
     <table class="mainTableVulnerabilities pagebreakafter">
         <caption>
@@ -71,23 +63,22 @@
         <thead class="mainTableHeader" >
             <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Severity</th>
+                <th scope="col">Priority</th>
                 <th scope="col">Title</th>
                 <th scope="col">Packages affected</th>
             </tr>
         </thead>
         <tbody class="mainTableBody" >
-            <tr class="mainTableBodyRow" th:if="${openVulnerabilities.vulnerabilities.empty}">
+            <tr class="mainTableBodyRow" th:if="${openVulnerabilities.empty}">
                 <td colspan="4"> No vulnerabilities </td>
             </tr>
-            <tr class="mainTableBodyRow" th:each="vulnerability : ${openVulnerabilities.vulnerabilities.sorted}" th:with="severities = ${ { { 'UNKNOWN', 'vulnSevUnknown' }, { 'CRITICAL', 'vulnSevCritical' }, { 'HIGH', 'vulnSevHigh' }, { 'MEDIUM', 'vulnSevMedium' }, { 'LOW', 'vulnSevLow' } } }">
+            <tr class="mainTableBodyRow" th:each="vulnerability : ${openVulnerabilities.sorted}" th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
                 <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
                     <span th:if="${vulnerability.nvdReference} != null"> <a class="secondaryRef" th:href="${vulnerability.nvdReference}">NVD</a></span>
                     <span th:if="${vulnerability.redhatReference} != null"> <a class="secondaryRef" th:href="${vulnerability.redhatReference}">RedHat</a></span>
                     <p th:if="${vulnerability.wasInPreviousScan == false}" class="newVulnerabilityMarker">&nbsp;NEW&nbsp;</p>
-                    <p th:if="${vulnerability.isPriorityForRemediation == false}" class="secondaryRef">Lower priority - less severe and/or exploitable</p>
                 </td>
-                <td th:class="|vulnSev${stringUtils.toUpperCamelCase(vulnerability.severity.name())}${stringUtils.conditional(vulnerability.isPriorityForRemediation,'','NonPriority')}|"><span class="vulnSeverity" th:text="${vulnerability.severity.name()}"/><p><span class="vulnScore" th:text="|CVSS: ${vulnerability.cvssScore}|"/><br class="vulnScore" /><span class="vulnScore" th:if="${vulnerability.epssScore} != null" th:text="|EPSS: ${stringUtils.displayDouble(vulnerability.epssScore)}|"/></p></td>
+                <td th:class="|vulnPriority${stringUtils.toUpperCamelCase(vulnerability.priority.name())}|"><span class="vulnPriority" th:text="${vulnerability.priority.name()}"/><p><span class="vulnScore" th:text="|Vendor Severity: ${vulnerability.vendorSeverity.name()}|"/><br class="vulnScore" /><span class="vulnScore" th:text="|CVSS: ${vulnerability.cvssScore}|"/><br class="vulnScore" /><span class="vulnScore" th:if="${vulnerability.epssScore} != null" th:text="|EPSS: ${stringUtils.displayDouble(vulnerability.epssScore)}|"/></p></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
                 <td>
                     <table class="subTablePackageVulnerabilities">
@@ -118,23 +109,23 @@
         <thead class="whitelistTableHeader" >
             <tr>
                 <th scope="col"> ID </th>
-                <th scope="col"> Severity </th>
+                <th scope="col"> Priority </th>
                 <th scope="col"> Title </th>
                 <th scope="col"> Whitelisting Justification </th>
                 <th scope="col"> Next Review </th>
                 <th scope="col"> Approval </th>
             </tr>
         </thead>
-        <tbody class="whitelistTableBody" >
+        <tbody class="whitelistTableBody pagebreakafter" >
             <tr class="whitelistTableBodyRow" th:if="${whitelistedVulnerabilities.empty}">
                 <td colspan="6"> No whitelisted vulnerabilities present </td>
             </tr>
-            <tr class="whitelistTableBodyRow" th:each="vulnerability : ${whitelistedVulnerabilities}">
+            <tr class="whitelistTableBodyRow" th:each="vulnerability : ${whitelistedVulnerabilities.sorted}">
                 <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
                     <span th:if="${vulnerability.nvdReference} != null"> <a class="secondaryRef" th:href="${vulnerability.nvdReference}">NVD</a></span>
                     <span th:if="${vulnerability.redhatReference} != null"> <a class="secondaryRef" th:href="${vulnerability.redhatReference}">RedHat</a></span>
                 </td>
-                <td th:class="|vulnSev${stringUtils.toUpperCamelCase(vulnerability.severity.name())}|"><span class="vulnSeverity" th:text="${vulnerability.severity.name()}"/></td>
+                <td th:class="|vulnPriority${stringUtils.toUpperCamelCase(vulnerability.priority.name())}|"><span class="vulnPriority" th:text="${vulnerability.priority.name()}"/><p><span class="vulnScore" th:text="|Vendor Severity: ${vulnerability.vendorSeverity.name()}|"/><br class="vulnScore" /><span class="vulnScore" th:text="|CVSS: ${vulnerability.cvssScore}|"/><br class="vulnScore" /><span class="vulnScore" th:if="${vulnerability.epssScore} != null" th:text="|EPSS: ${stringUtils.displayDouble(vulnerability.epssScore)}|"/></p></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.whitelistingReason)}">This is the whitelisting justification</span></td>
                 <td th:if="${vulnerability.requiresReview()}"><b>OVERDUE</b></td>
@@ -149,42 +140,56 @@
     <h2>Closed vulnerabilities</h2>
 
     <p>
-        <table th:with="severities = ${ { { 'UNKNOWN', 'vulnSevCritical' }, { 'CRITICAL', 'vulnSevCritical' }, { 'HIGH', 'vulnSevHigh' }, { 'MEDIUM', 'vulnSevMedium' }, { 'LOW', 'vulnSevLow' } } }">
+        <table th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
             <tr>
-                <td th:each="severity : ${severities}" th:if="${closedVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0])} != null" th:class="|${severity[1]} severityCountBox|">
-                        <span th:text="${severity[0]}"></span>
+                <td th:each="priority : ${priorities}" th:if="${closedVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()} != null" th:class="|${priority[1]} priorityCountBox|">
+                        <span class="vulnPriority" th:text="${priority[0]}"></span>
                         <br/>
-                        <span class="severityCount" th:text="${closedVulnerabilities.getCountOfVulnerabilitiesAtSeverity(severity[0])}">???</span>
+                        <span class="priorityCount" th:text="${closedVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()}">???</span>
                 </td>
             </tr>
         </table>
     </p>
 
-    <table class="mainTableClosedVulnerabilities">
+    <table class="mainTableClosedVulnerabilities pagebreakafter">
         <caption>
             Closed vulnerabilities - Details
         </caption>
         <thead class="mainTableHeader" >
             <tr>
-                <th scope="col"> ID </th>
-                <th scope="col"> Severity </th>
-                <th scope="col"> Title </th>
+                <th scope="col">ID</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Title</th>
             </tr>
         </thead>
         <tbody class="mainTableBody" >
-            <tr class="mainTableBodyRow" th:if="${closedVulnerabilities.vulnerabilities.empty}">
-                <td colspan="4"> No vulnerabilities closed between Trivy scans </td>
+            <tr class="mainTableBodyRow" th:if="${closedVulnerabilities.empty}">
+                <td colspan="4"> No vulnerabilities </td>
             </tr>
-            <tr class="mainTableBodyRow" th:each="vulnerability : ${closedVulnerabilities.vulnerabilities.sorted}">
+            <tr class="mainTableBodyRow" th:each="vulnerability : ${closedVulnerabilities.sorted}" th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
                 <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
                     <span th:if="${vulnerability.nvdReference} != null"> <a class="secondaryRef" th:href="${vulnerability.nvdReference}">NVD</a></span>
                     <span th:if="${vulnerability.redhatReference} != null"> <a class="secondaryRef" th:href="${vulnerability.redhatReference}">RedHat</a></span>
                 </td>
-                <td th:class="|vulnSev${stringUtils.toUpperCamelCase(vulnerability.severity.name())}|"><span class="vulnSeverity" th:text="${vulnerability.severity.name()}"/></td>
+                <td th:class="|vulnPriority${stringUtils.toUpperCamelCase(vulnerability.priority.name())}|"><span class="vulnPriority" th:text="${vulnerability.priority.name()}"/><p><span class="vulnScore" th:text="|Vendor Severity: ${vulnerability.vendorSeverity.name()}|"/><br class="vulnScore" /><span class="vulnScore" th:text="|CVSS: ${vulnerability.cvssScore}|"/><br class="vulnScore" /><span class="vulnScore" th:if="${vulnerability.epssScore} != null" th:text="|EPSS: ${stringUtils.displayDouble(vulnerability.epssScore)}|"/></p></td>
                 <td><span th:text="${stringUtils.getHyphenated(vulnerability.title)}">This is the vulnerability title</span></td>
             </tr>
         </tbody>
     </table>
 
+    <a id="configuration"/>
+    <h2>Report configuration</h2>
+
+    <p th:if="${isOffline}">Offline scan. No EPSS scores calculated. All priorities are calculated purely on the basis of vendor severity.</p>
+    <p th:unless="${isOffline}"><span th:text="|EPSS scores loaded reflecting the ${useTodayForEPSSQuery ? 'date of this report' : 'date of the most recent scan'}. |"></span><span th:if="${priorityModel == null || priorityModel.getType().name() == 'SEVERITYONLY'}">All priorities are calculated purely on the basis of vendor severity.</span><span th:if="${priorityModel != null && priorityModel.getType().name() == 'RECTANGULAR'}">All priorities are calculated on a rectangular priority model.</span><span th:if="${priorityModel != null && priorityModel.getType().name() == 'ELLIPTICAL'}">All priorities are calculated on an elliptical priority model.</span>
+    </p>
+    <p th:if="${priorityModel != null && priorityModel.getType().name() != 'SEVERITYONLY'}"><span th:if="${priorityModel.criticalThresholds == null && priorityModel.highThresholds == null && priorityModel.mediumThresholds == null}"><b>WARNING: </b>No priority thresholds set in this priority model.</span><span th:unless="${priorityModel.criticalThresholds == null && priorityModel.highThresholds == null && priorityModel.mediumThresholds == null}">Thresholds for each priority:
+            <ul>
+                <li th:if="${priorityModel.criticalThresholds} != null" th:text="|CRITICAL: Minimum CVSS ${priorityModel.criticalThresholds.minimumCVSS}, Minimum EPSS ${priorityModel.criticalThresholds.minimumEPSS}|"></li>
+                <li th:if="${priorityModel.highThresholds} != null" th:text="|HIGH: Minimum CVSS ${priorityModel.highThresholds.minimumCVSS}, Minimum EPSS ${priorityModel.highThresholds.minimumEPSS}|"></li>
+                <li th:if="${priorityModel.mediumThresholds} != null" th:text="|MEDIUM: Minimum CVSS ${priorityModel.mediumThresholds.minimumCVSS}, Minimum EPSS ${priorityModel.mediumThresholds.minimumEPSS}|"></li>
+            </ul>
+        </span>
+    </p>
 </body>
 </html>

@@ -1,31 +1,32 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.history;
 
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
-import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitySummary;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
 public class TrivyOneScanSummary {
     private String title;
     private String artefactName;
     private String artefactType;
-    private Date scanDate;
-    private TrivyScanVulnerabilitySummary vulnerabilitiesOpen;
+    private LocalDate scanDate;
+    private TrivyScanVulnerabilities vulnerabilitiesOpen;
     private TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted;
 
     public TrivyOneScanSummary(
         String title,
         String artefactName,
         String artefactType,
-        Date scanDate,
-        TrivyScanVulnerabilitySummary vulnerabilitiesOpen,
+        LocalDate scanDate,
+        TrivyScanVulnerabilities vulnerabilitiesOpen,
         TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted) {
 
         if (title == null)
         {
-            DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM);
-            title = String.format("Artefact %s of type %s, scanned %s", artefactName, artefactType, format.format(scanDate));
+            DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+            title = String.format("Artefact %s of type %s, scanned %s", artefactName, artefactType, scanDate.format(formatter));
         }
 
         this.title = title;
@@ -48,11 +49,11 @@ public class TrivyOneScanSummary {
         return artefactType;
     }
 
-    public Date getScanDate() {
+    public LocalDate getScanDate() {
         return scanDate;
     }
 
-    public TrivyScanVulnerabilitySummary getOpenVulnerabilities() {
+    public TrivyScanVulnerabilities getOpenVulnerabilities() {
         return vulnerabilitiesOpen;
     }
 

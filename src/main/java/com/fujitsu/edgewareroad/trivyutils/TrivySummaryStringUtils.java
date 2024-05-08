@@ -1,5 +1,8 @@
 package com.fujitsu.edgewareroad.trivyutils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.regex.Pattern;
 
 import org.springframework.util.StringUtils;
@@ -8,6 +11,7 @@ public class TrivySummaryStringUtils {
     private final Pattern whitespaceSplitter = Pattern.compile("\s+");
     private final Pattern longWordSplitter = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])|(?<!^)(?=[:\\-/.])");
     private final int WORD_LEN_BEFORE_HYPHENATE = 18;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
 
     public String getHyphenated(String input)
     {
@@ -49,6 +53,16 @@ public class TrivySummaryStringUtils {
         }
 
         return builder.toString();
+    }
+
+    public String displayDate(LocalDate value)
+    {
+        return value != null ? value.format(dateFormatter) : "<no date specified>";
+    }
+
+    public String displayTodaysDate()
+    {
+        return LocalDate.now().format(dateFormatter);
     }
 
     public String displayDouble(Double value)

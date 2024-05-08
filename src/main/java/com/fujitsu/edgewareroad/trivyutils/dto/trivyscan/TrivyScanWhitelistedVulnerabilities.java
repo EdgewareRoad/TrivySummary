@@ -1,11 +1,9 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan;
 
-import java.util.TreeSet;
-
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntry;
 
-public class TrivyScanWhitelistedVulnerabilities extends TreeSet<TrivyScanWhitelistedVulnerability> {
+public class TrivyScanWhitelistedVulnerabilities extends TrivyScanVulnerabilitySet<TrivyScanWhitelistedVulnerability> {
     public TrivyScanVulnerabilities filterWhitelistedVulnerabilities(TrivyScanVulnerabilities unfilteredVulnerabilities, WhitelistEntries whitelistEntries)
     {
         TrivyScanVulnerabilities filteredVulnerabilities = new TrivyScanVulnerabilities();

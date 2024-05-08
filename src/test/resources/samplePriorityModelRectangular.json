@@ -1,0 +1,15 @@
+{
+    "type": "RECTANGULAR",
+    "criticalPriorityThresholds": {
+        "minimumCVSS": 7.0,
+        "minimumEPSS": 0.4
+    },
+    "highPriorityThresholds": {
+        "minimumCVSS": 4.5,
+        "minimumEPSS": 0.25
+    },
+    "mediumPriorityThresholds": {
+        "minimumCVSS": 2.0,
+        "minimumEPSS": 0.05
+    }
+}
