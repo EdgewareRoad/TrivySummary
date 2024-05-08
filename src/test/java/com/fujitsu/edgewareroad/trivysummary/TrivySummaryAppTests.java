@@ -7,13 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -24,7 +22,6 @@ import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEn
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
-@SpringBootTest
 class TrivySummaryAppTests {
 
 	static ObjectMapper mapper = new ObjectMapper();
