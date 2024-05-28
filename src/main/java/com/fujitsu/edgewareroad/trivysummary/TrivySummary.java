@@ -40,7 +40,7 @@ import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
 public class TrivySummary {
     public static class Configuration {
-        private Path outputFile = Paths.get(System.getProperty("user.dir"), "output.json");
+        private Path outputFile = Paths.get(System.getProperty("user.dir"), "output.pdf");
 	    private boolean offlineMode = false;
 	    private boolean useTodayForEPSSQuery = false;
 	    private PriorityModel priorityModel = new PriorityModel();
@@ -51,10 +51,23 @@ public class TrivySummary {
             return outputFile;
         }
 
+		public void setDefaultOutputPathFromInputFile(Path inputFile)
+		{
+			String fileName = inputFile.getFileName().toString();
+			if (fileName.endsWith(".json"))
+			{
+				fileName = fileName.substring(0, fileName.length() - ".json".length()) + ".pdf";
+			}
+			else
+			{
+				fileName = fileName + ".pdf";
+			}
+			this.outputFile = inputFile.getParent().resolve(fileName);
+		}
+
         public void setOutputFile(Path outputFile) {
             this.outputFile = outputFile;
         }
-
 
         public boolean isOfflineMode() {
             return offlineMode;
@@ -124,7 +137,7 @@ public class TrivySummary {
         history.getWhitelistEntries().addAll(entries);
     }
 
-	public boolean summariseTrivyHistory(String title) throws IOException, TrivyScanHistoryNotDeepEnoughException
+	public boolean summariseTrivyHistory(String title) throws IOException, TrivyScanHistoryNotDeepEnoughException, TrivyScanCouldNotRetrieveEPSSScoresException
 	{
 		String statusMessage = null;
 		boolean statusIsWarning = false;
@@ -145,7 +158,7 @@ public class TrivySummary {
 			TrivyScanVulnerabilities closedVulnerabilities = comparison.getClosedVulnerabilities();
 			if (!configuration.isOfflineMode())
 			{
-                LocalDate epssQueryDate = configuration.isUseTodayForEPSSQuery() ? null : comparison.getToScanDate();
+                LocalDate epssQueryDate = configuration.isUseTodayForEPSSQuery() || comparison.getToScanDate().equals(LocalDate.now()) ? null : comparison.getToScanDate();
 
 				// Try to update EPSS scores for open vulnerabilities. If they fail, we set
 				// offline mode to be true.
@@ -153,9 +166,7 @@ public class TrivySummary {
 					updateEPSSScores(openVulnerabilities, false, epssQueryDate);
 					openVulnerabilities.prioritiseForRemediation(configuration.getPriorityModel());
 				} catch (Exception e) {
-					statusMessage = "Could not retrieve EPSS scores for open vulnerabilities; no graph applied and open vulnerabilities will be prioritised only by vendor severity.";
-					statusIsWarning = true;
-					configuration.setOfflineMode(true); // Set this flag so we don't work with incomplete data
+					throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Could not retrieve EPSS scores for open vulnerabilities; Cannot create graph or prioritise vulnerabilities. Please check connectivity to %s or re-run TrivySummary with --offline.", BASE_EPSS_API_URL));
 				}
 				// Now update EPSS scores for closed vulnerabilities.
 				try {
@@ -232,7 +243,7 @@ public class TrivySummary {
 			openVulnerabilities = summary.getOpenVulnerabilities();
 			TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities = summary.getWhitelistedVulnerabilities();
 			if (!configuration.isOfflineMode()) {
-                LocalDate epssQueryDate = configuration.isUseTodayForEPSSQuery() ? null : summary.getScanDate();
+                LocalDate epssQueryDate = configuration.isUseTodayForEPSSQuery() || summary.getScanDate().equals(LocalDate.now()) ? null : summary.getScanDate();
 
 				// Try to update EPSS scores for open vulnerabilities. If they fail, we set
 				// offline mode to be true.
@@ -240,9 +251,7 @@ public class TrivySummary {
 					updateEPSSScores(openVulnerabilities, false, epssQueryDate);
 					openVulnerabilities.prioritiseForRemediation(configuration.getPriorityModel());
 				} catch (Exception e) {
-					statusMessage = "Could not retrieve EPSS scores for open vulnerabilities; no graph applied and open vulnerabilities will be prioritised only by vendor severity.";
-					statusIsWarning = true;
-					configuration.setOfflineMode(true); // Set this flag so we don't work with incomplete data
+					throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Could not retrieve EPSS scores for open vulnerabilities; Cannot create graph or prioritise vulnerabilities. Please check connectivity to %s or re-run TrivySummary with --offline.", BASE_EPSS_API_URL));
 				}
 				// Now update EPSS scores for whitelisted vulnerabilities.
 				try {
@@ -362,6 +371,8 @@ public class TrivySummary {
         }
     }
 
+	private static final String BASE_EPSS_API_URL = "https://api.first.org/data/v1/epss";
+
     private void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws IOException, InterruptedException
     {
         StringBuffer urlString = null;
@@ -369,7 +380,7 @@ public class TrivySummary {
         {
             if (urlString == null)
             {
-                urlString = new StringBuffer("https://api.first.org/data/v1/epss?cve=");
+                urlString = new StringBuffer(BASE_EPSS_API_URL + "?cve=");
                 urlString.append(vulnerability.getVulnerabilityID());
             }
             else

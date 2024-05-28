@@ -1,3 +1,16 @@
+Release 3.0.2:
+
+If the scan date is today, TrivySummary now omits the date from the EPSS Query as this
+can sometimes cause issues if an explicit date of today is used (assume due to time
+zones, calling this in the morning from the UK before the daily stats are generated).
+
+Default output file is now, for a single input file, the same name and folder but with
+a .pdf suffix. For the scenario where two input files are used, the default output 
+file path is the same as the input file but with name output.pdf.
+
+If not in offline mode and there are errors experienced in calling the EPSS API, the
+operation will simply fail with an error message, rather than creating a report.
+
 Release 3.0.1:
 
 Bug fixes

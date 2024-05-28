@@ -65,7 +65,7 @@ class TrivySummaryAppTests {
 	}
 
 	@Test
-	void contextLoads(@TempDir(cleanup = CleanupMode.NEVER) Path tempDir) throws URISyntaxException, StreamReadException, DatabindException, IOException, TrivyScanHistoryMustBeForSameArtefactType, TrivyScanHistoryNotDeepEnoughException {
+	void contextLoads(@TempDir(cleanup = CleanupMode.NEVER) Path tempDir) throws URISyntaxException, StreamReadException, DatabindException, IOException, TrivyScanHistoryMustBeForSameArtefactType, TrivyScanHistoryNotDeepEnoughException, TrivyScanCouldNotRetrieveEPSSScoresException {
 		PriorityModel priorityModelElliptical = mapper.readValue(Path.of(classLoader.getResource("samplePriorityModelElliptical.json").toURI()).toFile(), PriorityModel.class);
 		PriorityModel priorityModelRectangular = mapper.readValue(Path.of(classLoader.getResource("samplePriorityModelRectangular.json").toURI()).toFile(), PriorityModel.class);
 		PriorityModel priorityModelSeverityOnly = mapper.readValue(Path.of(classLoader.getResource("samplePriorityModelSeverityOnly.json").toURI()).toFile(), PriorityModel.class);

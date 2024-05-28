@@ -74,6 +74,23 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			configuration.setUseTodayForEPSSQuery(true);;
 		}
 
+
+		List<String> inputFiles = args.getNonOptionArgs();
+		if (inputFiles.size() == 0)
+		{
+			output("ERROR: no input files specified");
+			displayHelp();
+			this.exitCode = -1;
+			return;
+		}
+		if (inputFiles.size() > 2)
+		{
+			output("ERROR: too many input files specified");
+			displayHelp();
+			this.exitCode = -1;
+			return;
+		}
+
 		if (args.containsOption("outputFile"))
 		{
 			List<String> inputValues = args.getOptionValues("outputFile");
@@ -104,21 +121,11 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				return;
 			}
 		}
-
-		List<String> inputFiles = args.getNonOptionArgs();
-		if (inputFiles.size() == 0)
+		else if (inputFiles.size() == 1)
 		{
-			output("ERROR: no input files specified");
-			displayHelp();
-			this.exitCode = -1;
-			return;
-		}
-		if (inputFiles.size() > 2)
-		{
-			output("ERROR: too many input files specified");
-			displayHelp();
-			this.exitCode = -1;
-			return;
+			// If we've not set an explicit output file and we have a single input file, then derive
+			// an output file from this name
+			configuration.setDefaultOutputPathFromInputFile(workingDirectory.resolve(inputFiles.get(0)));
 		}
 
 		String title = null;
@@ -262,6 +269,10 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			return;
 		} catch (TrivyScanHistoryNotDeepEnoughException e) {
 			output("ERROR: System error - Trivy Scan History not deep enough - should never reach this");
+			this.exitCode = -1;
+			return;
+		} catch (TrivyScanCouldNotRetrieveEPSSScoresException e) {
+			output("ERROR: %s", e.getMessage());
 			this.exitCode = -1;
 			return;
 		}
