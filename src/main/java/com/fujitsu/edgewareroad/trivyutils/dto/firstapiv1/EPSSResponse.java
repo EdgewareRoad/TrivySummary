@@ -1,7 +1,9 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.firstapiv1;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EPSSResponse {
     @JsonProperty
     private String status;

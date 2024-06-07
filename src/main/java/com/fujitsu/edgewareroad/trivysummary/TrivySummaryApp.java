@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -184,6 +185,12 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 						displayHelp();
 						this.exitCode = -1;
 						return;
+					} catch (FileNotFoundException e) {
+						output("ERROR: Priority model not found %s", priorityModelPath.toString());
+						output("");
+						displayHelp();
+						this.exitCode = -1;
+						return;
 					} catch (IOException e) {
 						output("ERROR: File IO exception for priority model %s", priorityModelPath.toString());
 						output("");
@@ -191,7 +198,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 						this.exitCode = -1;
 						return;
 					}
-				}
+		}
 			}
 		}
 
@@ -222,6 +229,12 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					displayHelp();
 					this.exitCode = -1;
 					return;
+				} catch (FileNotFoundException e) {
+					output("ERROR: Whitelist file not found %s", whiteListFilePath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
 				} catch (IOException e) {
 					output("ERROR: File IO exception for whitelist file %s", whiteListFilePath.toString());
 					output("");
@@ -239,6 +252,12 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 
 			try {
 				worker.addTrivyScanFileToHistory(filePath);
+			} catch (FileNotFoundException e) {
+				output("ERROR: Could not find input file %s", filePath.toString());
+				output("");
+				displayHelp();
+				this.exitCode = -1;
+				return;
 			} catch (IOException e) {
 				output("ERROR: Could not read input file %s", filePath.toString());
 				output("");
@@ -273,6 +292,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			return;
 		} catch (TrivyScanCouldNotRetrieveEPSSScoresException e) {
 			output("ERROR: %s", e.getMessage());
+			output("Cause of EPSS score retrieval failure: %s: %s", e.getCause().getClass().getName(), e.getCause().getMessage());
 			this.exitCode = -1;
 			return;
 		}

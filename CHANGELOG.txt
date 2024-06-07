@@ -1,3 +1,9 @@
+Release 3.0.3:
+
+Fixed bug caused by EPSS API changing response format - now ignores new fields
+Better diagnostics in exception conditions (separate message for files not found, error trace when EPSS API
+generates exception)
+
 Release 3.0.2:
 
 If the scan date is today, TrivySummary now omits the date from the EPSS Query as this

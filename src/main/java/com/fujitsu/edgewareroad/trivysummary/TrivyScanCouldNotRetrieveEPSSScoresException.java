@@ -1,8 +1,8 @@
 package com.fujitsu.edgewareroad.trivysummary;
 
 public class TrivyScanCouldNotRetrieveEPSSScoresException extends Exception {
-    public TrivyScanCouldNotRetrieveEPSSScoresException(String message)
+    public TrivyScanCouldNotRetrieveEPSSScoresException(String message, Exception e)
     {
-        super(message);
+        super(message, e);
     }
 }

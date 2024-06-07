@@ -166,7 +166,7 @@ public class TrivySummary {
 					updateEPSSScores(openVulnerabilities, false, epssQueryDate);
 					openVulnerabilities.prioritiseForRemediation(configuration.getPriorityModel());
 				} catch (Exception e) {
-					throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Could not retrieve EPSS scores for open vulnerabilities; Cannot create graph or prioritise vulnerabilities. Please check connectivity to %s or re-run TrivySummary with --offline.", BASE_EPSS_API_URL));
+					throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Could not retrieve EPSS scores for open vulnerabilities; Cannot create graph or prioritise vulnerabilities. Please check connectivity to %s or re-run TrivySummary with --offline.", BASE_EPSS_API_URL), e);
 				}
 				// Now update EPSS scores for closed vulnerabilities.
 				try {
@@ -251,7 +251,7 @@ public class TrivySummary {
 					updateEPSSScores(openVulnerabilities, false, epssQueryDate);
 					openVulnerabilities.prioritiseForRemediation(configuration.getPriorityModel());
 				} catch (Exception e) {
-					throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Could not retrieve EPSS scores for open vulnerabilities; Cannot create graph or prioritise vulnerabilities. Please check connectivity to %s or re-run TrivySummary with --offline.", BASE_EPSS_API_URL));
+					throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Could not retrieve EPSS scores for open vulnerabilities; Cannot create graph or prioritise vulnerabilities. Please check connectivity to %s or re-run TrivySummary with --offline.", BASE_EPSS_API_URL), e);
 				}
 				// Now update EPSS scores for whitelisted vulnerabilities.
 				try {
