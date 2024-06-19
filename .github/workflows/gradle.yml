@@ -36,20 +36,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        include:
-          - os: ubuntu-latest
-            executable: 'trivysummary'
-            output-variant: 'linux-amd64'
-            output-suffix: ''
-          - os: macos-latest
-            executable: 'trivysummary'
-            output-name: 'macos-amd64'
-            output-suffix: ''
-          - os: windows-latest
-            executable: 'trivysummary.exe'
-            output-name: 'windows-amd64'
-            output-suffix: '.exe'
+        os: [macos-latest, macos-12, windows-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Set up JDK 21
@@ -96,3 +83,4 @@ jobs:
             build/native/nativeCompile/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.exe
             build/native/nativeCompile/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
             build/native/nativeCompile/trivysummary-macos-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
+            build/native/nativeCompile/trivysummary-macos-aarch64-${{ steps.read-properties.outputs.trivysummary_version }}
