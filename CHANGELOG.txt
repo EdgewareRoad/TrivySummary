@@ -1,3 +1,9 @@
+Release 3.1.0:
+
+Added native builds for Windows and Linux on Intel/AMD 64-bit processors. Will enable slimmed down Docker
+image to be created and simplify making a Trivy plug-in (although Mac OS builds failing so might be for the
+future only)
+
 Release 3.0.3:
 
 Fixed bug caused by EPSS API changing response format - now ignores new fields
