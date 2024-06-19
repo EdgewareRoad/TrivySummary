@@ -322,9 +322,6 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		output("        allows a view to be taken of improvements made, & what's left to fix.");
 
 		output("");
-		output("Note that, on Windows, trivysummary.bat should be used as the command.");
-
-		output("");
 		output("For scan dates, this application relies on the createdAt property added by");
 		output("later versions of Trivy (since v0.48.0).");
 

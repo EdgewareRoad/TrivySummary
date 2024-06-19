@@ -68,8 +68,6 @@ jobs:
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
         run: gradle nativeCompile
-      - name: Copy native executable to output name
-        run: copy build/native/nativeCompile/${{ matrix.executable }} build/distributions/trivysummary-${{ matrix.output-variant }}-${{ steps.read-properties.outputs.trivysummary_version }}${{ matrix.output-suffix }}
   publish:
     needs: build-native
     runs-on: ubuntu-latest
@@ -95,6 +93,6 @@ jobs:
           token: ${{ secrets.MAVENREPO_TOKEN }}
           files: |
             build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
-            build/distributions/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.exe
-            build/distributions/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
-            build/distributions/trivysummary-macos-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
+            build/native/nativeCompile/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.exe
+            build/native/nativeCompile/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
+            build/native/nativeCompile/trivysummary-macos-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
