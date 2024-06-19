@@ -60,6 +60,7 @@ jobs:
     needs: build-native
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4.1.1
       - name: Read/Write Properties File
         uses: kurt-code/gha-properties@v0.0.2
         id: read-properties
