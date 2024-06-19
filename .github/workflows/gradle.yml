@@ -10,10 +10,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4.1.1
     - name: Set up JDK 21
-      uses: actions/setup-java@v4.2.1
+      uses: actions/setup-graalvm@v1.2.2
       with:
-        java-version: 21
-        distribution: corretto
+        java-version: '21'
+        distribution: 'graalvm'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Read/Write Properties File
       uses: kurt-code/gha-properties@v0.0.2
       id: read-properties
@@ -25,22 +26,75 @@ jobs:
       run: |
         echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
         echo "github.ref: ${{ github.ref }}"
-    - name: Build with Gradle
+    - name: Build and Test with Gradle
+      run: gradle test --warning-mode all
+    - name: Create distributable ZIP file with Gradle
       run: gradle distZip --warning-mode all
-  publish:
+  build-native:
     needs: build-java
+    name: Build TrivySummary natively on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            executable: 'trivysummary'
+            output-variant: 'linux-amd64'
+            output-suffix: ''
+          - os: macos-latest
+            executable: 'trivysummary'
+            output-name: 'macos-amd64'
+            output-suffix: ''
+          - os: windows-latest
+            executable: 'trivysummary.exe'
+            output-name: 'windows-amd64'
+            output-suffix: '.exe'
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Set up JDK 21
+        uses: actions/setup-graalvm@v1.2.2
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+      - name: Read/Write Properties File
+        uses: kurt-code/gha-properties@v0.0.2
+        id: read-properties
+        with:
+          operation: 'read'
+          file-path: 'src/main/resources/application.properties'
+          keys: 'trivysummary.version'
+      - name: Build natively with Gradle
+        run: gradle nativeCompile
+      - name: Copy native executable to output name
+        run: copy build/native/nativeCompile/${{ matrix.executable }} build/distributions/trivysummary-${{ matrix.output-variant }}-${{ steps.read-properties.outputs.trivysummary_version }}${{ matrix.output-suffix }}
+  publish:
+    needs: build-native
     runs-on: ubuntu-latest
     steps:
-    - name: Publish with Gradle
-      if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
-      run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
-    - name: "Create Release"
-      id: create_release
-      uses: softprops/action-gh-release@v2.0.4
-      if: startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version)
-      with:
-        tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
-        name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
-        body_path: CHANGELOG.txt
-        token: ${{ secrets.MAVENREPO_TOKEN }}
-        files: build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+      - name: Read/Write Properties File
+        uses: kurt-code/gha-properties@v0.0.2
+        id: read-properties
+        with:
+          operation: 'read'
+          file-path: 'src/main/resources/application.properties'
+          keys: 'trivysummary.version'
+      - name: Publish with Gradle
+        if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
+        run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
+      - name: "Create Release"
+        id: create_release
+        uses: softprops/action-gh-release@v2.0.5
+        if: startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version)
+        with:
+          tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
+          name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
+          body_path: CHANGELOG.txt
+          token: ${{ secrets.MAVENREPO_TOKEN }}
+          files: |
+            build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+            build/distributions/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.exe
+            build/distributions/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
+            build/distributions/trivysummary-macos-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
