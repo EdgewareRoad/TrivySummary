@@ -28,10 +28,12 @@ jobs:
     - name: Build and Test with Gradle
       run: gradle test --warning-mode all
     - name: Create distributable ZIP file with Gradle
+      run: gradle distZip --warning-mode all
+    - name: Copy distributable ZIP file
       run: |
-        gradle distZip --warning-mode all
-        mkdir dist
-        cp build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip dist/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+          ls build/distribution
+          mkdir dist
+          cp build/distributions/* dist
     - name: Publish with Gradle
       if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
       run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all

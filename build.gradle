@@ -13,11 +13,7 @@ group = 'com.fujitsu.edgewareroad'
 def appProps = new Properties()
 file("src/main/resources/application.properties").withInputStream { appProps.load(it) }
 
-def osName = System.getProperty("os.name")
-def os = osName.startsWith("Windows") ? "windows" : ( osName.startsWith("Linux") ? "linux" : ( osName.startsWith("Mac") ? "macos" : "unknown" ) )
-def arch = System.getProperty("os.arch")
-
-def version = appProps.getProperty("trivysummary.version")
+version = appProps.getProperty("trivysummary.version")
 
 repositories {
 	mavenCentral()
