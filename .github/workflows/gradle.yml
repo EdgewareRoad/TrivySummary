@@ -9,12 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4.1.1
-    - name: Set up GraalVM 21
-      uses: graalvm/setup-graalvm@v1.2.2
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4.2.1
       with:
         java-version: '21'
-        distribution: 'graalvm'
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        distribution: 'corretto'
     - name: Read/Write Properties File
       uses: kurt-code/gha-properties@v0.0.2
       id: read-properties
@@ -29,15 +28,18 @@ jobs:
     - name: Build and Test with Gradle
       run: gradle test --warning-mode all
     - name: Create distributable ZIP file with Gradle
-      run: gradle distZip --warning-mode all
-  build-native:
+      run: |
+        gradle distZip --warning-mode all
+        mkdir dist
+        cp build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip dist/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+    - name: Publish with Gradle
+      if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
+      run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
+
+  build-native-ubuntu:
     needs: build-java
-    name: Build TrivySummary natively on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-#        os: [macos-latest, macos-13, windows-latest, ubuntu-latest]
-        os: [windows-latest, ubuntu-latest]
+    name: Build TrivySummary natively on Linux
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Set up GraalVM 21
@@ -55,17 +57,27 @@ jobs:
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
-        run: gradle nativeCompile
-  release:
-    needs: build-native
-    runs-on: ubuntu-latest
+        run: gradle clean nativeCompile
+      - name: Package native code for release
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip build/native/nativeCompile/*
+
+  build-native-windows:
+    needs:
+      - build-java
+      - build-native-ubuntu
+    name: Build TrivySummary natively on Windows
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4.1.1
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Set up GraalVM 21
+        uses: graalvm/setup-graalvm@v1.2.2
         with:
           java-version: '21'
-          distribution: 'corretto'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
       - name: Read/Write Properties File
         uses: kurt-code/gha-properties@v0.0.2
         id: read-properties
@@ -73,9 +85,43 @@ jobs:
           operation: 'read'
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
-      - name: Publish with Gradle
-        if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
-        run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
+      - name: Build natively with Gradle
+        run: gradle clean nativeCompile
+  
+  package-native-windows:
+    needs:
+      - build-native-windows
+    name: Package TrivySummary for Windows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Read/Write Properties File
+        uses: kurt-code/gha-properties@v0.0.2
+        id: read-properties
+        with:
+          operation: 'read'
+          file-path: 'src/main/resources/application.properties'
+          keys: 'trivysummary.version'
+      - name: Package native code for release
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip build/native/nativeCompile/*
+        
+  release:
+    needs:
+      - build-java
+      - build-native-ubuntu
+      - package-native-windows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Read/Write Properties File
+        uses: kurt-code/gha-properties@v0.0.2
+        id: read-properties
+        with:
+          operation: 'read'
+          file-path: 'src/main/resources/application.properties'
+          keys: 'trivysummary.version'
       - name: "Create Release"
         id: create_release
         uses: softprops/action-gh-release@v2.0.5
@@ -85,9 +131,4 @@ jobs:
           name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
           body_path: CHANGELOG.txt
           token: ${{ secrets.MAVENREPO_TOKEN }}
-          files: |
-            build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
-            build/native/nativeCompile/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.exe
-            build/native/nativeCompile/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
-#            build/native/nativeCompile/trivysummary-macos-x86-64-${{ steps.read-properties.outputs.trivysummary_version }}
-#            build/native/nativeCompile/trivysummary-macos-aarch64-${{ steps.read-properties.outputs.trivysummary_version }}
+          files: dist/*

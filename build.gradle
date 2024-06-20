@@ -110,9 +110,10 @@ testing {
 graalvmNative {
 	binaries {
 		main {
-			imageName = 'trivysummary-'+os+'-'+arch+'-'+version
+			imageName = 'trivysummary'
 			mainClass = 'com.fujitsu.edgewareroad.trivysummary.TrivySummaryApp'
 			buildArgs.add("-O4")
+
 		}
 		test {
 			buildArgs.add("-O0")
