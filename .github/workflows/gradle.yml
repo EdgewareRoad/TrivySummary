@@ -30,6 +30,9 @@ jobs:
       run: gradle test --warning-mode all
     - name: Create distributable ZIP file with Gradle
       run: gradle distZip --warning-mode all
+    - name: Publish with Gradle
+      if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
+      run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
   build-native:
     needs: build-java
     name: Build TrivySummary natively on ${{ matrix.os }}
@@ -56,7 +59,7 @@ jobs:
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
         run: gradle nativeCompile
-  publish:
+  release:
     needs: build-native
     runs-on: ubuntu-latest
     steps:
@@ -75,9 +78,6 @@ jobs:
           operation: 'read'
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
-      - name: Publish with Gradle
-        if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
-        run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
       - name: "Create Release"
         id: create_release
         uses: softprops/action-gh-release@v2.0.5
