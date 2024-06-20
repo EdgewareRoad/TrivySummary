@@ -15,7 +15,6 @@ jobs:
         java-version: '21'
         distribution: 'graalvm'
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        native-image-job-reports: 'true'
     - name: Read/Write Properties File
       uses: kurt-code/gha-properties@v0.0.2
       id: read-properties
@@ -48,6 +47,7 @@ jobs:
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
+          native-image-musl: 'true'
       - name: Read/Write Properties File
         uses: kurt-code/gha-properties@v0.0.2
         id: read-properties
@@ -63,7 +63,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Set up JDK 21
-        uses: actions/setup-java@4.2.1
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'corretto'
