@@ -62,7 +62,7 @@ jobs:
         run: gradle clean nativeCompile
       - name: Package native code for release
         run: |
-          apt install zip -q
+          sudo apt install zip -q
           ls build/native/nativeCompile
           zip -qq -r dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i build/native/nativeCompile/*
 
@@ -107,7 +107,7 @@ jobs:
           keys: 'trivysummary.version'
       - name: Package native code for release
         run: |
-          apt install zip -q
+          sudo apt install zip -q
           ls build/native/nativeCompile
           zip -qq -r dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i build/native/nativeCompile/*
         
