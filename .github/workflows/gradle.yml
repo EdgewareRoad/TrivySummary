@@ -36,8 +36,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-#        os: [macos-latest, macos-13, windows-latest, ubuntu-latest]
-        os: [windows-latest, ubuntu-latest]
+        os: [macos-latest, macos-13, windows-latest, ubuntu-latest]
+#        os: [windows-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Set up JDK 21
@@ -61,6 +61,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
+      - name: Set up JDK 21
+        uses: graalvm/setup-graalvm@v1.2.2
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
       - name: Read/Write Properties File
         uses: kurt-code/gha-properties@v0.0.2
         id: read-properties
@@ -84,5 +91,5 @@ jobs:
             build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
             build/native/nativeCompile/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.exe
             build/native/nativeCompile/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}
-#            build/native/nativeCompile/trivysummary-macos-x86-64-${{ steps.read-properties.outputs.trivysummary_version }}
-#            build/native/nativeCompile/trivysummary-macos-aarch64-${{ steps.read-properties.outputs.trivysummary_version }}
+            build/native/nativeCompile/trivysummary-macos-x86-64-${{ steps.read-properties.outputs.trivysummary_version }}
+            build/native/nativeCompile/trivysummary-macos-aarch64-${{ steps.read-properties.outputs.trivysummary_version }}
