@@ -9,12 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4.1.1
-    - name: Set up JDK 21
+    - name: Set up GraalVM 21
       uses: graalvm/setup-graalvm@v1.2.2
       with:
         java-version: '21'
         distribution: 'graalvm'
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        native-image-job-reports: 'true'
     - name: Read/Write Properties File
       uses: kurt-code/gha-properties@v0.0.2
       id: read-properties
@@ -30,9 +31,6 @@ jobs:
       run: gradle test --warning-mode all
     - name: Create distributable ZIP file with Gradle
       run: gradle distZip --warning-mode all
-    - name: Publish with Gradle
-      if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
-      run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
   build-native:
     needs: build-java
     name: Build TrivySummary natively on ${{ matrix.os }}
@@ -43,7 +41,7 @@ jobs:
         os: [windows-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v4.1.1
-      - name: Set up JDK 21
+      - name: Set up GraalVM 21
         uses: graalvm/setup-graalvm@v1.2.2
         with:
           java-version: '21'
@@ -64,6 +62,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
+      - name: Set up JDK 21
+        uses: actions/setup-java@4.2.1
+        with:
+          java-version: '21'
+          distribution: 'corretto'
       - name: Read/Write Properties File
         uses: kurt-code/gha-properties@v0.0.2
         id: read-properties
@@ -71,6 +74,9 @@ jobs:
           operation: 'read'
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
+      - name: Publish with Gradle
+        if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
+        run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
       - name: "Create Release"
         id: create_release
         uses: softprops/action-gh-release@v2.0.5
