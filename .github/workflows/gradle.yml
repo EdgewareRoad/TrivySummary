@@ -31,7 +31,7 @@ jobs:
       run: gradle distZip --warning-mode all
     - name: Copy distributable ZIP file
       run: |
-          ls build/distribution
+          ls build/distributions
           mkdir dist
           cp build/distributions/* dist
     - name: Publish with Gradle
