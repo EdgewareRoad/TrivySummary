@@ -63,7 +63,7 @@ jobs:
       - name: Package native code for release
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip build/native/nativeCompile/*
+          args: zip -qq -r dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i build/native/nativeCompile/*
 
   build-native-windows:
     needs:
@@ -107,7 +107,7 @@ jobs:
       - name: Package native code for release
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip build/native/nativeCompile/*
+          args: zip -qq -r dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i build/native/nativeCompile/*
         
   release:
     needs:
