@@ -29,11 +29,12 @@ jobs:
       run: gradle test --warning-mode all
     - name: Create distributable ZIP file with Gradle
       run: gradle distZip --warning-mode all
-    - name: Copy distributable ZIP file
-      run: |
-          ls build/distributions
-          mkdir dist
-          cp build/distributions/* dist
+    - name: Upload release artefact
+      uses: actions/upload-artifact@v4
+      with:
+        name: jar-distributable
+        path: build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+        retention-days: 1
     - name: Publish with Gradle
       if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
       run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
@@ -64,7 +65,14 @@ jobs:
         run: |
           sudo apt install zip -q
           ls build/native/nativeCompile
+          mkdir dist
           zip -qq -r dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i build/native/nativeCompile/*
+      - name: Upload release artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-distributable
+          path: dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+          retention-days: 1
 
   build-native-windows:
     needs:
@@ -90,32 +98,23 @@ jobs:
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
         run: gradle clean nativeCompile
-  
-  package-native-windows:
-    needs:
-      - build-native-windows
-    name: Package TrivySummary for Windows
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Read/Write Properties File
-        uses: kurt-code/gha-properties@v0.0.2
-        id: read-properties
-        with:
-          operation: 'read'
-          file-path: 'src/main/resources/application.properties'
-          keys: 'trivysummary.version'
       - name: Package native code for release
         run: |
-          sudo apt install zip -q
           ls build/native/nativeCompile
-          zip -qq -r dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i build/native/nativeCompile/*
-        
+          mkdir dist
+          tar -a -c -f dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip build/native/nativeCompile/*.*
+      - name: Upload release artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-distributable
+          path: dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip
+          retention-days: 1
+  
   release:
     needs:
       - build-java
       - build-native-ubuntu
-      - package-native-windows
+      - build-native-windows
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
@@ -126,6 +125,14 @@ jobs:
           operation: 'read'
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
+      - name: Create dist folder to download to
+        run: |
+          mkdir dist
+      - name: Download release artefacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
       - name: "Create Release"
         id: create_release
         uses: softprops/action-gh-release@v2.0.5
