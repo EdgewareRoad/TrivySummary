@@ -99,7 +99,7 @@ jobs:
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
-        run: gradle clean nativeCompile
+        run: gradle clean nativeTest
       - name: Package native code for release
         run: |
           mkdir dist
