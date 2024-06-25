@@ -88,6 +88,10 @@ dependencies {
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    graalCompileOnly 'org.graalvm.nativeimage:svm:21.2.0'
+    graalCompileOnly 'org.graalvm.sdk:graal-sdk:21.2.0'
+    nativeImageCompileOnly sourceSets.graal.output.classesDirs
 }
 
 jar {
