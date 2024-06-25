@@ -1,0 +1,10 @@
+{
+  "resources":{
+  "includes":[{
+    "pattern":"\\Qtestapp/test*.json\\E"
+  }, {
+    "pattern":"\\QsampleWhitelist*.json\\E"
+  }, {
+    "pattern":"\\QsamplePriorityModel*.json\\E"
+  }]}
+}

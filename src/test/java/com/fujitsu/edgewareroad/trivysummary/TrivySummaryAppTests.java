@@ -2,11 +2,13 @@ package com.fujitsu.edgewareroad.trivysummary;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
@@ -24,38 +26,32 @@ import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
 class TrivySummaryAppTests {
 
+	public static void main(String[] args) throws Exception
+	{
+		TrivySummaryAppTests tests = new TrivySummaryAppTests();
+		tests.contextLoads(java.nio.file.Files.createTempDirectory("trivysummary_", (FileAttribute<?>[])null));
+	}
+
 	static ObjectMapper mapper = new ObjectMapper();
 	static ClassLoader classLoader = TrivySummaryAppTests.class.getClassLoader();
-	static Path pathTestApp001Scan, pathTestApp002Scan, pathTestApp003Scan;
-
-	static {
-		try {
-			pathTestApp001Scan = Path.of(classLoader.getResource("testapp/testapp-0.0.1.json").toURI());
-			pathTestApp002Scan = Path.of(classLoader.getResource("testapp/testapp-0.0.2.json").toURI());
-			pathTestApp003Scan = Path.of(classLoader.getResource("testapp/testapp-0.0.3.json").toURI());
-			}
-		catch(Exception e){
-			assertTrue(false, e.getMessage());
-		}
-	}
 
 	public TrivySummaryAppTests() {
 	    mapper.registerModule(new JavaTimeModule());
 	}
 
-	public enum TestScenario {
-		SINGLEFILE_TEST001(Arrays.asList(pathTestApp001Scan)),
-		SINGLEFILE_TEST002(Arrays.asList(pathTestApp002Scan)),
-		SINGLEFILE_TEST003(Arrays.asList(pathTestApp003Scan)),
-		COMPARE_TEST001_TEST002(Arrays.asList(pathTestApp001Scan, pathTestApp002Scan)),
-		COMPARE_TEST002_TEST003(Arrays.asList(pathTestApp002Scan, pathTestApp003Scan)),
-		COMPARE_TEST001_TEST003(Arrays.asList(pathTestApp001Scan, pathTestApp003Scan));
-
+	public class TestScenario {
+		private final String name;
 		private final List<Path> paths;
 
-		private TestScenario(List<Path> paths)
+		public TestScenario(String name, List<Path> paths)
 		{
+			this.name = name;
 			this.paths = paths;
+		}
+
+		public String getName()
+		{
+			return this.name;
 		}
 
 		public List<Path> getPaths()
@@ -66,15 +62,58 @@ class TrivySummaryAppTests {
 
 	@Test
 	void contextLoads(@TempDir(cleanup = CleanupMode.NEVER) Path tempDir) throws URISyntaxException, StreamReadException, DatabindException, IOException, TrivyScanHistoryMustBeForSameArtefactType, TrivyScanHistoryNotDeepEnoughException, TrivyScanCouldNotRetrieveEPSSScoresException {
-		PriorityModel priorityModelElliptical = mapper.readValue(Path.of(classLoader.getResource("samplePriorityModelElliptical.json").toURI()).toFile(), PriorityModel.class);
-		PriorityModel priorityModelRectangular = mapper.readValue(Path.of(classLoader.getResource("samplePriorityModelRectangular.json").toURI()).toFile(), PriorityModel.class);
-		PriorityModel priorityModelSeverityOnly = mapper.readValue(Path.of(classLoader.getResource("samplePriorityModelSeverityOnly.json").toURI()).toFile(), PriorityModel.class);
-		WhitelistEntries whitelistEntries1 = mapper.readValue(Path.of(classLoader.getResource("sampleWhitelist1.json").toURI()).toFile(), WhitelistEntries.class);
-		WhitelistEntries whitelistEntries2 = mapper.readValue(Path.of(classLoader.getResource("sampleWhitelist2.json").toURI()).toFile(), WhitelistEntries.class);
+		PriorityModel priorityModelElliptical, priorityModelRectangular, priorityModelSeverityOnly;
+		try(InputStream stream = classLoader.getResourceAsStream("samplePriorityModelElliptical.json"))
+		{
+			priorityModelElliptical = mapper.readValue(stream, PriorityModel.class);
+		}
+		try(InputStream stream = classLoader.getResourceAsStream("samplePriorityModelRectangular.json"))
+		{
+			priorityModelRectangular = mapper.readValue(stream, PriorityModel.class);
+		}
+		try(InputStream stream = classLoader.getResourceAsStream("samplePriorityModelSeverityOnly.json"))
+		{
+			priorityModelSeverityOnly = mapper.readValue(stream, PriorityModel.class);
+		}
+
+		WhitelistEntries whitelistEntries1, whitelistEntries2;
+		try(InputStream stream = classLoader.getResourceAsStream("sampleWhitelist1.json"))
+		{
+			whitelistEntries1 = mapper.readValue(stream, WhitelistEntries.class);
+		}
+		try(InputStream stream = classLoader.getResourceAsStream("sampleWhitelist2.json"))
+		{
+			whitelistEntries2 = mapper.readValue(stream, WhitelistEntries.class);
+		}
 
 		final List<Boolean> booleans = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
 		final List<PriorityModel> priorityModels = Arrays.asList(priorityModelElliptical, priorityModelRectangular, priorityModelSeverityOnly);
-		for (TestScenario scenario : TestScenario.values())
+
+		Path pathTestApp001Scan = Path.of(tempDir.toString(), "testapp-0.0.1.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testapp-0.0.1.json"))
+		{
+			Files.copy(stream, pathTestApp001Scan);
+		}
+		Path pathTestApp002Scan = Path.of(tempDir.toString(), "testapp-0.0.2.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testapp-0.0.2.json"))
+		{
+			Files.copy(stream, pathTestApp002Scan);
+		}
+		Path pathTestApp003Scan = Path.of(tempDir.toString(), "testapp-0.0.3.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testapp-0.0.3.json"))
+		{
+			Files.copy(stream, pathTestApp003Scan);
+		}
+
+		ArrayList<TestScenario> scenarios = new ArrayList<>();
+		scenarios.add(new TestScenario("SINGLEFILE_TEST001", Arrays.asList(pathTestApp001Scan)));
+		scenarios.add(new TestScenario("SINGLEFILE_TEST002", Arrays.asList(pathTestApp002Scan)));
+		scenarios.add(new TestScenario("SINGLEFILE_TEST003", Arrays.asList(pathTestApp003Scan)));
+		scenarios.add(new TestScenario("COMPARE_TEST001_TEST002", Arrays.asList(pathTestApp001Scan, pathTestApp002Scan)));
+		scenarios.add(new TestScenario("COMPARE_TEST002_TEST003", Arrays.asList(pathTestApp002Scan, pathTestApp003Scan)));
+		scenarios.add(new TestScenario("COMPARE_TEST001_TEST003", Arrays.asList(pathTestApp001Scan, pathTestApp003Scan)));
+
+		for (TestScenario scenario : scenarios)
 		{
 			for (Boolean useTodayForEPSSQuery : booleans)
 			{
@@ -86,7 +125,7 @@ class TrivySummaryAppTests {
 					configuration.setUseTodayForEPSSQuery(useTodayForEPSSQuery.booleanValue());
 					configuration.setPriorityModel(priorityModel);
 
-					String fileName = String.format("trivysummary-test-%s-%s-%s.pdf", scenario.name(), priorityModel.getType().name(), useTodayForEPSSQuery ? "EPSSTODAY" : "EPSSSCANDATE");
+					String fileName = String.format("trivysummary-test-%s-%s-%s.pdf", scenario.getName(), priorityModel.getType().name(), useTodayForEPSSQuery ? "EPSSTODAY" : "EPSSSCANDATE");
 					Path outputFilePath = tempDir.resolve(fileName);
 
 					configuration.setOutputFile(outputFilePath);
@@ -99,14 +138,14 @@ class TrivySummaryAppTests {
 					worker.addWhitelistEntries(whitelistEntries1);
 					worker.addWhitelistEntries(whitelistEntries2);
 
-					worker.summariseTrivyHistory(scenario.name());
+					worker.summariseTrivyHistory(scenario.getName());
 				}
 				TrivySummary.Configuration configuration = new TrivySummary.Configuration();
 
 				configuration.setAppVersion("x.y.z");
 				configuration.setOfflineMode(true);
 
-				String fileName = String.format("trivysummary-test-%s-OFFLINE.pdf", scenario.name());
+				String fileName = String.format("trivysummary-test-%s-OFFLINE.pdf", scenario.getName());
 				Path outputFilePath = tempDir.resolve(fileName);
 
 				configuration.setOutputFile(outputFilePath);
@@ -119,7 +158,7 @@ class TrivySummaryAppTests {
 				worker.addWhitelistEntries(whitelistEntries1);
 				worker.addWhitelistEntries(whitelistEntries2);
 
-				worker.summariseTrivyHistory(scenario.name());
+				worker.summariseTrivyHistory(scenario.getName());
 			}
 		}
 	}

@@ -15,6 +15,11 @@ file("src/main/resources/application.properties").withInputStream { appProps.loa
 
 version = appProps.getProperty("trivysummary.version")
 
+def javaHome = System.properties['java.home']
+
+nativeCompile.dependsOn test
+nativeTestCompile.dependsOn test
+
 repositories {
 	mavenCentral()
 }
@@ -45,6 +50,10 @@ java {
 	// Note, building on Java 21 but Spring Boot 6 still allows JDK 17 compatibility, so allow for this.
 	sourceCompatibility = '17'
 	targetCompatibility = '17'
+}
+
+compileJava {
+	options.compilerArgs << '--add-exports=java.desktop/sun.awt=ALL-UNNAMED'
 }
 
 application {
@@ -99,24 +108,43 @@ testing {
 	suites {
 		test {
 			useJUnitJupiter()
+			targets.all {
+				testTask.configure {
+					jvmArgs('-agentlib:native-image-agent=config-output-dir=build/main/generated-META-INF/native-image')
+				}
+			}
 		}
 	}
 }
 
 graalvmNative {
-	binaries {
-		main {
+    binaries {
+        main {
+			// Main options
 			imageName = 'trivysummary'
 			mainClass = 'com.fujitsu.edgewareroad.trivysummary.TrivySummaryApp'
+            // Advanced options
 			buildArgs.add("-O4")
-
-		}
+    	    configurationFileDirectories.from(file('build/main/generated-META-INF/native-image'), file('src/main/resources/META-INF/native-image')) // Adds a native image configuration file directory, containing files like reflection configuration
+        }
 		test {
+            debug = true // Determines if debug info should be generated, defaults to false (alternatively add --debug-native to the CLI)
 			buildArgs.add("-O0")
+	        configurationFileDirectories.from(file('build/main/generated-META-INF/native-image'), file('src/main/resources/META-INF/native-image'), file('src/test/resources/META-INF/native-image')) // Adds a native image configuration file directory, containing files like reflection configuration
 		}
 	}
 	binaries.all {
+		verbose = true // Add verbose output, defaults to false
+		fallback = true // Sets the fallback mode of native-image, defaults to false
+		sharedLibrary = false // Determines if image is a shared library, defaults to false if `java-library` plugin isn't included
+		quickBuild = false // Determines if image is being built in quick build mode (alternatively use GRAALVM_QUICK_BUILD environment variable, or add --native-quick-build to the CLI)
+		richOutput = true // Determines if native-image building should be done with rich output
+
 		buildArgs.add("--verbose")
+		buildArgs.add("-H:+AddAllCharsets")
+		buildArgs.add("--add-exports=java.desktop/sun.awt=ALL-UNNAMED")
+
+		runtimeArgs.add('-Djava.home=' + javaHome)	// Gets around an AWT issue where it needs the java home property set, even if it's rubbish
 	}
 }
 

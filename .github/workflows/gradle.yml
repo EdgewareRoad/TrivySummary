@@ -60,7 +60,7 @@ jobs:
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
-        run: gradle clean nativeCompile
+        run: gradle clean nativeCompile nativeTest
       - name: Package native code for release
         run: |
           sudo apt install zip -q
@@ -99,7 +99,7 @@ jobs:
           file-path: 'src/main/resources/application.properties'
           keys: 'trivysummary.version'
       - name: Build natively with Gradle
-        run: gradle clean nativeTest
+        run: gradle clean nativeCompile nativeTest
       - name: Package native code for release
         run: |
           mkdir dist
