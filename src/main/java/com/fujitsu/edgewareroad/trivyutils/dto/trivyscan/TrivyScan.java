@@ -18,8 +18,8 @@ public class TrivyScan
     @JsonProperty("ArtifactType")
     private String artifactType;
 
-    @JsonProperty("Metadata")
-    private TrivyScanMetadata metadata;
+ //   @JsonProperty("Metadata")
+ //   private TrivyScanMetadata metadata;
 
     @JsonProperty("Results")
     private TrivyScanResult[] results;
@@ -59,13 +59,13 @@ public class TrivyScan
         this.artifactType = artifactType;
     }
 
-    public TrivyScanMetadata getMetadata() {
-        return metadata;
-    }
+ //   public TrivyScanMetadata getMetadata() {
+ //       return metadata;
+ //   }
 
-    public void setMetadata(TrivyScanMetadata metadata) {
-        this.metadata = metadata;
-    }
+ //   public void setMetadata(TrivyScanMetadata metadata) {
+ //       this.metadata = metadata;
+ //   }
 
     public TrivyScanResult[] getResults() {
         return results;
