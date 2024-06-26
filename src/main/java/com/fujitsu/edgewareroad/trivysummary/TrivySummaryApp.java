@@ -37,6 +37,12 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 	public static void main(String[] args) {
 		// Suppress logging and banner output that otherwise we can't control
 		System.setProperty("spring.main.banner-mode", "off");
+
+		if (System.getProperty("java.home") == null)
+		{
+			System.setProperty("java.home", TrivySummaryApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		}
+
 		XRLog.setLoggerImpl(new Slf4jLogger());
 
 		System.exit(SpringApplication.exit(SpringApplication.run(TrivySummaryApp.class, args)));

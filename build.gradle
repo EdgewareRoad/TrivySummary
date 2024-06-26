@@ -17,9 +17,6 @@ version = appProps.getProperty("trivysummary.version")
 
 def javaHome = System.properties['java.home']
 
-nativeCompile.dependsOn test
-nativeTestCompile.dependsOn test
-
 repositories {
 	mavenCentral()
 }
@@ -157,6 +154,24 @@ graalvmNative {
 		runtimeArgs.add('-Djava.home=' + javaHome)	// Gets around an AWT issue where it needs the java home property set, even if it's rubbish
 	}
 }
+
+nativeCompile.dependsOn(test)
+nativeTestCompile.dependsOn(test)
+
+task copyFontsToNativeCompile(dependsOn: nativeCompile, type: Copy) {
+	from javaHome + '/lib'
+	into "build/native/nativeCompile/lib"
+	include "*font*"
+}
+
+task copyFontsToNativeTestCompile(dependsOn: nativeTestCompile, type: Copy) {
+	from javaHome + '/lib'
+	into "build/native/nativeTestCompile/lib"
+	include "*font*"
+}
+
+nativeCompile.finalizedBy(copyFontsToNativeCompile)
+nativeTestCompile.finalizedBy(copyFontsToNativeTestCompile)
 
 // Publishing the output to GitHub (standard JAR, sources plus POM file, distribution ZIP)
 publishing {
