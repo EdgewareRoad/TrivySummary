@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4.1.1
-    - name: Set up GraalVM 21
-      uses: graalvm/setup-graalvm@v1.2.2
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4.2.1
       with:
-        java-version: '21'
-        distribution: 'graalvm'
+        java-version: 21
+        distribution: corretto
     - name: Read/Write Properties File
       uses: kurt-code/gha-properties@v0.0.2
       id: read-properties
@@ -25,126 +25,22 @@ jobs:
       run: |
         echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
         echo "github.ref: ${{ github.ref }}"
-    - name: Build and Test with Gradle
-      run: gradle test --warning-mode all
-    - name: Create distributable ZIP file with Gradle
+    - name: Build with Gradle
       run: gradle distZip --warning-mode all
-    - name: Upload release artefact
-      uses: actions/upload-artifact@v4
-      with:
-        name: jar-distributable
-        path: build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
-        retention-days: 1
+  publish:
+    needs: build-java
+    runs-on: ubuntu-latest
+    steps:
     - name: Publish with Gradle
       if: endsWith(steps.read-properties.outputs.trivysummary_version, '-SNAPSHOT') || (startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version))
       run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
-
-  build-native-ubuntu:
-    needs: build-java
-    name: Build TrivySummary natively on Linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Set up GraalVM 21
-        uses: graalvm/setup-graalvm@v1.2.2
-        with:
-          java-version: '21'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-      - name: Read/Write Properties File
-        uses: kurt-code/gha-properties@v0.0.2
-        id: read-properties
-        with:
-          operation: 'read'
-          file-path: 'src/main/resources/application.properties'
-          keys: 'trivysummary.version'
-      - name: Build natively with Gradle
-        run: gradle clean nativeCompile nativeTest
-      - name: Package native code for release
-        run: |
-          sudo apt install zip -q
-          mkdir dist
-          cd build/native/nativeCompile
-          ls
-          zip -qq -r ../../../dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip . -i *
-          cd ../../..
-      - name: Upload release artefact
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-distributable
-          path: dist/trivysummary-linux-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip
-          retention-days: 1
-
-  build-native-windows:
-    needs:
-      - build-java
-      - build-native-ubuntu
-    name: Build TrivySummary natively on Windows
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Set up GraalVM 21
-        uses: graalvm/setup-graalvm@v1.2.2
-        with:
-          java-version: '21'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-      - name: Read/Write Properties File
-        uses: kurt-code/gha-properties@v0.0.2
-        id: read-properties
-        with:
-          operation: 'read'
-          file-path: 'src/main/resources/application.properties'
-          keys: 'trivysummary.version'
-      - name: Build natively with Gradle
-        run: gradle clean nativeCompile nativeTest
-      - name: Package native code for release
-        run: |
-          mkdir dist
-          cd build/native/nativeCompile
-          rm *.args
-          ls
-          tar -a -c -f ../../../dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip *.*
-          cd ../../..
-      - name: Upload release artefact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-distributable
-          path: dist/trivysummary-windows-amd64-${{ steps.read-properties.outputs.trivysummary_version }}.zip
-          retention-days: 1
-  
-  release:
-    needs:
-      - build-java
-      - build-native-ubuntu
-      - build-native-windows
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Read/Write Properties File
-        uses: kurt-code/gha-properties@v0.0.2
-        id: read-properties
-        with:
-          operation: 'read'
-          file-path: 'src/main/resources/application.properties'
-          keys: 'trivysummary.version'
-      - name: Create dist folder to download to
-        run: |
-          mkdir dist
-      - name: Download release artefacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
-      - name: "Create Release"
-        id: create_release
-        uses: softprops/action-gh-release@v2.0.5
-        if: startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version)
-        with:
-          tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
-          name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
-          body_path: CHANGELOG.txt
-          token: ${{ secrets.MAVENREPO_TOKEN }}
-          files: dist/*
+    - name: "Create Release"
+      id: create_release
+      uses: softprops/action-gh-release@v2.0.4
+      if: startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version)
+      with:
+        tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
+        name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
+        body_path: CHANGELOG.txt
+        token: ${{ secrets.MAVENREPO_TOKEN }}
+        files: build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
