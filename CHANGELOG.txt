@@ -1,8 +1,7 @@
-Release 3.1.0:
+Release 3.0.4:
 
-Added native builds for Windows and Linux on Intel/AMD 64-bit processors. Will enable slimmed down Docker
-image to be created and simplify making a Trivy plug-in (although Mac OS builds failing so might be for the
-future only)
+Better error handling in the rare case that EPSS service returns an error (happened for scores for date
+2024-12-01 for some reason)
 
 Release 3.0.3:
 
