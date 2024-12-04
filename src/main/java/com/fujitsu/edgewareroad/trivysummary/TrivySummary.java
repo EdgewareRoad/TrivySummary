@@ -347,7 +347,7 @@ public class TrivySummary {
 
     private final int MAX_BATCH_SIZE_FOR_EPSS_API = 50;
 
-    private void updateEPSSScores(Collection<? extends TrivyScanVulnerability> vulnerabilities, boolean force, LocalDate queryDate) throws IOException, InterruptedException
+    private void updateEPSSScores(Collection<? extends TrivyScanVulnerability> vulnerabilities, boolean force, LocalDate queryDate) throws IOException, InterruptedException, TrivyScanCouldNotRetrieveEPSSScoresException
     {
         TrivyScanVulnerabilities vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();
 
@@ -373,7 +373,7 @@ public class TrivySummary {
 
 	private static final String BASE_EPSS_API_URL = "https://api.first.org/data/v1/epss";
 
-    private void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws IOException, InterruptedException
+    private void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws IOException, InterruptedException, TrivyScanCouldNotRetrieveEPSSScoresException
     {
         StringBuffer urlString = null;
         for (TrivyScanVulnerability vulnerability : vulnerabilities)
@@ -403,6 +403,11 @@ public class TrivySummary {
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 		String responseBody = response.body();
+		if (response.statusCode() != 200)
+		{
+			// An error occurred.
+			throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Error returned from EPSS service. Response = %s", responseBody), null);
+		}
 	
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new JavaTimeModule());
