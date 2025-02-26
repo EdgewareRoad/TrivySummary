@@ -1,3 +1,8 @@
+Release 3.0.5:
+
+Patch release to bring Java dependencies up to date, now passing Trivy scans with zero
+vulnerabilities at date of issue.
+
 Release 3.0.4:
 
 Better error handling in the rare case that EPSS service returns an error (happened for scores for date
