@@ -6,7 +6,10 @@ on:
 
 jobs:
   build:
-
+    permissions:
+      contents: read
+      pull-requests: write
+      
     runs-on: ubuntu-latest
 
     steps:
@@ -41,5 +44,4 @@ jobs:
         name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
         body_path: CHANGELOG.txt
         token: ${{ secrets.MAVENREPO_TOKEN }}
-        contents: read
         files: build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
