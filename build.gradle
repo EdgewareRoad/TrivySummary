@@ -80,8 +80,8 @@ dependencies {
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
 	implementation 'org.apache.xmlgraphics:batik-dom:1.19'
 	implementation 'org.apache.commons:commons-lang3:3.17.0'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.4.5'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:3.4.5'
 }
 
 jar {
