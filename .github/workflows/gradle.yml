@@ -41,4 +41,5 @@ jobs:
         name: Release ${{ steps.read-properties.outputs.trivysummary_version }}
         body_path: CHANGELOG.txt
         token: ${{ secrets.MAVENREPO_TOKEN }}
+        contents: read
         files: build/distributions/trivysummary-${{ steps.read-properties.outputs.trivysummary_version }}.zip
