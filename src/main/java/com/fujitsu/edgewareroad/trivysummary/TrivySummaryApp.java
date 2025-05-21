@@ -265,7 +265,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				this.exitCode = -1;
 				return;
 			} catch (IOException e) {
-				output("ERROR: Could not read input file %s", filePath.toString());
+				output("ERROR: Could not read (%s) input file %s", e.getMessage(), filePath.toString());
 				output("");
 				displayHelp();
 				this.exitCode = -1;
@@ -287,7 +287,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				this.exitCode = -1;
 			}
 		} catch (IOException e) {
-			output("ERROR: Could not write output file %s", configuration.getOutputFile().toString());
+			output("ERROR: Could not write (%s) output file %s", e.getMessage(), configuration.getOutputFile().toString());
 			output("");
 			displayHelp();
 			this.exitCode = -1;

@@ -1,3 +1,7 @@
+Release 3.0.8:
+
+Added better error diagnostics for IOException cases.
+
 Release 3.0.7:
 
 Refactored to enable dependabot, automating future security remediation as much as possible.
