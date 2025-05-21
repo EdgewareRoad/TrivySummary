@@ -116,7 +116,7 @@ testing {
 publishing {
 	publications {
 		maven(MavenPublication) {
-			groupId 'com.fujitsu.edgewareroad'
+			groupId = 'com.fujitsu.edgewareroad'
 			artifacts = [ jar, sourcesJar, distZip ]
 			pom {
 				name = 'trivysummary'
