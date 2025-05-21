@@ -1,9 +1,9 @@
-Release 3.0.6:
+Release 3.0.7:
 
-Patch release to bring Java dependencies up to date, now passing Trivy scans with zero
-vulnerabilities at date of issue.
+Refactored to enable dependabot, automating future security remediation as much as possible.
+Fixed legacy format of Gradle build file.
 
-Release 3.0.5:
+Releases 3.0.5 and 3.0.6:
 
 Patch release to bring Java dependencies up to date, now passing Trivy scans with zero
 vulnerabilities at date of issue.
