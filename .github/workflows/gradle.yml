@@ -30,6 +30,8 @@ jobs:
       run: |
         echo "version: ${{ steps.read-properties.outputs.trivysummary_version }}"
         echo "github.ref: ${{ github.ref }}"
+    - name: Test with Gradle
+      run: gradle test --warning-mode all
     - name: Build with Gradle
       run: gradle distZip --warning-mode all
     - name: Publish with Gradle
