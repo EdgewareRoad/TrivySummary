@@ -338,7 +338,7 @@ public class TrivySummary {
 			LocalDate dateOfScan = LocalDate.ofInstant(Files.getLastModifiedTime(inputScan).toInstant(), ZoneId.systemDefault());
 			if (scan.getCreatedAt() != null)
 			{
-				dateOfScan = scan.getCreatedAt();
+				dateOfScan = scan.getCreatedAt().toLocalDate();
 			}
 
 			history.addScan(dateOfScan, scan);

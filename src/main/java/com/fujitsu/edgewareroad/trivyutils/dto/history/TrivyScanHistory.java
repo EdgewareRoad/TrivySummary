@@ -99,7 +99,7 @@ public class TrivyScanHistory {
         TrivyScanVulnerabilities lastVulnerabilities = trivyScanTo.getAllPackageVulnerabilities().getVulnerabilitiesWithoutPackages();
         lastVulnerabilities  = whitelistedVulnerabilities.filterWhitelistedVulnerabilities(lastVulnerabilities, whitelistEntries);
 
-        return new TrivyOneScanSummary(title, trivyScanTo.getArtifactName(), trivyScanTo.getArtifactType(), trivyScanTo.getCreatedAt(),
+        return new TrivyOneScanSummary(title, trivyScanTo.getArtifactName(), trivyScanTo.getArtifactType(), trivyScanTo.getCreatedAt().toLocalDate(),
             lastVulnerabilities, whitelistedVulnerabilities);
     }
 
@@ -140,7 +140,7 @@ public class TrivyScanHistory {
         TrivyScanVulnerabilities fixedVulnerabilities = new TrivyScanVulnerabilities(previousVulnerabilities);
         fixedVulnerabilities.removeAll(lastVulnerabilities);
 
-        return new TrivyTwoScanComparison(title, getArtefactNames(), getArtefactType(), historyMayNotBeForSameArtefact, trivyScanFrom.getCreatedAt(), trivyScanTo.getCreatedAt(),
+        return new TrivyTwoScanComparison(title, getArtefactNames(), getArtefactType(), historyMayNotBeForSameArtefact, trivyScanFrom.getCreatedAt().toLocalDate(), trivyScanTo.getCreatedAt().toLocalDate(),
             openVulnerabilities, fixedVulnerabilities, whitelistedVulnerabilities);
     }
 

@@ -1,6 +1,6 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -10,7 +10,7 @@ public class TrivyScan
     private int schemaVersion;
 
     @JsonProperty("CreatedAt")
-    private LocalDate createdAt;
+    private ZonedDateTime createdAt;
 
     @JsonProperty("ArtifactName")
     private String artifactName;
@@ -35,11 +35,11 @@ public class TrivyScan
         this.schemaVersion = schemaVersion;
     }
 
-    public LocalDate getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }    
 
