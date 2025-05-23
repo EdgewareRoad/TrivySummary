@@ -11,15 +11,6 @@ updates:
       interval: "daily"
       time: "09:00"
       timezone: "Europe/London"
-    allow:
-      dependency-type: "security"
-
-  - package-ecosystem: "gradle" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "monthly"
-      time: "16:00"
-      timezone: "Europe/London"
 
   - package-ecosystem: "github-actions"
     directory: "/"
