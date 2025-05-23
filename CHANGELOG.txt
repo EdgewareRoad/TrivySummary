@@ -1,3 +1,7 @@
+Release 3.0.11:
+
+Updated Sprint Boot to 3.5.0.
+
 Release 3.0.10:
 
 Fixed numeric output of CVSS and EPSS scores in JSON to guarantee more human readable.
