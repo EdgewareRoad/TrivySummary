@@ -1,3 +1,7 @@
+Release 3.0.13:
+
+Updated Sprint Boot to 3.5.3 and Jsoup to 1.21.1.
+
 Release 3.0.12:
 
 Updated Jackson to 2.19.1.
