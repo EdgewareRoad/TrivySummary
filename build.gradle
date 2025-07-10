@@ -79,7 +79,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.21.1'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
 	implementation 'org.apache.xmlgraphics:batik-dom:1.19'
-	implementation 'org.apache.commons:commons-lang3:3.17.0'
+	implementation 'org.apache.commons:commons-lang3:3.18.0'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
