@@ -73,7 +73,7 @@ dependencies {
 	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.28') {
 		exclude group: 'commons-io', module: 'commons-io'
 	}
-	implementation 'commons-io:commons-io:2.19.0'
+	implementation 'commons-io:commons-io:2.20.0'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.28'
 	// https://mvnrepository.com/artifact/org.jsoup/jsoup
 	implementation 'org.jsoup:jsoup:1.21.1'
