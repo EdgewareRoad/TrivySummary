@@ -1,3 +1,7 @@
+Release 3.0.5:
+
+Updated openhtmltopdf to 1.1.31.
+
 Release 3.0.14:
 
 Updated Java dependencies, esp. Sprint Boot to 3.5.5, Jsoup to 1.21.2, and Jackson to 2.20.0.
