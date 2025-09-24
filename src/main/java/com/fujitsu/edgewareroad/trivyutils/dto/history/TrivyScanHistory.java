@@ -11,15 +11,18 @@ import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilitie
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class TrivyScanHistory {
     @JsonProperty("scanHistory")
-    private TreeMap<LocalDate, TrivyScan> scanHistory = new TreeMap<>();
+    private @Getter @Setter TreeMap<LocalDate, TrivyScan> scanHistory = new TreeMap<>();
 
     @JsonProperty
     private boolean historyMayNotBeForSameArtefact = false;
 
     @JsonProperty
-    private WhitelistEntries whitelistEntries = new WhitelistEntries();
+    private final @Getter WhitelistEntries whitelistEntries = new WhitelistEntries();
 
     public TrivyScanHistory()
     {
@@ -142,17 +145,5 @@ public class TrivyScanHistory {
 
         return new TrivyTwoScanComparison(title, getArtefactNames(), getArtefactType(), historyMayNotBeForSameArtefact, trivyScanFrom.getCreatedAt().toLocalDate(), trivyScanTo.getCreatedAt().toLocalDate(),
             openVulnerabilities, fixedVulnerabilities, whitelistedVulnerabilities);
-    }
-
-    public TreeMap<LocalDate, TrivyScan> getScanHistory() {
-        return scanHistory;
-    }
-
-    protected void setScanHistory(TreeMap<LocalDate, TrivyScan> scanHistory) {
-        this.scanHistory = scanHistory;
-    }
-
-    public WhitelistEntries getWhitelistEntries() {
-        return whitelistEntries;
     }
 }

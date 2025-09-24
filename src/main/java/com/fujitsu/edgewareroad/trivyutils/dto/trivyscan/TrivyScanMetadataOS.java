@@ -2,30 +2,16 @@ package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
 public class TrivyScanMetadataOS
 {
     @JsonProperty("Family")
-    private String family;
+    private @Getter @Setter String family;
 
     @JsonProperty("Name")
-    private String name;
-
-    public TrivyScanMetadataOS() {
-    }
-
-    public String getFamily() {
-        return family;
-    }
-
-    public void setFamily(String family) {
-        this.family = family;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private @Getter @Setter String name;
 }

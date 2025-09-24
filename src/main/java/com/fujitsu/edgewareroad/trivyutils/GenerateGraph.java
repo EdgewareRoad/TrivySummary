@@ -88,7 +88,7 @@ public class GenerateGraph {
             VulnerabilityPriority showLabelThreshold) {
         if (priorityModel == null || priorityModel.getType().equals(PriorityModelType.SEVERITYONLY))
         {
-            return vulnerability.getCVSSScore() >= DEFAULT_FLOOR_VALUES_FOR_CVE_LABELS.getMinimumCVSS() && vulnerability.getEPSSScoreNormalised() >= DEFAULT_FLOOR_VALUES_FOR_CVE_LABELS.getMinimumEPSS();
+            return vulnerability.getCvssScore() >= DEFAULT_FLOOR_VALUES_FOR_CVE_LABELS.getMinimumCvss() && vulnerability.getEpssScoreNormalised() >= DEFAULT_FLOOR_VALUES_FOR_CVE_LABELS.getMinimumEpss();
         }
         else
         {
@@ -136,27 +136,27 @@ public class GenerateGraph {
             if (thresholds != null) {
                 svgGenerator.setPaint(Color.decode("#fff0b0"));
                 int epssAxis = Double
-                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEPSS(), EPSS_MODE)))
+                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEpss(), EPSS_MODE)))
                         .intValue();
-                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCVSS()) / 10.0).intValue();
+                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCvss()) / 10.0).intValue();
                 svgGenerator.fillOval(graphHeight - epssAxis, graphWidth - cvssAxis, epssAxis * 2, cvssAxis * 2);
             }
             thresholds = configuration.getPriorityModel().getThresholds(VulnerabilityPriority.HIGH);
             if (thresholds != null) {
                 svgGenerator.setPaint(Color.decode("#ffe0e0"));
                 int epssAxis = Double
-                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEPSS(), EPSS_MODE)))
+                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEpss(), EPSS_MODE)))
                         .intValue();
-                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCVSS()) / 10.0).intValue();
+                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCvss()) / 10.0).intValue();
                 svgGenerator.fillOval(graphHeight - epssAxis, graphWidth - cvssAxis, epssAxis * 2, cvssAxis * 2);
             }
             thresholds = configuration.getPriorityModel().getThresholds(VulnerabilityPriority.CRITICAL);
             if (thresholds != null) {
                 svgGenerator.setPaint(Color.decode("#f0b0b0"));
                 int epssAxis = Double
-                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEPSS(), EPSS_MODE)))
+                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEpss(), EPSS_MODE)))
                         .intValue();
-                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCVSS()) / 10.0).intValue();
+                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCvss()) / 10.0).intValue();
                 svgGenerator.fillOval(graphHeight - epssAxis, graphWidth - cvssAxis, epssAxis * 2, cvssAxis * 2);
             }
             svgGenerator.setPaint(Color.BLACK);
@@ -169,27 +169,27 @@ public class GenerateGraph {
             if (thresholds != null) {
                 svgGenerator.setPaint(Color.decode("#fff0b0"));
                 int epssAxis = Double
-                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEPSS(), EPSS_MODE)))
+                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEpss(), EPSS_MODE)))
                         .intValue();
-                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCVSS()) / 10.0).intValue();
+                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCvss()) / 10.0).intValue();
                 svgGenerator.fillRect(graphHeight - epssAxis, graphWidth - cvssAxis, epssAxis, cvssAxis);
             }
             thresholds = configuration.getPriorityModel().getThresholds(VulnerabilityPriority.HIGH);
             if (thresholds != null) {
                 svgGenerator.setPaint(Color.decode("#ffe0e0"));
                 int epssAxis = Double
-                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEPSS(), EPSS_MODE)))
+                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEpss(), EPSS_MODE)))
                         .intValue();
-                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCVSS()) / 10.0).intValue();
+                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCvss()) / 10.0).intValue();
                 svgGenerator.fillRect(graphHeight - epssAxis, graphWidth - cvssAxis, epssAxis, cvssAxis);
             }
             thresholds = configuration.getPriorityModel().getThresholds(VulnerabilityPriority.CRITICAL);
             if (thresholds != null) {
                 svgGenerator.setPaint(Color.decode("#f0b0b0"));
                 int epssAxis = Double
-                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEPSS(), EPSS_MODE)))
+                        .valueOf(graphHeight * (1.0 - getEPSSYValue(thresholds.getMinimumEpss(), EPSS_MODE)))
                         .intValue();
-                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCVSS()) / 10.0).intValue();
+                int cvssAxis = Double.valueOf(graphWidth * (10.0 - thresholds.getMinimumCvss()) / 10.0).intValue();
                 svgGenerator.fillRect(graphHeight - epssAxis, graphWidth - cvssAxis, epssAxis, cvssAxis);
             }
             svgGenerator.setPaint(Color.BLACK);
@@ -254,8 +254,8 @@ public class GenerateGraph {
                         break;
                 }
 
-                Double xPos = GRAPH_OFFSET + (vulnerability.getCVSSScore() * graphWidth / 10);
-                Double yPos = (1 - getEPSSYValue(vulnerability.getEPSSScoreNormalised(), EPSS_MODE)) * graphHeight;
+                Double xPos = GRAPH_OFFSET + (vulnerability.getCvssScore() * graphWidth / 10);
+                Double yPos = (1 - getEPSSYValue(vulnerability.getEpssScoreNormalised(), EPSS_MODE)) * graphHeight;
                 svgGenerator.fillOval(xPos.intValue() - DOT_RADIUS, yPos.intValue() - DOT_RADIUS, DOT_RADIUS * 2,
                         DOT_RADIUS * 2);
                 if (showCVELabel(vulnerability, configuration.getPriorityModel(), configuration.getFailPriorityThreshold())) {

@@ -4,76 +4,30 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
 public class TrivyScan
 {
     @JsonProperty("SchemaVersion")
-    private int schemaVersion;
+    private @Getter @Setter int schemaVersion;
 
     @JsonProperty("CreatedAt")
-    private ZonedDateTime createdAt;
+    private @Getter @Setter ZonedDateTime createdAt;
 
     @JsonProperty("ArtifactName")
-    private String artifactName;
+    private @Getter @Setter String artifactName;
 
     @JsonProperty("ArtifactType")
-    private String artifactType;
+    private @Getter @Setter String artifactType;
 
  //   @JsonProperty("Metadata")
- //   private TrivyScanMetadata metadata;
+ //   private @Getter @Setter TrivyScanMetadata metadata;
 
     @JsonProperty("Results")
-    private TrivyScanResult[] results;
-
-    public TrivyScan() {
-    }
-
-    public int getSchemaVersion() {
-        return schemaVersion;
-    }
-
-    public void setSchemaVersion(int schemaVersion) {
-        this.schemaVersion = schemaVersion;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }    
-
-    public String getArtifactName() {
-        return artifactName;
-    }
-
-    public void setArtifactName(String artifactName) {
-        this.artifactName = artifactName;
-    }
-
-    public String getArtifactType() {
-        return artifactType;
-    }
-
-    public void setArtifactType(String artifactType) {
-        this.artifactType = artifactType;
-    }
-
- //   public TrivyScanMetadata getMetadata() {
- //       return metadata;
- //   }
-
- //   public void setMetadata(TrivyScanMetadata metadata) {
- //       this.metadata = metadata;
- //   }
-
-    public TrivyScanResult[] getResults() {
-        return results;
-    }
-
-    public void setResults(TrivyScanResult[] results) {
-        this.results = results;
-    }
+    private @Getter @Setter TrivyScanResult[] results;
 
     /**
      * Gets the complete set of vulnerabilities for this scan, irrespective of the targeted result.

@@ -4,24 +4,29 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
+import lombok.Getter;
+
 public class TrivyOneScanSummary {
-    private String title;
-    private String artefactName;
-    private String artefactType;
-    private LocalDate scanDate;
-    private TrivyScanVulnerabilities vulnerabilitiesOpen;
-    private TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted;
+    private final @Getter String title;
+    private final @Getter String artefactName;
+    private final @Getter String artefactType;
+    private final @Getter LocalDate scanDate;
+    @JsonProperty("vulnerabilitiesOpen")
+    private final @Getter TrivyScanVulnerabilities openVulnerabilities;
+    @JsonProperty("vulnerabilitiesWhitelisted")
+    private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
 
     public TrivyOneScanSummary(
         String title,
         String artefactName,
         String artefactType,
         LocalDate scanDate,
-        TrivyScanVulnerabilities vulnerabilitiesOpen,
-        TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted) {
+        TrivyScanVulnerabilities openVulnerabilities,
+        TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities) {
 
         if (title == null)
         {
@@ -33,31 +38,7 @@ public class TrivyOneScanSummary {
         this.artefactName = artefactName;
         this.artefactType = artefactType;
         this.scanDate = scanDate;
-        this.vulnerabilitiesOpen = vulnerabilitiesOpen;
-        this.vulnerabilitiesWhitelisted = vulnerabilitiesWhitelisted;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getArtefactName() {
-        return artefactName;
-    }
-
-    public String getArtefactType() {
-        return artefactType;
-    }
-
-    public LocalDate getScanDate() {
-        return scanDate;
-    }
-
-    public TrivyScanVulnerabilities getOpenVulnerabilities() {
-        return vulnerabilitiesOpen;
-    }
-
-    public TrivyScanWhitelistedVulnerabilities getWhitelistedVulnerabilities() {
-        return vulnerabilitiesWhitelisted;
+        this.openVulnerabilities = openVulnerabilities;
+        this.whitelistedVulnerabilities = whitelistedVulnerabilities;
     }
 }

@@ -4,69 +4,29 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@AllArgsConstructor()
+@Builder
+@JsonDeserialize(builder = WhitelistEntry.WhitelistEntryBuilder.class)
 public class WhitelistEntry implements Comparable<WhitelistEntry> {
     @JsonProperty(required = true)
-    private String vulnerabilityID;
+    private @NonNull @Getter @Setter String vulnerabilityID;
     @JsonProperty(required = true)
-    private String reason;
+    private @NonNull @Getter @Setter String reason;
     @JsonProperty(required = true)
-    private LocalDate nextReviewDate;
+    private @NonNull @Getter @Setter LocalDate nextReviewDate;
     @JsonProperty(required = false)
-    private LocalDate approvalDate;
+    private @Getter @Setter LocalDate approvalDate;
     @JsonProperty(required = false)
-    private String approvedBy;
-
-    protected WhitelistEntry()
-    {
-    }
-
-    public WhitelistEntry(
-        @JsonProperty(value = "vulnerabilityID", required = true) String vulnerabilityID,
-        @JsonProperty(value = "reason", required = true) String reason,
-        @JsonProperty(value = "nextReviewDate", required = true) LocalDate nextReviewDate,
-        @JsonProperty(value = "approvalDate", required = false) LocalDate approvalDate,
-        @JsonProperty(value = "approvedBy", required = false) String approvedBy
-        )
-    {
-        this.vulnerabilityID = vulnerabilityID;
-        this.reason = reason;
-        this.nextReviewDate = nextReviewDate;
-        this.approvalDate = approvalDate;
-        this.approvedBy = approvedBy;
-    }
-
-    public String getVulnerabilityID() {
-        return vulnerabilityID;
-    }
-    public void setVulnerabilityID(String vulnerabilityID) {
-        this.vulnerabilityID = vulnerabilityID;
-    }
-    public String getReason() {
-        return reason;
-    }
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-    public LocalDate getNextReviewDate() {
-        return nextReviewDate;
-    }
-    public void setNextReviewDate(LocalDate nextReviewDate) {
-        this.nextReviewDate = nextReviewDate;
-    }
-    public LocalDate getApprovalDate() {
-        return approvalDate;
-    }
-    public void setApprovalDate(LocalDate approvalDate) {
-        this.approvalDate = approvalDate;
-    }
-    public String getApprovedBy() {
-        return approvedBy;
-    }
-    public void setApprovedBy(String approvedBy) {
-        this.approvedBy = approvedBy;
-    }
+    private @Getter @Setter String approvedBy;
 
     @Override
     public int compareTo(WhitelistEntry that) {

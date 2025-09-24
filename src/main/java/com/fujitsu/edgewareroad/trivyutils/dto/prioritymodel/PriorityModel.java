@@ -3,59 +3,35 @@ package com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor 
+@AllArgsConstructor
 public class PriorityModel {
     @JsonProperty
-    private PriorityModelType type = PriorityModelType.SEVERITYONLY;
-    @JsonProperty
-    private VulnerabilityScorePriorityThresholds criticalPriorityThresholds = null;
-    @JsonProperty
-    private VulnerabilityScorePriorityThresholds highPriorityThresholds = null;
-    @JsonProperty
-    private VulnerabilityScorePriorityThresholds mediumPriorityThresholds = null;
-
-    public PriorityModel()
-    {
-    }
-
-    public PriorityModel(PriorityModelType type, VulnerabilityScorePriorityThresholds critical, VulnerabilityScorePriorityThresholds high, VulnerabilityScorePriorityThresholds medium)
-    {
-        this.type = type;
-        this.criticalPriorityThresholds = critical;
-        this.highPriorityThresholds = high;
-        this.mediumPriorityThresholds = medium;
-    }
-
-    public PriorityModelType getType()
-    {
-        return type;
-    }
+    private @Getter PriorityModelType type = PriorityModelType.SEVERITYONLY;
+    @JsonProperty("criticalPriorityThresholds")
+    private @Getter VulnerabilityScorePriorityThresholds criticalThresholds = null;
+    @JsonProperty("highPriorityThresholds")
+    private @Getter VulnerabilityScorePriorityThresholds highThresholds = null;
+    @JsonProperty("mediumPriorityThresholds")
+    private @Getter VulnerabilityScorePriorityThresholds mediumThresholds = null;
 
     public VulnerabilityScorePriorityThresholds getThresholds(VulnerabilityPriority priority)
     {
         switch(priority)
         {
             case CRITICAL:
-                return criticalPriorityThresholds;
+                return criticalThresholds;
             case HIGH:
-                return highPriorityThresholds;
+                return highThresholds;
             case MEDIUM:
-                return mediumPriorityThresholds;
+                return mediumThresholds;
             default:
                 return null;
         }
-    }
-
-    public VulnerabilityScorePriorityThresholds getCriticalThresholds()
-    {
-        return criticalPriorityThresholds;
-    }
-    public VulnerabilityScorePriorityThresholds getHighThresholds()
-    {
-        return highPriorityThresholds;
-    }
-    public VulnerabilityScorePriorityThresholds getMediumThresholds()
-    {
-        return mediumPriorityThresholds;
     }
 
     public static VulnerabilityPriority getPriorityOnlyFromVendorSeverity(VulnerabilitySeverity vendorSeverity)
@@ -84,22 +60,22 @@ public class PriorityModel {
                 return getPriorityOnlyFromVendorSeverity(vendorSeverity);
             
             case RECTANGULAR:
-                if (criticalPriorityThresholds != null && cvssScore >= criticalPriorityThresholds.getMinimumCVSS() && (epssScore >= criticalPriorityThresholds.getMinimumEPSS()))
+                if (criticalThresholds != null && cvssScore >= criticalThresholds.getMinimumCvss() && (epssScore >= criticalThresholds.getMinimumEpss()))
                     return VulnerabilityPriority.CRITICAL;
-                else if (highPriorityThresholds != null && cvssScore >= highPriorityThresholds.getMinimumCVSS() && (epssScore >= highPriorityThresholds.getMinimumEPSS()))
+                else if (highThresholds != null && cvssScore >= highThresholds.getMinimumCvss() && (epssScore >= highThresholds.getMinimumEpss()))
                     return VulnerabilityPriority.HIGH;
-                else if (mediumPriorityThresholds != null && cvssScore >= mediumPriorityThresholds.getMinimumCVSS() && (epssScore >= mediumPriorityThresholds.getMinimumEPSS()))
+                else if (mediumThresholds != null && cvssScore >= mediumThresholds.getMinimumCvss() && (epssScore >= mediumThresholds.getMinimumEpss()))
                     return VulnerabilityPriority.MEDIUM;
                 else
                     // We've not matched a priority so we must assume a LOW priority
                     return VulnerabilityPriority.LOW;
             
             case ELLIPTICAL:
-            if (criticalPriorityThresholds != null && withinEllipticalModeThresholds(cvssScore, epssScore, criticalPriorityThresholds))
+            if (criticalThresholds != null && withinEllipticalModeThresholds(cvssScore, epssScore, criticalThresholds))
                 return VulnerabilityPriority.CRITICAL;
-            else if (highPriorityThresholds != null && withinEllipticalModeThresholds(cvssScore, epssScore, highPriorityThresholds))
+            else if (highThresholds != null && withinEllipticalModeThresholds(cvssScore, epssScore, highThresholds))
                 return VulnerabilityPriority.HIGH;
-            else if (mediumPriorityThresholds != null && withinEllipticalModeThresholds(cvssScore, epssScore, mediumPriorityThresholds))
+            else if (mediumThresholds != null && withinEllipticalModeThresholds(cvssScore, epssScore, mediumThresholds))
                 return VulnerabilityPriority.MEDIUM;
             else
                 // We've not matched a priority so we must assume a LOW priority
@@ -113,8 +89,8 @@ public class PriorityModel {
 
     private boolean withinEllipticalModeThresholds(double cvssScore, double epssScore, VulnerabilityScorePriorityThresholds priorityThresholds)
     {
-        double ellipseCVSSAxis = 10.0d - priorityThresholds.getMinimumCVSS();
-        double ellipseEPSSAxis = 1.0d - priorityThresholds.getMinimumEPSS();
+        double ellipseCVSSAxis = 10.0d - priorityThresholds.getMinimumCvss();
+        double ellipseEPSSAxis = 1.0d - priorityThresholds.getMinimumEpss();
         double ellipseCVSSPoint = 10.0d - cvssScore;
         double ellipseEPSSPoint = 1.0d - epssScore;
 

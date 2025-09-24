@@ -229,7 +229,7 @@ public class TrivySummary {
 				.configure(SerializationFeature.WRITE_ENUMS_USING_INDEX, false)
 				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 				.configure(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE, true)
-				.setSerializationInclusion(Include.NON_NULL);
+				.setDefaultPropertyInclusion(Include.NON_NULL);
 				mapper.registerModule(new JavaTimeModule());
 
 				Files.writeString(configuration.getOutputFile(), mapper.writeValueAsString(comparison));
@@ -297,7 +297,7 @@ public class TrivySummary {
 				.configure(SerializationFeature.WRITE_ENUMS_USING_INDEX, false)
 				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 				.configure(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE, true)
-				.setSerializationInclusion(Include.NON_NULL);
+				.setDefaultPropertyInclusion(Include.NON_NULL);
 				mapper.registerModule(new JavaTimeModule());
 
 				Files.writeString(configuration.getOutputFile(), mapper.writeValueAsString(summary));
@@ -353,7 +353,7 @@ public class TrivySummary {
 
         for (TrivyScanVulnerability vulnerability : vulnerabilities)
         {
-            if (force || vulnerability.getEPSSScore() == null)
+            if (force || vulnerability.getEpssScore() == null)
             {
                 vulnerabilitiesRequiringLPSSScores.add(vulnerability);
 
@@ -420,7 +420,7 @@ public class TrivySummary {
 			{
 				if (vulnerability.getVulnerabilityID().equalsIgnoreCase(epssData.getVulnerabilityID()))
 				{
-					vulnerability.setEPSSScore(epssData.getEpssScore());
+					vulnerability.setEpssScore(epssData.getEpssScore());
 					break;
 				}
 			}

@@ -2,52 +2,22 @@ package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
 public class TrivyScanResult
 {
     @JsonProperty("Target")
-    private String target;
+    private @Getter @Setter String target;
 
     @JsonProperty("Class")
-    private String targetClass;
+    private @Getter @Setter String targetClass;
 
     @JsonProperty("Type")
-    private String targetType;
+    private @Getter @Setter String targetType;
 
     @JsonProperty("Vulnerabilities")
-    private TrivyScanPackageVulnerabilities vulnerabilities = new TrivyScanPackageVulnerabilities();
-
-    public TrivyScanResult() {
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public String getTargetClass() {
-        return targetClass;
-    }
-
-    public void setTargetClass(String targetClass) {
-        this.targetClass = targetClass;
-    }
-
-    public String getTargetType() {
-        return targetType;
-    }
-
-    public void setTargetType(String targetType) {
-        this.targetType = targetType;
-    }
-
-    public TrivyScanPackageVulnerabilities getVulnerabilities() {
-        return vulnerabilities;
-    }
-
-    public void setVulnerabilities(TrivyScanPackageVulnerabilities vulnerabilities) {
-        this.vulnerabilities = vulnerabilities;
-    }
+    private @Getter @Setter TrivyScanPackageVulnerabilities vulnerabilities = new TrivyScanPackageVulnerabilities();
 }

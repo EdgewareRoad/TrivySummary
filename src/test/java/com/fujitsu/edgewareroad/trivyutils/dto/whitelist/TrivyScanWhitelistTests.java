@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class TrivyScanWhitelistTests {
@@ -20,18 +20,18 @@ public class TrivyScanWhitelistTests {
     {
         WhitelistEntries entries = new WhitelistEntries();
 
-        entries.add(new WhitelistEntryBuilder()
-            .setVulnerabilityID("CVE-2022-00001")
-            .setReason("This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.")
-            .setNextReviewDate(LocalDate.now().plusDays(90))
+        entries.add(WhitelistEntry.builder()
+            .vulnerabilityID("CVE-2022-00001")
+            .reason("This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.")
+            .nextReviewDate(LocalDate.now().plusDays(90))
             .build());
 
-        entries.add(new WhitelistEntryBuilder()
-            .setVulnerabilityID("CVE-2022-00002")
-            .setReason("Bob said it was OK.")
-            .setNextReviewDate(LocalDate.now().plusDays(120))
-            .setApprovalDate(LocalDate.now().minusDays(1))
-            .setApprovedBy("Bob")
+        entries.add(WhitelistEntry.builder()
+            .vulnerabilityID("CVE-2022-00002")
+            .reason("Bob said it was OK.")
+            .nextReviewDate(LocalDate.now().plusDays(120))
+            .approvalDate(LocalDate.now().minusDays(1))
+            .approvedBy("Bob")
             .build());
 
         ObjectMapper mapper = new ObjectMapper();
@@ -45,11 +45,11 @@ public class TrivyScanWhitelistTests {
     public void testCreateWhitelistMissingID() throws JsonProcessingException
     {
         try {
-            new WhitelistEntryBuilder()
-                .setReason("This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.")
-                .setNextReviewDate(LocalDate.now().plusDays(90))
+            WhitelistEntry.builder()
+                .reason("This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.")
+                .nextReviewDate(LocalDate.now().plusDays(90))
                 .build();
-        } catch (IllegalArgumentException ex)
+        } catch (NullPointerException ex)
         {
             return;
         }
@@ -61,11 +61,11 @@ public class TrivyScanWhitelistTests {
     public void testCreateWhitelistMissingReason() throws JsonProcessingException
     {
         try {
-            new WhitelistEntryBuilder()
-                .setVulnerabilityID("CVE-2022-00001")
-                .setNextReviewDate(LocalDate.now().plusDays(90))
+            WhitelistEntry.builder()
+                .vulnerabilityID("CVE-2022-00001")
+                .nextReviewDate(LocalDate.now().plusDays(90))
                 .build();
-        } catch (IllegalArgumentException ex)
+        } catch (NullPointerException ex)
         {
             return;
         }
@@ -77,11 +77,11 @@ public class TrivyScanWhitelistTests {
     public void testCreateWhitelistMissingReviewDate() throws JsonProcessingException
     {
         try {
-            new WhitelistEntryBuilder()
-                .setVulnerabilityID("CVE-2022-00001")
-                .setReason("This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.")
+            WhitelistEntry.builder()
+                .vulnerabilityID("CVE-2022-00001")
+                .reason("This base image contains the affected JAR but does not expose it in a manner that can be exploited by external consumers.")
                 .build();
-        } catch (IllegalArgumentException ex)
+        } catch (NullPointerException ex)
         {
             return;
         }
@@ -139,9 +139,9 @@ public class TrivyScanWhitelistTests {
 
         try {
             mapper.readValue(importData, WhitelistEntries.class);
-        } catch (MismatchedInputException ex)
+        } catch (ValueInstantiationException ex)
         {
-            assertTrue(ex.getMessage().contains("Missing required creator property 'vulnerabilityID'"), "Wrong exception thrown");
+            assertTrue(ex.getMessage().contains("vulnerabilityID is marked non-null but is null"), "Wrong exception thrown");
             return;
         }
 

@@ -5,19 +5,25 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
+import lombok.Getter;
+
 public class TrivyTwoScanComparison {
-    private String title;
-    private List<String> artefactNames;
-    private String artefactType;
+    private final @Getter String title;
+    private final List<String> artefactNames;
+    private final @Getter String artefactType;
     private boolean historyMayNotBeForSameArtefact = false;
-    private LocalDate fromScanDate;
-    private LocalDate toScanDate;
-    private TrivyScanVulnerabilities vulnerabilitiesOpen;
-    private TrivyScanVulnerabilities vulnerabilitiesClosed;
-    private TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted;
+    private final @Getter LocalDate fromScanDate;
+    private final @Getter LocalDate toScanDate;
+    @JsonProperty("vulnerabilitiesOpen")
+    private final @Getter TrivyScanVulnerabilities openVulnerabilities;
+    @JsonProperty("vulnerabilitiesClosed")
+    private final @Getter TrivyScanVulnerabilities closedVulnerabilities;
+    @JsonProperty("vulnerabilitiesWhitelisted")
+    private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
 
     public TrivyTwoScanComparison(
         String title,
@@ -58,13 +64,9 @@ public class TrivyTwoScanComparison {
         this.historyMayNotBeForSameArtefact = historyMayNotBeForSameArtefact;
         this.fromScanDate = fromScanDate;
         this.toScanDate = toScanDate;
-        this.vulnerabilitiesOpen = vulnerabilitiesOpen;
-        this.vulnerabilitiesClosed = vulnerabilitiesClosed;
-        this.vulnerabilitiesWhitelisted = vulnerabilitiesWhitelisted;
-    }
-
-    public String getTitle() {
-        return title;
+        this.openVulnerabilities = vulnerabilitiesOpen;
+        this.closedVulnerabilities = vulnerabilitiesClosed;
+        this.whitelistedVulnerabilities = vulnerabilitiesWhitelisted;
     }
 
     public String getEarlierArtefactName() {
@@ -75,32 +77,8 @@ public class TrivyTwoScanComparison {
         return artefactNames.get(1);
     }
 
-    public String getArtefactType() {
-        return artefactType;
-    }
-
     public boolean historyMayNotBeForSameArtefact()
     {
         return historyMayNotBeForSameArtefact;
-    }
-
-    public LocalDate getFromScanDate() {
-        return fromScanDate;
-    }
-
-    public LocalDate getToScanDate() {
-        return toScanDate;
-    }
-
-    public TrivyScanVulnerabilities getOpenVulnerabilities() {
-        return vulnerabilitiesOpen;
-    }
-
-    public TrivyScanVulnerabilities getClosedVulnerabilities() {
-        return vulnerabilitiesClosed;
-    }
-
-    public TrivyScanWhitelistedVulnerabilities getWhitelistedVulnerabilities() {
-        return vulnerabilitiesWhitelisted;
     }
 }
