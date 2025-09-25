@@ -79,7 +79,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.21.2'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
 	implementation 'org.apache.xmlgraphics:batik-dom:1.19'
-	implementation 'org.apache.commons:commons-lang3:3.18.0'
+	implementation 'org.apache.commons:commons-lang3:3.19.0'
 	compileOnly 'org.projectlombok:lombok:1.18.42'
 	annotationProcessor 'org.projectlombok:lombok:1.18.42'
 	testCompileOnly 'org.projectlombok:lombok:1.18.42'
