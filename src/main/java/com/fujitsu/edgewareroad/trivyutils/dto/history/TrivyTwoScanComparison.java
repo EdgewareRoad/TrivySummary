@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
@@ -18,11 +17,8 @@ public class TrivyTwoScanComparison {
     private boolean historyMayNotBeForSameArtefact = false;
     private final @Getter LocalDate fromScanDate;
     private final @Getter LocalDate toScanDate;
-    @JsonProperty("vulnerabilitiesOpen")
     private final @Getter TrivyScanVulnerabilities openVulnerabilities;
-    @JsonProperty("vulnerabilitiesClosed")
     private final @Getter TrivyScanVulnerabilities closedVulnerabilities;
-    @JsonProperty("vulnerabilitiesWhitelisted")
     private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
 
     public TrivyTwoScanComparison(
@@ -32,9 +28,9 @@ public class TrivyTwoScanComparison {
         boolean historyMayNotBeForSameArtefact,
         LocalDate fromScanDate,
         LocalDate toScanDate,
-        TrivyScanVulnerabilities vulnerabilitiesOpen,
-        TrivyScanVulnerabilities vulnerabilitiesClosed,
-        TrivyScanWhitelistedVulnerabilities vulnerabilitiesWhitelisted) {
+        TrivyScanVulnerabilities openVulnerabilities,
+        TrivyScanVulnerabilities closedVulnerabilities,
+        TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities) {
 
         if (title == null)
         {
@@ -64,9 +60,9 @@ public class TrivyTwoScanComparison {
         this.historyMayNotBeForSameArtefact = historyMayNotBeForSameArtefact;
         this.fromScanDate = fromScanDate;
         this.toScanDate = toScanDate;
-        this.openVulnerabilities = vulnerabilitiesOpen;
-        this.closedVulnerabilities = vulnerabilitiesClosed;
-        this.whitelistedVulnerabilities = vulnerabilitiesWhitelisted;
+        this.openVulnerabilities = openVulnerabilities;
+        this.closedVulnerabilities = closedVulnerabilities;
+        this.whitelistedVulnerabilities = whitelistedVulnerabilities;
     }
 
     public String getEarlierArtefactName() {

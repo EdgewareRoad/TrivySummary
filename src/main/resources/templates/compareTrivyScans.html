@@ -39,20 +39,28 @@
         </ul>
     </p>
 
-    <a id="openVulnerabilities"/>
+    <a id="openVulnerabilities"></a>
     <h2>Open vulnerabilities</h2>
 
-    <p>
-        <table th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
-            <tr>
-                <td th:each="priority : ${priorities}" th:if="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()} != null" th:class="|${priority[1]} priorityCountBox|">
-                        <span class="vulnPriority" th:text="${priority[0]}"></span>
-                        <br/>
-                        <span class="priorityCount" th:text="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()}">???</span>
-                </td>
-            </tr>
-        </table>
-    </p>
+    <table class="pagebreakafter" th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
+        <tr>
+            <td th:each="priority : ${priorities}" th:if="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()} != null" th:class="|${priority[1]} priorityCountBox|">
+                <table>
+                    <tr>
+                        <td class="vulnPriority" th:text="${priority[0]}">???</td>
+                        <td class="priorityCount" th:text="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size()}">???</td>
+                    </tr>
+                </table>
+                <div th:if="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size() > 0}">
+                    <table>
+                        <tr>
+                            <td class="priorityCountFixable"><span th:text="|${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0], true).size()} with |">???</span><a class="fixDisclaimerLink" href="#fixDisclaimer">fixes</a> available</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <p th:if="${svgGraph != ''}" class="pagebreakafter" th:utext="${svgGraph}"></p>
 
@@ -93,7 +101,7 @@
                             <tr th:each="packageVuln : ${vulnerability.packageVulnerabilities}">
                                 <td><span th:text="${stringUtils.getHyphenated(packageVuln.pkgName)}">ABCD123</span></td>
                                 <td><span th:text="${packageVuln.installedVersion}">vXXXX</span></td>
-                                <td><span th:text="${packageVuln.fixedVersion}">vYYYY</span></td>
+                                <td><a th:text="${stringUtils.textWithDefaultOnNullOrEmpty(packageVuln.fixedVersion, 'No fixed package available')}" href="#fixDisclaimer">vYYYY</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -102,7 +110,7 @@
         </tbody>
     </table>
 
-    <a id="whitelistedVulnerabilities"/>
+    <a id="whitelistedVulnerabilities"></a>
     <h2>Whitelisted vulnerabilities</h2>
 
     <table class="whitelistTableVulnerabilities pagebreakafter">
@@ -136,7 +144,7 @@
         </tbody>
     </table>
 
-    <a id="closedVulnerabilities"/>
+    <a id="closedVulnerabilities"></a>
     <h2>Closed vulnerabilities</h2>
 
     <p>
@@ -177,7 +185,7 @@
         </tbody>
     </table>
 
-    <a id="configuration"/>
+    <a id="configuration"></a>
     <h2>Report configuration</h2>
 
     <p th:if="${isOffline}">Offline scan. No EPSS scores calculated. All priorities are calculated purely on the basis of vendor severity.</p>
@@ -191,5 +199,11 @@
             </ul>
         </span>
     </p>
+
+    <a id="fixDisclaimer"></a>
+    <h2>Fix Disclaimer</h2>
+    <p>Please note that the term "fix" refers to the known availability of a patched version of the affected package for the platform, OS or product.  Moreover, where a fix is not yet marked as being available,
+        this does not mean that the vulnerability / exposure should not be assessed as there may be other ways to remediate, such as upgrading the base OS / product on which the component is built, or rewriting
+        the code to avoid use of the affected package.</p>
 </body>
 </html>

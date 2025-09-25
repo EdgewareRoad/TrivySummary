@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.util.StringUtils;
+
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 
@@ -15,11 +16,10 @@ public class TrivyOneScanSummary {
     private final @Getter String artefactName;
     private final @Getter String artefactType;
     private final @Getter LocalDate scanDate;
-    @JsonProperty("vulnerabilitiesOpen")
     private final @Getter TrivyScanVulnerabilities openVulnerabilities;
-    @JsonProperty("vulnerabilitiesWhitelisted")
     private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
 
+    @SuppressWarnings("null")
     public TrivyOneScanSummary(
         String title,
         String artefactName,
@@ -31,7 +31,7 @@ public class TrivyOneScanSummary {
         if (title == null)
         {
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
-            title = String.format("Artefact %s of type %s, scanned %s", artefactName, artefactType, scanDate.format(formatter));
+            title = String.format("Artefact %s of type %s, scanned %s", artefactName.contains(":") ? StringUtils.split(artefactName, ":")[0] : artefactName, artefactType, scanDate.format(formatter));
         }
 
         this.title = title;

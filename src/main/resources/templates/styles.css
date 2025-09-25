@@ -40,6 +40,7 @@
 }
 
 body {
+    color: black;
     box-sizing: border-box;
     font-family: sans-serif;
     font-size: 0.8em;
@@ -47,23 +48,31 @@ body {
 }
 
 h1 {
+    color: black;
     font-size: 1.5em;
     font-weight: 800;
 }
 
 h2 {
+    color: black;
     font-size: 2em;
     font-weight: 600;
 }
 
 h3 {
+    color: black;
     font-size: 1.4em;
     font-weight: 600;
 }
 
 caption {
+    color: black;
     font-size: 1.2em;
     font-weight: 400;
+}
+
+a.fixDisclaimerLink {
+    color: white;
 }
 
 .pagebreakafter {
@@ -225,6 +234,7 @@ tbody.whitelistTableBody tr.whitelistTableBodyRow:nth-child(odd) {
 }
 
 td {
+    color: black;
     padding: 0.5em;
     font-weight: 100;
     vertical-align: top;
@@ -235,18 +245,23 @@ tr {
 }
 
 .vulnPriority {
+    color: white;
     font-weight: 800;
+    vertical-align: top;
 }
 
 .vulnPriorityLow {
-    background-color: lawngreen;
+    color: white;
+    background-color: green;
 }
 
 .vulnPriorityMedium {
-    background-color: orange;
+    color: white;
+    background-color: darkorange;
 }
 
 .vulnPriorityHigh {
+    color: white;
     background-color: orangered;
 }
 
@@ -257,6 +272,7 @@ tr {
 
 .priorityCountBox {
     min-width: 6em;
+    width: 25%;
 }
 
 .secondaryRef {
@@ -269,10 +285,33 @@ tr {
 }
 
 .priorityCount {
+    color: white;
     font-size: 4em;
     font-weight: 800;
     white-space: nowrap;
     overflow: hidden;
+    vertical-align: top;
+    text-align: right;
+    width: 100%;
+    padding-top: 0em;
+    padding-bottom: 0em;
+    padding-left: 0em;
+    padding-right: 0.15em;
+    margin-top: 0em;
+    margin-bottom: 0em;
+    margin-left: 0em;
+    margin-right: 0em;
+}
+
+.priorityCountFixable {
+    color: white;
+    font-size: 1em;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: top;
+    padding-top: 0em;
+    margin-top: 0em;
 }
 
 .newVulnerabilityMarker {

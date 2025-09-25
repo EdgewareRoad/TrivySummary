@@ -80,8 +80,8 @@ public class TrivySummaryStringUtils {
         return builder.toString();
     }
 
-    public String conditional(boolean conditional, String ifTrue, String ifFalse)
+    public String textWithDefaultOnNullOrEmpty(String text, String defaultText)
     {
-        return conditional ? ifTrue : ifFalse;
+        return StringUtils.hasText(text) ? text : defaultText;
     }
 }
