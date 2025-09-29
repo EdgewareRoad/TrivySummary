@@ -125,7 +125,7 @@ The format of a treatment plan is as follows:
 * ticketSystemURLTemplate _(mandatory)_
 
   A templated URL form for your ticketing system with the ticket reference replaced by _{ticketId}_.
-  For example, a typical Jira configuration might be _https://myjirasystem.mydomain.com/browse/{ticketId}_
+  For example, a typical Jira configuration might be `https://myjirasystem.mydomain.com/browse/{ticketId}`
 
 * defaultNoteText _(mandatory, but may be left blank)_
 

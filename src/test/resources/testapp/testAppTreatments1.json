@@ -15,6 +15,6 @@
     "noteText" : "This is a note for all vulnerabilities in myArtefact:2025",
     "affectedArtefacts" : [ "myOtherArtefact:v1.0.1", "myOtherOtherArtefact:v2.3.4" ]
   } ],
-  "ticketSystemURLTemplate" : "https://example.com/tickets/{id}",
-  "defaultNoteText" : "Nothing is happening here"
+  "ticketSystemURLTemplate" : "https://example.com/tickets/{ticketId}",
+  "defaultNoteText" : "TODO - awaiting assessment"
 }
