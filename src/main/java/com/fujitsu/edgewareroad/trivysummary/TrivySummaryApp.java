@@ -15,6 +15,7 @@ import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivySca
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.VulnerabilityPriority;
+import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.TreatmentPlan;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.util.XRLog;
@@ -243,6 +244,53 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					return;
 				} catch (IOException e) {
 					output("ERROR: File IO exception for whitelist file %s", whiteListFilePath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+			}
+		}
+
+		if (args.containsOption("treatmentPlan"))
+		{
+			List<String> treatmentPlanValues = args.getOptionValues("treatmentPlan");
+			if (treatmentPlanValues.size() > 1) {
+				output("ERROR: treatmentPlan option specified multiple times. Only zero or one value is permitted");
+				output("");
+				displayHelp();
+				this.exitCode = -1;
+				return;
+			}
+			if (treatmentPlanValues.size() == 1) {
+				Path treatmentPlanPath = workingDirectory.resolve(treatmentPlanValues.iterator().next());
+
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.registerModule(new JavaTimeModule());
+				try {
+					configuration.setTreatmentPlan(mapper.readValue(treatmentPlanPath.toFile(), TreatmentPlan.class));
+				} catch (StreamReadException e) {
+					output("ERROR: JSON Parsing exception for treatment plan %s: %s", treatmentPlanPath.toString(),
+							e.getMessage());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				} catch (DatabindException e) {
+					output("ERROR: JSON Mapping exception for treatment plan %s: %s", treatmentPlanPath.toString(),
+							e.getMessage());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				} catch (FileNotFoundException e) {
+					output("ERROR: Treatment plan not found %s", treatmentPlanPath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				} catch (IOException e) {
+					output("ERROR: File IO exception for treatment plan %s", treatmentPlanPath.toString());
 					output("");
 					displayHelp();
 					this.exitCode = -1;

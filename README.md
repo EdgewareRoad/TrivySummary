@@ -54,6 +54,10 @@ later versions of Trivy (since v0.48.0).
     whitelisted in the output. You can specify this argument multiple times
     if you wish to load multiple whitelists
 
+  --treatmentPlan=...
+    If set, the JSON format treatment plan so that progress can be reported
+    and tracked. Only one treatment plan may be specified.
+
   --offline
     If set, TrivySummary will not attempt to access EPSS scores to assess
     the exploitability of CVEs. This will bypass graphing and prioritisation
@@ -110,6 +114,34 @@ Each JSON file is an array of whitelisting entries. Each whitelisting entry has 
   to recognise this whitelisting as having been approved.
 
 For sample JSON to whitelist [see here](src/test/resources/sampleWhitelist1.json)
+
+### Treatment plan
+
+This application supports a fuller reporting structure of progress by specifying a treatment plan which
+will be merged into any generated PDF report.
+
+The format of a treatment plan is as follows:
+
+* ticketSystemURLTemplate _(mandatory)_
+
+  A templated URL form for your ticketing system with the ticket reference replaced by _{ticketId}_.
+  For example, a typical Jira configuration might be _https://myjirasystem.mydomain.com/browse/{ticketId}_
+
+* defaultNoteText _(mandatory, but may be left blank)_
+
+  A default note to be displayed in the event that a vulnerability is detected which does not match a note or treatment
+
+* treatments _(mandatory)_
+
+  A list of treatments currently in the ticketing system, matching one or more CVE references, and/or one or more artefact names
+
+* notes _(mandatory)_
+
+  A list of notes which may apply, matching one or more CVE references, and/or one or more artefact names.
+  The intent here is to be able to give clarity as to the agreed approach where a ticket would be inappropriate (e.g. where no fixes are available yet but a patch release is expected imminently, a note
+  to explain this and how this is tracked might be more appropriate than a treatment linked to a ticket).
+
+For a sample treatment plan JSON [see here](src/test/resources/testapp/testAppTreatments1.json)
 
 ### <a id="epss"/>Better remediation prioritisation through EPSS (exploitability scoring)
 

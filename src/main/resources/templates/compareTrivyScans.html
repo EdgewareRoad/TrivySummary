@@ -54,7 +54,7 @@
                 <div th:if="${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0]).size() > 0}">
                     <table>
                         <tr>
-                            <td class="priorityCountFixable"><span th:text="|${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0], true).size()} with |">???</span><a class="fixDisclaimerLink" href="#fixDisclaimer">fixes</a> available</td>
+                            <td class="priorityCountFixable"><span th:text="|${openVulnerabilities.getVulnerabilitiesAtPriority(priority[0], true).size()} |">???</span><a class="fixDisclaimerLink" href="#fixDisclaimer">fixable</a></td>
                         </tr>
                     </table>
                 </div>
@@ -74,11 +74,12 @@
                 <th scope="col">Priority</th>
                 <th scope="col">Title</th>
                 <th scope="col">Packages affected</th>
+                <th scope="col" th:if="${treatmentPlan != null}">Treatment Plan</th>
             </tr>
         </thead>
         <tbody class="mainTableBody" >
             <tr class="mainTableBodyRow" th:if="${openVulnerabilities.empty}">
-                <td colspan="4"> No vulnerabilities </td>
+                <td colspan="5"> No vulnerabilities </td>
             </tr>
             <tr class="mainTableBodyRow" th:each="vulnerability : ${openVulnerabilities.sorted}" th:with="priorities = ${ { { 'CRITICAL', 'vulnPriorityCritical' }, { 'HIGH', 'vulnPriorityHigh' }, { 'MEDIUM', 'vulnPriorityMedium' }, { 'LOW', 'vulnPriorityLow' } } }">
                 <td><a th:href="${vulnerability.primaryURL}" th:text="${vulnerability.vulnerabilityID}" href="http://google.co.uk"> CVE id </a>
@@ -94,17 +95,32 @@
                             <tr>
                                 <th>Package</th>
                                 <th>Installed version</th>
-                                <th>Fixed in version(s)</th>
+                                <th><a href="#fixDisclaimer">Fixed in version(s)</a></th>
                             </tr>
                         </thead>
                         <tbody class="subTableBody" >
                             <tr th:each="packageVuln : ${vulnerability.packageVulnerabilities}">
                                 <td><span th:text="${stringUtils.getHyphenated(packageVuln.pkgName)}">ABCD123</span></td>
                                 <td><span th:text="${packageVuln.installedVersion}">vXXXX</span></td>
-                                <td><a th:text="${stringUtils.textWithDefaultOnNullOrEmpty(packageVuln.fixedVersion, 'No fixed package available')}" href="#fixDisclaimer">vYYYY</a></td>
+                                <td><span th:text="${stringUtils.textWithDefaultOnNullOrEmpty(packageVuln.fixedVersion, 'No fixed package available')}"></span></td>
                             </tr>
                         </tbody>
                     </table>
+                </td>
+                <td th:if="${treatmentPlan != null}" th:with="vulnerabilityTreatments=${treatmentPlan.getVulnerabilityTreatment(artefactName,vulnerability.vulnerabilityID)}">
+                    <div th:if="${vulnerabilityTreatments == null}" th:text="${treatmentPlan.defaultNoteText}"></div>
+                    <div th:unless="${vulnerabilityTreatments == null}">
+                        <table class="subTableTreatmentPlan">
+                            <tbody class="subTableBody" >
+                                <tr th:each="entry : ${vulnerabilityTreatments.notes}">
+                                    <td><span th:text="${stringUtils.getHyphenated(entry.noteText)}">Description of treatment</span></td>
+                                </tr>
+                                <tr th:each="entry : ${vulnerabilityTreatments.treatmentPlanEntries}">
+                                    <td><b><a th:href="${treatmentPlan.ticketSystemURLTemplate.replace('{ticketId}', entry.ticketId)}" th:text="${entry.ticketId}" href="http://google.co.uk">Ticket ID</a></b><br/><span th:text="${stringUtils.getHyphenated(entry.description)}">Description of treatment</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </td>
             </tr>
         </tbody>
@@ -202,8 +218,10 @@
 
     <a id="fixDisclaimer"></a>
     <h2>Fix Disclaimer</h2>
-    <p>Please note that the term "fix" refers to the known availability of a patched version of the affected package for the platform, OS or product.  Moreover, where a fix is not yet marked as being available,
-        this does not mean that the vulnerability / exposure should not be assessed as there may be other ways to remediate, such as upgrading the base OS / product on which the component is built, or rewriting
+    <p>Please note that the term "fix" refers to the known availability of a patched version of the affected package for the platform, OS or product.
+        It does not necessarily mean that the fix is immediately applicable as other factors (e.g. compatibility of the package with other components).
+        Moreover, where a fix is <i>not</i> yet marked as being available, this does not preclude assessment of the overall exposure as there may be other ways to remediate,
+        such as upgrading the base OS / product on which the component is built, or rewriting
         the code to avoid use of the affected package.</p>
 </body>
 </html>

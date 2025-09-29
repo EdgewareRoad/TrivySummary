@@ -1,0 +1,20 @@
+{
+  "treatments" : [ {
+    "ticketId" : "TICKET-1",
+    "vulnerabilityIDs" : [ "CVE-2023-0001", "CVE-2023-0002" ],
+    "description" : "First ticket"
+  }, {
+    "ticketId" : "TICKET-2",
+    "affectedArtefacts" : [ "myArtefact:2024" ],
+    "description" : "Second ticket"
+  } ],
+  "notes" : [ {
+    "noteText" : "This is a note for CVE-2023-0001 and CVE-2023-0004",
+    "vulnerabilityIDs" : [ "CVE-2023-0001", "CVE-2023-0004" ]
+  }, {
+    "noteText" : "This is a note for all vulnerabilities in myArtefact:2025",
+    "affectedArtefacts" : [ "myOtherArtefact:v1.0.1", "myOtherOtherArtefact:v2.3.4" ]
+  } ],
+  "ticketSystemURLTemplate" : "https://example.com/tickets/{id}",
+  "defaultNoteText" : "Nothing is happening here"
+}

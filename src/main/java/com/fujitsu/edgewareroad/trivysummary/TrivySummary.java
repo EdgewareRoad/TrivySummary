@@ -32,18 +32,23 @@ import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEn
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.VulnerabilityPriority;
+import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.TreatmentPlan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerability;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class TrivySummary {
     public static class Configuration {
         private Path outputFile = Paths.get(System.getProperty("user.dir"), "output.pdf");
 	    private boolean offlineMode = false;
 	    private boolean useTodayForEPSSQuery = false;
-	    private PriorityModel priorityModel = new PriorityModel();
+	    private @Getter @Setter PriorityModel priorityModel = new PriorityModel();
+		private @Getter @Setter TreatmentPlan treatmentPlan = null;
         private VulnerabilityPriority failPriorityThreshold = null;
         private String appVersion = "UNKNOWN_VERSION";
 
@@ -87,17 +92,6 @@ public class TrivySummary {
         public void setUseTodayForEPSSQuery(boolean useTodayForEPSSQuery) {
             this.useTodayForEPSSQuery = useTodayForEPSSQuery;
         }
-
-
-        public PriorityModel getPriorityModel() {
-            return priorityModel;
-        }
-
-
-        public void setPriorityModel(PriorityModel priorityModel) {
-            this.priorityModel = priorityModel;
-        }
-
 
         public VulnerabilityPriority getFailPriorityThreshold() {
             return failPriorityThreshold;
@@ -216,6 +210,7 @@ public class TrivySummary {
 				variables.put("statusIsWarning", statusIsWarning);
 				variables.put("useTodayForEPSSQuery", configuration.isUseTodayForEPSSQuery());
                 variables.put("priorityModel", configuration.getPriorityModel());
+				variables.put("treatmentPlan", configuration.getTreatmentPlan());
                 variables.put("isOffline", configuration.isOfflineMode());
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));
@@ -284,6 +279,7 @@ public class TrivySummary {
 				variables.put("statusIsWarning", statusIsWarning);
 				variables.put("useTodayForEPSSQuery", configuration.isUseTodayForEPSSQuery());
                 variables.put("priorityModel", configuration.getPriorityModel());
+				variables.put("treatmentPlan", configuration.getTreatmentPlan());
                 variables.put("isOffline", configuration.isOfflineMode());
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));

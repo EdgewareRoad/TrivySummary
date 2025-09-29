@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.1.0
+Release 3.2.0
 
-* Now highlights those vulnerabilities that have fixes available (i.e. aiding prioritisation for remediation)
+* Now accepts optional treatment plan JSON as input for fuller, more meaningful progress reports
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.1.0
+
+* Now highlights those vulnerabilities that have fixes available (i.e. aiding prioritisation for remediation)
 
 Release 3.0.16:
 
