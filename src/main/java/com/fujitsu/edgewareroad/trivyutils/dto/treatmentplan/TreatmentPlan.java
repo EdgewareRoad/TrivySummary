@@ -75,7 +75,12 @@ public class TreatmentPlan {
         TreeSet<TreatmentPlanEntry> result = new TreeSet<>();
         for (TreatmentPlanEntry entry : treatments)
         {
-            if (entry.getAffectedArtefacts().contains(artefact)) result.add(entry);
+            for (String entryArtefact : entry.getAffectedArtefacts()) {
+                if (artefact.startsWith(entryArtefact)) {
+                    result.add(entry);
+                    break;
+                }
+            }
         }
         return result;
     }
@@ -95,7 +100,12 @@ public class TreatmentPlan {
         TreeSet<Note> result = new TreeSet<>();
         for (Note entry : notes)
         {
-            if (entry.getAffectedArtefacts().contains(artefact)) result.add(entry);
+            for (String entryArtefact : entry.getAffectedArtefacts()) {
+                if (artefact.startsWith(entryArtefact)) {
+                    result.add(entry);
+                    break;
+                }
+            }
         }
         return result;
     }

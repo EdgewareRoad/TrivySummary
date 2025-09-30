@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.TreatmentPlan.VulnerabilityTreatment;
 
 public class TreatmentPlanTests {
     @Test
@@ -38,27 +39,58 @@ public class TreatmentPlanTests {
         entry2.getVulnerabilityIDs().add("CVE-2023-0003");
         treatments.add(entry2);
 
+        TreatmentPlanEntry entry3 = new TreatmentPlanEntry();
+        entry3.setTicketId("TICKET-3");
+        entry3.setDescription("Third ticket");
+        entry3.getAffectedArtefacts().add("mycomponent:");
+        treatments.add(entry3);
+
         Note note1 = new Note();
-        note1.setNoteText("This is a note for _CVE-2023-0001_ and _CVE-2023-0004_");
+        note1.setNoteText("This is a note for certain vulnerabilities and a component");
         note1.getVulnerabilityIDs().add("CVE-2023-0001");
         note1.getVulnerabilityIDs().add("CVE-2023-0004");
+        note1.getAffectedArtefacts().add("mycomponent:");
         notes.add(note1);
 
         // Test findByTicketId
         assert plan.findTreatmentByTicketId("TICKET-1") == entry1;
         assert plan.findTreatmentByTicketId("TICKET-2") == entry2;
-        assert plan.findTreatmentByTicketId("TICKET-3") == null;
+        assert plan.findTreatmentByTicketId("TICKET-3") == entry3;
+        assert plan.findTreatmentByTicketId("TICKET-4") == null;
 
-        // Test TreatementPlanEntry.findByVulnerabilityId
+        // Test findByVulnerabilityId
         assert plan.findTreatmentByVulnerabilityId("CVE-2023-0001").contains(entry1);
         assert plan.findTreatmentByVulnerabilityId("CVE-2023-0002").contains(entry1);
         assert plan.findTreatmentByVulnerabilityId("CVE-2023-0003").contains(entry2);
         assert plan.findTreatmentByVulnerabilityId("CVE-2023-0004").isEmpty();
 
-        // Test Notes.findByVulnerabilityId
+        // Test findTreatmentByArtefact
+        assert plan.findTreatmentByArtefact("mycomponent:1.0.0").contains(entry3);
+        assert plan.findTreatmentByArtefact("mycomponent:1").contains(entry3);
+        assert plan.findTreatmentByArtefact("mycomponent:").contains(entry3);
+        assert plan.findTreatmentByArtefact("othercomponent:2.0.0").isEmpty();        
+
+        // Test findNoteByVulnerabilityId
         assert plan.findNoteByVulnerabilityId("CVE-2023-0001").contains(note1);
         assert plan.findNoteByVulnerabilityId("CVE-2023-0004").contains(note1);
         assert plan.findNoteByVulnerabilityId("CVE-2023-0002").isEmpty();
+
+        // Test findNoteByArtefact
+        assert plan.findNoteByArtefact("mycomponent:1.0.0").contains(note1);
+        assert plan.findNoteByArtefact("mycomponent:1").contains(note1);
+        assert plan.findNoteByArtefact("mycomponent:").contains(note1);
+        assert plan.findNoteByArtefact("othercomponent:2.0.0").isEmpty();
+
+        VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("mycomponent:", "CVE-2023-0002");
+
+        assert treatment != null;
+        assert treatment.getArtefact().equals("mycomponent:");  
+        assert treatment.getVulnerabilityID().equals("CVE-2023-0002");
+        assert treatment.getTreatmentPlanEntries().size() == 2;
+        assert treatment.getTreatmentPlanEntries().contains(entry1);
+        assert treatment.getTreatmentPlanEntries().contains(entry3);
+        assert treatment.getNotes().size() == 1;
+        assert treatment.getNotes().contains(note1);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

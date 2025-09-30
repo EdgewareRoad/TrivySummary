@@ -133,11 +133,12 @@ The format of a treatment plan is as follows:
 
 * treatments _(mandatory)_
 
-  A list of treatments currently in the ticketing system, matching one or more CVE references, and/or one or more artefact names
+  A list of treatments currently in the ticketing system, matching one or more CVE references, and/or one or more artefact names.
 
 * notes _(mandatory)_
 
   A list of notes which may apply, matching one or more CVE references, and/or one or more artefact names.
+  Artefact names are matched on the basis of starts-with, so you can write a note that matches multiple tags (e.g. to give operational context to where the component sits in your architecture).
   The intent here is to be able to give clarity as to the agreed approach where a ticket would be inappropriate (e.g. where no fixes are available yet but a patch release is expected imminently, a note
   to explain this and how this is tracked might be more appropriate than a treatment linked to a ticket).
 
