@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.TreatmentPlan.VulnerabilityTreatment;
 
 public class TreatmentPlanTests {
     @Test
@@ -81,11 +81,9 @@ public class TreatmentPlanTests {
         assert plan.findNoteByArtefact("mycomponent:").contains(note1);
         assert plan.findNoteByArtefact("othercomponent:2.0.0").isEmpty();
 
-        VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("mycomponent:", "CVE-2023-0002");
+        VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("mycomponent:", Set.of("CVE-2023-0002"));
 
         assert treatment != null;
-        assert treatment.getArtefact().equals("mycomponent:");  
-        assert treatment.getVulnerabilityID().equals("CVE-2023-0002");
         assert treatment.getTreatmentPlanEntries().size() == 2;
         assert treatment.getTreatmentPlanEntries().contains(entry1);
         assert treatment.getTreatmentPlanEntries().contains(entry3);
@@ -112,9 +110,8 @@ public class TreatmentPlanTests {
         InputStream inputStream = getClass().getResourceAsStream("/testapp/testAppTreatments1.json");
         TreatmentPlan plan = mapper.readValue(inputStream, TreatmentPlan.class);
         assertNotNull(plan);
-        TreatmentPlan.VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("artefactA", "CVE-2023-0001");
+        VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("artefactA", Set.of("CVE-2023-0001"));
         assertNotNull(treatment);
-        assert treatment.getVulnerabilityID().equals("CVE-2023-0001");
         assert treatment.getTreatmentPlanEntries().size() == 1;
     }
 }           

@@ -1,15 +1,14 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan;
 
+import java.util.Set;
 import java.util.TreeSet;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -28,26 +27,22 @@ public class TreatmentPlan {
     private @NonNull String ticketSystemURLTemplate;
     private String defaultNoteText;
 
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    public class VulnerabilityTreatment {
-        private final @Getter @NonNull String artefact;
-        private final @Getter @NonNull String vulnerabilityID;
-        private final @Getter @NonNull TreeSet<TreatmentPlanEntry> treatmentPlanEntries;
-        private final @Getter @NonNull TreeSet<Note> notes;
-    }
-
-    public VulnerabilityTreatment getVulnerabilityTreatment(String artefact, String vulnerabilityID) {
-        TreeSet<TreatmentPlanEntry> applicableTreatments = findTreatmentByVulnerabilityId(vulnerabilityID);
-        applicableTreatments.addAll(findTreatmentByArtefact(artefact));
-        TreeSet<Note> applicableNotes = findNoteByVulnerabilityId(vulnerabilityID);
-        applicableNotes.addAll(findNoteByArtefact(artefact));
+    public VulnerabilityTreatment getVulnerabilityTreatment(String artefact, Set<String> vulnerabilityIDs) {
+        TreeSet<TreatmentPlanEntry> applicableTreatments = findTreatmentByArtefact(artefact);
+        for (String vulnerabilityID : vulnerabilityIDs) {
+            applicableTreatments.addAll(findTreatmentByVulnerabilityId(vulnerabilityID));
+        }
+        TreeSet<Note> applicableNotes = findNoteByArtefact(artefact);
+        for (String vulnerabilityID : vulnerabilityIDs) {
+            applicableNotes.addAll(findNoteByVulnerabilityId(vulnerabilityID));
+        }
         
         // If the vulnerability isn't mentioned in any treatment plan entry or note, return null
         if (applicableTreatments.isEmpty() && applicableNotes.isEmpty()) {
             return null;
         }
 
-        return new VulnerabilityTreatment(artefact, vulnerabilityID, applicableTreatments, applicableNotes);
+        return new VulnerabilityTreatment(applicableTreatments, applicableNotes);
     }
 
     

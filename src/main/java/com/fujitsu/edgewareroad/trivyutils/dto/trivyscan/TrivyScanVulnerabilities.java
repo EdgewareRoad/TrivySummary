@@ -1,6 +1,8 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class TrivyScanVulnerabilities extends TrivyScanVulnerabilitySet<TrivyScanVulnerability> {
 
@@ -48,5 +50,15 @@ public class TrivyScanVulnerabilities extends TrivyScanVulnerabilitySet<TrivySca
                 this.add(vulnNew);
             }
         }
+    }
+
+    public Set<String> getAllVulnerabilityIDs()
+    {
+        Set<String> vulnIDs = new TreeSet<>();
+        for (TrivyScanVulnerability vuln : this)
+        {
+            vulnIDs.add(vuln.getVulnerabilityID());
+        }
+        return vulnIDs;
     }
 }

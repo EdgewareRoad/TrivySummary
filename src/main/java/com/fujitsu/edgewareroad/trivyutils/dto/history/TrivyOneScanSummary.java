@@ -8,8 +8,10 @@ import org.springframework.util.StringUtils;
 
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment.ReportedTreatment;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class TrivyOneScanSummary {
     private final @Getter String title;
@@ -18,6 +20,7 @@ public class TrivyOneScanSummary {
     private final @Getter LocalDate scanDate;
     private final @Getter TrivyScanVulnerabilities openVulnerabilities;
     private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
+    private @Getter @Setter ReportedTreatment treatment = null;
 
     @SuppressWarnings("null")
     public TrivyOneScanSummary(

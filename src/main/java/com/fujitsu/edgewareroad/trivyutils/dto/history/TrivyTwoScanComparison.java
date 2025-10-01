@@ -7,8 +7,10 @@ import java.util.List;
 
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment.ReportedTreatment;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class TrivyTwoScanComparison {
     private final @Getter String title;
@@ -20,6 +22,7 @@ public class TrivyTwoScanComparison {
     private final @Getter TrivyScanVulnerabilities openVulnerabilities;
     private final @Getter TrivyScanVulnerabilities closedVulnerabilities;
     private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
+    private @Getter @Setter ReportedTreatment treatment = null;
 
     public TrivyTwoScanComparison(
         String title,

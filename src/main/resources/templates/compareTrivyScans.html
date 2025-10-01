@@ -74,7 +74,7 @@
                 <th scope="col">Priority</th>
                 <th scope="col">Title</th>
                 <th scope="col">Packages affected</th>
-                <th scope="col" th:if="${treatmentPlan != null}">Treatment Plan</th>
+                <th scope="col" th:if="${treatment != null}">Treatment Plan</th>
             </tr>
         </thead>
         <tbody class="mainTableBody" >
@@ -107,20 +107,17 @@
                         </tbody>
                     </table>
                 </td>
-                <td th:if="${treatmentPlan != null}" th:with="vulnerabilityTreatments=${treatmentPlan.getVulnerabilityTreatment(artefactName,vulnerability.vulnerabilityID)}">
-                    <div th:if="${vulnerabilityTreatments == null}" th:text="${treatmentPlan.defaultNoteText}"></div>
-                    <div th:unless="${vulnerabilityTreatments == null}">
-                        <table class="subTableTreatmentPlan">
-                            <tbody class="subTableBody" >
-                                <tr th:each="entry : ${vulnerabilityTreatments.notes}">
-                                    <td><span th:text="${stringUtils.getHyphenated(entry.noteText)}">Description of treatment</span></td>
-                                </tr>
-                                <tr th:each="entry : ${vulnerabilityTreatments.treatmentPlanEntries}">
-                                    <td><b><a th:href="${treatmentPlan.ticketSystemURLTemplate.replace('{ticketId}', entry.ticketId)}" th:text="${entry.ticketId}" href="http://google.co.uk">Ticket ID</a></b><br/><span th:text="${stringUtils.getHyphenated(entry.description)}">Description of treatment</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <td th:if="${vulnerability.treatment != null}">
+                    <table class="subTableTreatmentPlan">
+                        <tbody class="subTableBody" >
+                            <tr th:each="note : ${vulnerability.treatment.notes}">
+                                <td><span th:text="${stringUtils.getHyphenated(note)}">Description of treatment</span></td>
+                            </tr>
+                            <tr th:each="ticket : ${vulnerability.treatment.tickets}">
+                                <td><b><a th:href="${ticket.ticketURI}" th:text="${ticket.ticketId}" href="http://google.co.uk">Ticket ID</a></b><br/><span th:text="${stringUtils.getHyphenated(ticket.description)}">Description of treatment</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </td>
             </tr>
         </tbody>

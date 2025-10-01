@@ -13,7 +13,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,10 +35,13 @@ import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyTwoScanComparison;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.VulnerabilityPriority;
 import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.TreatmentPlan;
+import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.VulnerabilityTreatment;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScan;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerabilities;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanVulnerability;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVulnerabilities;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment.ReportedTreatment;
+import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment.TicketedEntry;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
 import lombok.Getter;
@@ -189,6 +194,12 @@ public class TrivySummary {
 					statusIsWarning = true;
 				}
 			}
+			if (configuration.getTreatmentPlan() != null && comparison.getOpenVulnerabilities().size() > 0)
+			{
+				comparison.setTreatment(createReportedTreatment(configuration.getTreatmentPlan().getTicketSystemURLTemplate(), configuration.getTreatmentPlan().getVulnerabilityTreatment(
+												comparison.getLaterArtefactName(),
+												comparison.getOpenVulnerabilities().getAllVulnerabilityIDs())));
+			}
 	
 			if (configuration.getOutputFile().toString().endsWith(".pdf"))
 			{
@@ -210,7 +221,7 @@ public class TrivySummary {
 				variables.put("statusIsWarning", statusIsWarning);
 				variables.put("useTodayForEPSSQuery", configuration.isUseTodayForEPSSQuery());
                 variables.put("priorityModel", configuration.getPriorityModel());
-				variables.put("treatmentPlan", configuration.getTreatmentPlan());
+				variables.put("treatment", comparison.getTreatment());
                 variables.put("isOffline", configuration.isOfflineMode());
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));
@@ -262,6 +273,18 @@ public class TrivySummary {
 					statusIsWarning = true;
 				}
 			}
+			if (configuration.getTreatmentPlan() != null && summary.getOpenVulnerabilities().size() > 0)
+			{
+				summary.setTreatment(createReportedTreatment(configuration.getTreatmentPlan().getTicketSystemURLTemplate(), configuration.getTreatmentPlan().getVulnerabilityTreatment(
+												summary.getArtefactName(),
+												summary.getOpenVulnerabilities().getAllVulnerabilityIDs())));
+
+				for (TrivyScanVulnerability trivyScanVulnerability : summary.getOpenVulnerabilities()) {
+					trivyScanVulnerability.setTreatment(createReportedTreatment(configuration.getTreatmentPlan().getTicketSystemURLTemplate(), configuration.getTreatmentPlan().getVulnerabilityTreatment(
+												summary.getArtefactName(),
+												Set.of(trivyScanVulnerability.getVulnerabilityID()))));
+				}
+			}
 
 			if (configuration.getOutputFile().toString().endsWith(".pdf"))
 			{
@@ -279,7 +302,7 @@ public class TrivySummary {
 				variables.put("statusIsWarning", statusIsWarning);
 				variables.put("useTodayForEPSSQuery", configuration.isUseTodayForEPSSQuery());
                 variables.put("priorityModel", configuration.getPriorityModel());
-				variables.put("treatmentPlan", configuration.getTreatmentPlan());
+				variables.put("treatment", summary.getTreatment());
                 variables.put("isOffline", configuration.isOfflineMode());
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));
@@ -423,4 +446,26 @@ public class TrivySummary {
 		}
     }
 
+	private ReportedTreatment createReportedTreatment(String ticketURITemplate, VulnerabilityTreatment treatment)
+	{
+		if (treatment == null) return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()));
+
+		java.util.List<TicketedEntry> tickets = new java.util.ArrayList<>();
+		for (var entry : treatment.getTreatmentPlanEntries())
+		{
+			String ticketURI = null;
+			if (entry.getTicketId() != null && ticketURITemplate != null)
+			{
+				ticketURI = ticketURITemplate.replace("{ticketId}", entry.getTicketId());
+			}
+			tickets.add(new TicketedEntry(entry.getTicketId(), ticketURI, entry.getDescription()));
+		}
+		List<String> notes = new java.util.ArrayList<>();
+		for (var entry : treatment.getNotes())
+		{
+			notes.add(entry.getNoteText());
+		}
+
+		return new ReportedTreatment(tickets, notes);
+	}
 }

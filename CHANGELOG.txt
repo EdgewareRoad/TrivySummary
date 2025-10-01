@@ -1,13 +1,17 @@
 This Release
 ------------
 
+Release 3.2.2
+
+* Treatment plan now reported in JSON as well as PDF
+
+Older Releases in this major version
+------------------------------------
+
 Release 3.2.1
 
 * Treatment plan matching of artefact names now uses startsWith to allow treatments to match multiple tags
 * Bumped commons-lang3 to 3.19.0
-
-Older Releases in this major version
-------------------------------------
 
 Release 3.2.0
 
