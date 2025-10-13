@@ -42,9 +42,9 @@ sourceSets {
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
-	// Note, building on Java 21 but Spring Boot 6 still allows JDK 17 compatibility, so allow for this.
+	// Note, building on Java 25 but Spring Boot 6 still allows JDK 17 compatibility, so allow for this.
 	sourceCompatibility = '17'
 	targetCompatibility = '17'
 }
