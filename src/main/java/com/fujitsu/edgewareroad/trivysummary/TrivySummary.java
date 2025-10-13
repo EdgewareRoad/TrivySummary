@@ -17,10 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fujitsu.edgewareroad.trivyutils.GenerateGraph;
 import com.fujitsu.edgewareroad.trivyutils.RenderToPDF;
 import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
@@ -46,6 +42,9 @@ import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 public class TrivySummary {
     public static class Configuration {
@@ -125,6 +124,9 @@ public class TrivySummary {
     private Configuration configuration;
     private TrivyScanHistory history = new TrivyScanHistory();
     private static HttpClient client = HttpClient.newHttpClient();
+    private static ObjectMapper mapper = JsonMapper.builder()
+						.configure(SerializationFeature.INDENT_OUTPUT, true)
+						.build();
 
     public TrivySummary(Configuration configuration)
     {
@@ -230,14 +232,6 @@ public class TrivySummary {
 			}
 			else
 			{
-				ObjectMapper mapper = new ObjectMapper()
-				.configure(SerializationFeature.INDENT_OUTPUT, true)
-				.configure(SerializationFeature.WRITE_ENUMS_USING_INDEX, false)
-				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-				.configure(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE, true)
-				.setDefaultPropertyInclusion(Include.NON_NULL);
-				mapper.registerModule(new JavaTimeModule());
-
 				Files.writeString(configuration.getOutputFile(), mapper.writeValueAsString(comparison));
 			}
 		}
@@ -311,14 +305,6 @@ public class TrivySummary {
 			}
 			else
 			{
-				ObjectMapper mapper = new ObjectMapper()
-				.configure(SerializationFeature.INDENT_OUTPUT, true)
-				.configure(SerializationFeature.WRITE_ENUMS_USING_INDEX, false)
-				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-				.configure(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE, true)
-				.setDefaultPropertyInclusion(Include.NON_NULL);
-				mapper.registerModule(new JavaTimeModule());
-
 				Files.writeString(configuration.getOutputFile(), mapper.writeValueAsString(summary));
 			}
 		}
@@ -428,8 +414,6 @@ public class TrivySummary {
 			throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Error returned from EPSS service. Response = %s", responseBody), null);
 		}
 	
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new JavaTimeModule());
 		EPSSResponse epssResponse = mapper.readValue(responseBody, EPSSResponse.class);
 
 		for (EPSSData epssData : epssResponse.getData())

@@ -22,7 +22,6 @@ public class TrivyOneScanSummary {
     private final @Getter TrivyScanWhitelistedVulnerabilities whitelistedVulnerabilities;
     private @Getter @Setter ReportedTreatment treatment = null;
 
-    @SuppressWarnings("null")
     public TrivyOneScanSummary(
         String title,
         String artefactName,

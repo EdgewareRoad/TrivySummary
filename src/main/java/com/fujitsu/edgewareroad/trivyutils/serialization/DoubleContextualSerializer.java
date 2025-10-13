@@ -1,17 +1,15 @@
 package com.fujitsu.edgewareroad.trivyutils.serialization;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-public class DoubleContextualSerializer extends JsonSerializer<Double> implements ContextualSerializer {
+public class DoubleContextualSerializer extends ValueSerializer<Double> {
 
     private int precision = 0;
 
@@ -22,7 +20,16 @@ public class DoubleContextualSerializer extends JsonSerializer<Double> implement
     public DoubleContextualSerializer() {}
 
     @Override
-    public void serialize(Double value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public ValueSerializer<?> createContextual(SerializationContext ctxt, BeanProperty property) {
+        Precision precisionAnnotation = property.getAnnotation(Precision.class);
+        if (precisionAnnotation != null) {
+            return new DoubleContextualSerializer(precisionAnnotation.precision());
+        }
+        return this;
+    }
+
+    @Override
+    public void serialize(Double value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
         if (precision == 0) {
             gen.writeNumber(value.doubleValue());
         }
@@ -31,15 +38,5 @@ public class DoubleContextualSerializer extends JsonSerializer<Double> implement
             bd = bd.setScale(precision, RoundingMode.HALF_UP);
             gen.writeString(bd.toPlainString());
         }
-    }
-
-    @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
-            throws JsonMappingException {
-        Precision precisionAnnotation = property.getAnnotation(Precision.class);
-        if (precisionAnnotation != null) {
-            return new DoubleContextualSerializer(precisionAnnotation.precision());
-        }
-        return this;
     }
 }

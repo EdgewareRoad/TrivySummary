@@ -9,16 +9,18 @@ import java.util.TreeSet;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class TreatmentPlanTests {
+
+    private final ObjectMapper mapper = JsonMapper.builder().build();
+
     @Test
-    public void testTreatmentPlan() throws JsonProcessingException {
+    public void testTreatmentPlan() throws JacksonException {
         TreatmentPlan plan = TreatmentPlan.builder().
                 ticketSystemURLTemplate("http://example.com/ticket/{ticketId}").
                 defaultNoteText("This is a default note").
@@ -90,10 +92,6 @@ public class TreatmentPlanTests {
         assert treatment.getNotes().size() == 1;
         assert treatment.getNotes().contains(note1);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         String json = mapper.writeValueAsString(plan);
         assertNotNull(json);
 
@@ -103,10 +101,6 @@ public class TreatmentPlanTests {
 
     @Test
     public void testVulnerabilityTreatmentLoadFromFile() throws StreamReadException, DatabindException, IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         InputStream inputStream = getClass().getResourceAsStream("/testapp/testAppTreatments1.json");
         TreatmentPlan plan = mapper.readValue(inputStream, TreatmentPlan.class);
         assertNotNull(plan);
