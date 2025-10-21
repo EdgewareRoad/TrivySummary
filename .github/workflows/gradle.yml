@@ -39,7 +39,7 @@ jobs:
       run: gradle publish -Pmvnpub.user="${{ secrets.MAVENREPO_USER }}" -Pmvnpub.key="${{ secrets.MAVENREPO_TOKEN }}" --warning-mode all
     - name: "Create Release"
       id: create_release
-      uses: softprops/action-gh-release@v2.3.4
+      uses: softprops/action-gh-release@v2.4.1
       if: startsWith(github.ref, 'refs/tags/') && endsWith(github.ref, steps.read-properties.outputs.trivysummary_version)
       with:
         tag_name: ${{ steps.read-properties.outputs.trivysummary_version }}
