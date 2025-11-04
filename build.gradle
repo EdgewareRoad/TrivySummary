@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'application'
 	id 'jvm-test-suite'
-	id 'org.springframework.boot' version '4.0.0-M3'
+	id 'org.springframework.boot' version '4.0.0-RC1'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'maven-publish'
 	id 'jacoco'
@@ -44,13 +44,17 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(25)
 	}
-	// Note, building on Java 25 but Spring Boot 6 still allows JDK 17 compatibility, so allow for this.
-	sourceCompatibility = '17'
-	targetCompatibility = '17'
+	sourceCompatibility = '25'
+	targetCompatibility = '25'
 }
 
 compileJava {
-	options.compilerArgs << '--add-exports=java.desktop/sun.awt=ALL-UNNAMED'
+	// options.compilerArgs << '--add-exports=java.desktop/sun.awt=ALL-UNNAMED'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	// Needed for IDE builds which fail as Lombok cannot access sun.misc.Unsafe
+	options.forkOptions.jvmArgs << '--sun-misc-unsafe-memory-access=allow'
 }
 
 application {

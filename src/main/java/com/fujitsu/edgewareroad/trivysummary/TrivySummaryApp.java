@@ -370,7 +370,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		String title = String.format("TrivySummary %s", appProperties.getVersion());
 		output(title);
 		// String of equals signs used to underline the above title
-		output(IntStream.range(0, title.length()).mapToObj(index -> "=").collect(Collectors.joining()));
+		output(IntStream.range(0, title.length()).mapToObj(_ -> "=").collect(Collectors.joining()));
 		output("");
 		output("Either:");
 		output("  trivysummary <trivyScanOutput>.json <args>");

@@ -102,6 +102,7 @@ public class TreatmentPlanTests {
     @Test
     public void testVulnerabilityTreatmentLoadFromFile() throws StreamReadException, DatabindException, IOException {
         InputStream inputStream = getClass().getResourceAsStream("/testapp/testAppTreatments1.json");
+        assertNotNull(inputStream);
         TreatmentPlan plan = mapper.readValue(inputStream, TreatmentPlan.class);
         assertNotNull(plan);
         VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("artefactA", Set.of("CVE-2023-0001"));
