@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'application'
 	id 'jvm-test-suite'
-	id 'org.springframework.boot' version '4.0.0-RC1'
+	id 'org.springframework.boot' version '4.0.0-RC2'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'maven-publish'
 	id 'jacoco'
@@ -75,7 +75,7 @@ dependencies {
 	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.31') {
 		exclude group: 'commons-io', module: 'commons-io'
 	}
-	implementation 'commons-io:commons-io:2.20.0'
+	implementation 'commons-io:commons-io:2.21.0'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.31'
 	implementation 'org.jsoup:jsoup:1.21.2'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
@@ -156,3 +156,4 @@ publishing {
 		}
 	}
 }
+
