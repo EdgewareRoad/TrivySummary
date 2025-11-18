@@ -350,7 +350,7 @@ public class TrivySummary {
 		}
 	}
 
-    private final int MAX_BATCH_SIZE_FOR_EPSS_API = 50;
+	private final int MAX_SIZE_FOR_EPSS_API_CVE_LIST = 1900;	// Conservative limit on param length for CVE list in EPSS API
 
     private void updateEPSSScores(Collection<? extends TrivyScanVulnerability> vulnerabilities, boolean force, LocalDate queryDate) throws IOException, InterruptedException, TrivyScanCouldNotRetrieveEPSSScoresException
     {
@@ -362,7 +362,7 @@ public class TrivySummary {
             {
                 vulnerabilitiesRequiringLPSSScores.add(vulnerability);
 
-                if (vulnerabilitiesRequiringLPSSScores.size() >= MAX_BATCH_SIZE_FOR_EPSS_API)
+                if (vulnerabilitiesRequiringLPSSScores.getCVEListCommaSeparated().length() >= MAX_SIZE_FOR_EPSS_API_CVE_LIST)
                 {
                     retrieveEPSSScores(vulnerabilitiesRequiringLPSSScores, queryDate);
                     vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();
@@ -380,22 +380,10 @@ public class TrivySummary {
 
     private void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws IOException, InterruptedException, TrivyScanCouldNotRetrieveEPSSScoresException
     {
-        StringBuffer urlString = null;
-        for (TrivyScanVulnerability vulnerability : vulnerabilities)
-        {
-            if (urlString == null)
-            {
-                urlString = new StringBuffer(BASE_EPSS_API_URL + "?cve=");
-                urlString.append(vulnerability.getVulnerabilityID());
-            }
-            else
-            {
-                urlString.append(",");
-                urlString.append(vulnerability.getVulnerabilityID());
-            }
-        }
+		if (vulnerabilities == null || vulnerabilities.size() == 0) return;
 
-        if (urlString == null) return;
+        StringBuffer urlString = new StringBuffer(BASE_EPSS_API_URL + "?cve=");
+		urlString.append(vulnerabilities.getCVEListCommaSeparated());
 
 		if (queryDate != null)
 	    {

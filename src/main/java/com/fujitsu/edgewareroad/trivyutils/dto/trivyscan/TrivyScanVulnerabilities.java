@@ -61,4 +61,99 @@ public class TrivyScanVulnerabilities extends TrivyScanVulnerabilitySet<TrivySca
         }
         return vulnIDs;
     }
+
+    @Override
+    public boolean add(TrivyScanVulnerability vulnerability)
+    {
+        boolean changed = false;
+        if (vulnerability != null)
+        {
+            changed = super.add(vulnerability);
+            if (changed) 
+            {
+                addCVEToCommaSeparatedList(vulnerability);
+            }
+        }
+        return changed;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends TrivyScanVulnerability> vulnerabilities)
+    {
+        boolean changed = false;
+        if (vulnerabilities != null)
+        {
+            for (TrivyScanVulnerability vulnerability : vulnerabilities)
+            {
+                changed = changed | this.add(vulnerability);
+            }
+        }
+        return changed;
+    }
+
+    @Override
+    public boolean remove(Object vulnerability)
+    {
+        boolean changed = false;
+        if (vulnerability != null)
+        {
+            changed = super.remove(vulnerability);
+            if (changed) {
+                cveListCommaSeparated = null;
+                buildCVEListCommaSeparated();
+            }
+        }
+        return changed;
+    }
+
+    @Override
+    public boolean removeAll(Collection<? extends Object> vulnerabilities)
+    {
+        boolean changed = super.removeAll(vulnerabilities);
+        if (changed) {
+            cveListCommaSeparated = null;
+            buildCVEListCommaSeparated();
+        }
+        return changed;
+    }
+
+    private String cveListCommaSeparated = null;
+
+    private void addCVEToCommaSeparatedList(TrivyScanVulnerability vulnerability)
+    {
+        String cve = vulnerability.getVulnerabilityID();
+        if (cveListCommaSeparated == null || cveListCommaSeparated.isEmpty())
+        {
+            cveListCommaSeparated = cve;
+        }
+        else
+        {
+            cveListCommaSeparated = cveListCommaSeparated + "," + cve;
+        }
+    }
+
+    private void buildCVEListCommaSeparated()
+    {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (TrivyScanVulnerability vuln : this)
+        {
+            if (!first)
+            {
+                sb.append(",");
+            }
+            sb.append(vuln.getVulnerabilityID());
+            first = false;
+        }
+        cveListCommaSeparated = sb.toString();
+    }
+
+    public String getCVEListCommaSeparated()
+    {
+        if (cveListCommaSeparated == null)
+        {
+            buildCVEListCommaSeparated();
+        }
+        return cveListCommaSeparated;
+    }
 }
