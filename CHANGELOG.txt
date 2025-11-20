@@ -1,12 +1,17 @@
 This Release
 ------------
 
-Release 3.2.2
+Release 3.3.0
 
-* Treatment plan now reported in JSON as well as PDF
+* Upgrade of dependent frameworks, mostly upgrade to Spring Boot and Jackson 3
+* Optimised calls to EPSS API
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.2.2
+
+* Treatment plan now reported in JSON as well as PDF
 
 Release 3.2.1
 
