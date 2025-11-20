@@ -362,7 +362,7 @@ public class TrivySummary {
             {
                 vulnerabilitiesRequiringLPSSScores.add(vulnerability);
 
-                if (vulnerabilitiesRequiringLPSSScores.getCVEListCommaSeparated().length() >= MAX_SIZE_FOR_EPSS_API_CVE_LIST)
+                if (vulnerabilitiesRequiringLPSSScores.getCVEListCommaSeparatedLength() >= MAX_SIZE_FOR_EPSS_API_CVE_LIST)
                 {
                     retrieveEPSSScores(vulnerabilitiesRequiringLPSSScores, queryDate);
                     vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();

@@ -14,11 +14,13 @@ public class TrivyScanVulnerabilities extends TrivyScanVulnerabilitySet<TrivySca
     public TrivyScanVulnerabilities(Collection<TrivyScanVulnerability> collection)
     {
         this(collection, null);
+        buildCVEListCommaSeparated();
     }
     
     public TrivyScanVulnerabilities(Collection<TrivyScanVulnerability> collection, Boolean inPreviousScan)
     {
         super(collection);
+        buildCVEListCommaSeparated();
         if (inPreviousScan != null)
         {
             for (TrivyScanVulnerability vuln : this)
@@ -117,18 +119,18 @@ public class TrivyScanVulnerabilities extends TrivyScanVulnerabilitySet<TrivySca
         return changed;
     }
 
-    private String cveListCommaSeparated = null;
+    private StringBuilder cveListCommaSeparated = null;
 
     private void addCVEToCommaSeparatedList(TrivyScanVulnerability vulnerability)
     {
         String cve = vulnerability.getVulnerabilityID();
         if (cveListCommaSeparated == null || cveListCommaSeparated.isEmpty())
         {
-            cveListCommaSeparated = cve;
+            cveListCommaSeparated = new StringBuilder(cve);
         }
         else
         {
-            cveListCommaSeparated = cveListCommaSeparated + "," + cve;
+            cveListCommaSeparated = cveListCommaSeparated.append(",").append(cve);
         }
     }
 
@@ -145,15 +147,24 @@ public class TrivyScanVulnerabilities extends TrivyScanVulnerabilitySet<TrivySca
             sb.append(vuln.getVulnerabilityID());
             first = false;
         }
-        cveListCommaSeparated = sb.toString();
+        cveListCommaSeparated = sb;
+    }
+
+    public int getCVEListCommaSeparatedLength()
+    {
+        if (cveListCommaSeparated == null)
+        {
+            return 0;
+        }
+        return cveListCommaSeparated.length();
     }
 
     public String getCVEListCommaSeparated()
     {
         if (cveListCommaSeparated == null)
         {
-            buildCVEListCommaSeparated();
+            return "";
         }
-        return cveListCommaSeparated;
+        return cveListCommaSeparated.toString();
     }
 }
