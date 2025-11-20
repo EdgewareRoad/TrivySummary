@@ -7,16 +7,18 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.ValueInstantiationException;
+import tools.jackson.databind.json.JsonMapper;
 
 public class TrivyScanWhitelistTests {
+
+    private final ObjectMapper mapper = JsonMapper.builder().build();
+    
     @Test
-    public void testCreateWhitelistValid() throws JsonProcessingException
+    public void testCreateWhitelistValid() throws JacksonException
     {
         WhitelistEntries entries = new WhitelistEntries();
 
@@ -34,15 +36,11 @@ public class TrivyScanWhitelistTests {
             .approvedBy("Bob")
             .build());
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         System.out.println(mapper.writeValueAsString(entries));
     }
 
     @Test
-    public void testCreateWhitelistMissingID() throws JsonProcessingException
+    public void testCreateWhitelistMissingID()
     {
         try {
             WhitelistEntry.builder()
@@ -58,7 +56,7 @@ public class TrivyScanWhitelistTests {
     }
 
     @Test
-    public void testCreateWhitelistMissingReason() throws JsonProcessingException
+    public void testCreateWhitelistMissingReason()
     {
         try {
             WhitelistEntry.builder()
@@ -74,7 +72,7 @@ public class TrivyScanWhitelistTests {
     }
 
     @Test
-    public void testCreateWhitelistMissingReviewDate() throws JsonProcessingException
+    public void testCreateWhitelistMissingReviewDate() 
     {
         try {
             WhitelistEntry.builder()
@@ -90,7 +88,7 @@ public class TrivyScanWhitelistTests {
     }
 
     @Test
-    public void testImportJsonDataValid() throws JsonMappingException, JsonProcessingException
+    public void testImportJsonDataValid() throws DatabindException, JacksonException
     {
         String importData = """
             [ {
@@ -106,17 +104,12 @@ public class TrivyScanWhitelistTests {
               } ]
                 """;
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
         WhitelistEntries entries = mapper.readValue(importData, WhitelistEntries.class);
         System.out.println(mapper.writeValueAsString(entries));
     }
 
     @Test
-    public void testImportJsonDataInvalid() throws JsonMappingException, JsonProcessingException
+    public void testImportJsonDataInvalid() throws DatabindException, JacksonException
     {
         // Note no vulnerability ID on the second entry.
         String importData = """
@@ -131,11 +124,6 @@ public class TrivyScanWhitelistTests {
                 "approvedBy" : "Bob"
               } ]
                 """;
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         try {
             mapper.readValue(importData, WhitelistEntries.class);

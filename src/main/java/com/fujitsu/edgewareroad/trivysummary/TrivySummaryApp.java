@@ -7,10 +7,11 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
@@ -34,6 +35,8 @@ import java.nio.file.Path;
 public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 
 	private int exitCode; // initialised with 0
+
+	private ObjectMapper mapper = JsonMapper.builder().build();
 
 	public static void main(String[] args) {
 		// Suppress logging and banner output that otherwise we can't control
@@ -174,8 +177,21 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				if (priorityModelValues.size() == 1) {
 					Path priorityModelPath = workingDirectory.resolve(priorityModelValues.iterator().next());
 
-					ObjectMapper mapper = new ObjectMapper();
-					mapper.registerModule(new JavaTimeModule());
+					if (!Files.exists(priorityModelPath)) {
+						output("ERROR: Priority model not found %s", priorityModelPath.toString());
+						output("");
+						displayHelp();
+						this.exitCode = -1;
+						return;
+					}
+					if (!Files.isReadable(priorityModelPath)) {
+						output("ERROR: Priority model file %s is not readable", priorityModelPath.toString());
+						output("");
+						displayHelp();
+						this.exitCode = -1;
+						return;
+					}
+
 					try {
 						configuration.setPriorityModel(mapper.readValue(priorityModelPath.toFile(), PriorityModel.class));
 					} catch (StreamReadException e) {
@@ -192,20 +208,8 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 						displayHelp();
 						this.exitCode = -1;
 						return;
-					} catch (FileNotFoundException e) {
-						output("ERROR: Priority model not found %s", priorityModelPath.toString());
-						output("");
-						displayHelp();
-						this.exitCode = -1;
-						return;
-					} catch (IOException e) {
-						output("ERROR: File IO exception for priority model %s", priorityModelPath.toString());
-						output("");
-						displayHelp();
-						this.exitCode = -1;
-						return;
 					}
-		}
+				}
 			}
 		}
 
@@ -219,8 +223,22 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			{
 				Path whiteListFilePath = workingDirectory.resolve(whiteListFileName);
 
+				if (!Files.exists(whiteListFilePath)) {
+					output("ERROR: Whitelist file not found %s", whiteListFilePath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+				if (!Files.isReadable(whiteListFilePath)) {
+					output("ERROR: Whitelist file file %s is not readable", whiteListFilePath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+
 				ObjectMapper mapper = new ObjectMapper();
-		        mapper.registerModule(new JavaTimeModule());
 	            try {
 					WhitelistEntries newEntries = mapper.readValue(whiteListFilePath.toFile(), WhitelistEntries.class);
 					worker.addWhitelistEntries(newEntries);
@@ -232,18 +250,6 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					return;
 				} catch (DatabindException e) {
 					output("ERROR: JSON Mapping exception for whitelist file %s: %s", whiteListFilePath.toString(), e.getMessage());
-					output("");
-					displayHelp();
-					this.exitCode = -1;
-					return;
-				} catch (FileNotFoundException e) {
-					output("ERROR: Whitelist file not found %s", whiteListFilePath.toString());
-					output("");
-					displayHelp();
-					this.exitCode = -1;
-					return;
-				} catch (IOException e) {
-					output("ERROR: File IO exception for whitelist file %s", whiteListFilePath.toString());
 					output("");
 					displayHelp();
 					this.exitCode = -1;
@@ -265,8 +271,22 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			if (treatmentPlanValues.size() == 1) {
 				Path treatmentPlanPath = workingDirectory.resolve(treatmentPlanValues.iterator().next());
 
+				if (!Files.exists(treatmentPlanPath)) {
+					output("ERROR: Treatment plan not found %s", treatmentPlanPath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+				if (!Files.isReadable(treatmentPlanPath)) {
+					output("ERROR: Treatment plan file %s is not readable", treatmentPlanPath.toString());
+					output("");
+					displayHelp();
+					this.exitCode = -1;
+					return;
+				}
+
 				ObjectMapper mapper = new ObjectMapper();
-				mapper.registerModule(new JavaTimeModule());
 				try {
 					configuration.setTreatmentPlan(mapper.readValue(treatmentPlanPath.toFile(), TreatmentPlan.class));
 				} catch (StreamReadException e) {
@@ -279,18 +299,6 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				} catch (DatabindException e) {
 					output("ERROR: JSON Mapping exception for treatment plan %s: %s", treatmentPlanPath.toString(),
 							e.getMessage());
-					output("");
-					displayHelp();
-					this.exitCode = -1;
-					return;
-				} catch (FileNotFoundException e) {
-					output("ERROR: Treatment plan not found %s", treatmentPlanPath.toString());
-					output("");
-					displayHelp();
-					this.exitCode = -1;
-					return;
-				} catch (IOException e) {
-					output("ERROR: File IO exception for treatment plan %s", treatmentPlanPath.toString());
 					output("");
 					displayHelp();
 					this.exitCode = -1;
@@ -362,7 +370,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		String title = String.format("TrivySummary %s", appProperties.getVersion());
 		output(title);
 		// String of equals signs used to underline the above title
-		output(IntStream.range(0, title.length()).mapToObj(index -> "=").collect(Collectors.joining()));
+		output(IntStream.range(0, title.length()).mapToObj(_ -> "=").collect(Collectors.joining()));
 		output("");
 		output("Either:");
 		output("  trivysummary <trivyScanOutput>.json <args>");

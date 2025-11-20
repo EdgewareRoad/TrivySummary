@@ -7,21 +7,21 @@ import java.io.InputStream;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.VulnerabilitySeverity;
+
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 public class PriorityModelTests {
     @Test
     public void testSampleEllipticalHappyPath() throws StreamReadException, DatabindException, IOException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        ObjectMapper mapper = JsonMapper.builder()
+            .configure(SerializationFeature.INDENT_OUTPUT, true)
+            .build();
 
         try (InputStream input = this.getClass().getResourceAsStream("/samplePriorityModelElliptical.json")) {
             PriorityModel model = mapper.readValue(input, PriorityModel.class);

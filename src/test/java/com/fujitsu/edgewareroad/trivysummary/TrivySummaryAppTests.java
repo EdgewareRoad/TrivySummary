@@ -15,14 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
+
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 class TrivySummaryAppTests {
 
@@ -32,11 +33,10 @@ class TrivySummaryAppTests {
 		tests.contextLoads(java.nio.file.Files.createTempDirectory("trivysummary_", (FileAttribute<?>[])null));
 	}
 
-	static ObjectMapper mapper = new ObjectMapper();
+	static final ObjectMapper mapper = JsonMapper.builder().build();
 	static ClassLoader classLoader = TrivySummaryAppTests.class.getClassLoader();
 
 	public TrivySummaryAppTests() {
-	    mapper.registerModule(new JavaTimeModule());
 	}
 
 	public class TestScenario {
