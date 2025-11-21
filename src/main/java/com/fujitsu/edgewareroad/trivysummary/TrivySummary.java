@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import com.fujitsu.edgewareroad.trivyutils.GenerateGraph;
 import com.fujitsu.edgewareroad.trivyutils.RenderToPDF;
@@ -39,6 +43,8 @@ import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.TrivyScanWhitelistedVul
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment.ReportedTreatment;
 import com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment.TicketedEntry;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
+import com.fujitsu.edgewareroad.trivyutils.performance.ExecutionTimeAdvice;
+import com.fujitsu.edgewareroad.trivyutils.performance.TrackExecutionTime;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -46,8 +52,9 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
+@Component
 public class TrivySummary {
-    public static class Configuration {
+    public class Configuration {
         private Path outputFile = Paths.get(System.getProperty("user.dir"), "output.pdf");
 	    private boolean offlineMode = false;
 	    private boolean useTodayForEPSSQuery = false;
@@ -55,6 +62,9 @@ public class TrivySummary {
 		private @Getter @Setter TreatmentPlan treatmentPlan = null;
         private VulnerabilityPriority failPriorityThreshold = null;
         private String appVersion = "UNKNOWN_VERSION";
+
+		private Configuration() {
+		}
 
         public Path getOutputFile() {
             return outputFile;
@@ -115,29 +125,34 @@ public class TrivySummary {
         {
             this.appVersion = version;
         }
-
-        public Configuration() {
-
-        }
     }
 
-    private Configuration configuration;
+    private Configuration configuration = new Configuration();
     private TrivyScanHistory history = new TrivyScanHistory();
     private static HttpClient client = HttpClient.newHttpClient();
     private static ObjectMapper mapper = JsonMapper.builder()
 						.configure(SerializationFeature.INDENT_OUTPUT, true)
 						.build();
 
-    public TrivySummary(Configuration configuration)
+    public TrivySummary()
     {
-        this.configuration = configuration;
     }
 
-    public void addWhitelistEntries(WhitelistEntries entries)
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	@Bean
+	public ExecutionTimeAdvice executionTimeAdvice() {
+		return new ExecutionTimeAdvice();
+	}
+	
+	public void addWhitelistEntries(WhitelistEntries entries)
     {
         history.getWhitelistEntries().addAll(entries);
     }
 
+	@TrackExecutionTime
 	public boolean summariseTrivyHistory(String title) throws IOException, TrivyScanHistoryNotDeepEnoughException, TrivyScanCouldNotRetrieveEPSSScoresException
 	{
 		String statusMessage = null;
@@ -301,7 +316,7 @@ public class TrivySummary {
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));
 
-				new RenderToPDF().renderToPDF(variables, "summariseTrivyScan", configuration.getOutputFile());
+				renderToPDF(variables, "summariseTrivyScan", configuration.getOutputFile());
 			}
 			else
 			{
@@ -315,6 +330,12 @@ public class TrivySummary {
 
 		// Now we look at the most recent scan results and examine the severity of open vulnerabilities, returning true if there are vulnerabilities above the fail threshold
         return resultIsFailure(openVulnerabilities);
+	}
+
+	@TrackExecutionTime
+	public void renderToPDF(Map<String, Object> variables, String templateName, Path outputPath) throws IOException
+	{
+		new RenderToPDF().renderToPDF(variables, templateName, outputPath);
 	}
 
     private boolean resultIsFailure(TrivyScanVulnerabilities openVulnerabilities)
@@ -334,6 +355,7 @@ public class TrivySummary {
 		return false;
     }
 
+	@TrackExecutionTime
 	public void addTrivyScanFileToHistory(Path inputScan) throws IOException, TrivyScanHistoryMustBeForSameArtefactType
 	{
 		try (InputStream in = Files.newInputStream(inputScan))
@@ -352,7 +374,8 @@ public class TrivySummary {
 
 	private final int MAX_SIZE_FOR_EPSS_API_CVE_LIST = 1900;	// Conservative limit on param length for CVE list in EPSS API
 
-    private void updateEPSSScores(Collection<? extends TrivyScanVulnerability> vulnerabilities, boolean force, LocalDate queryDate) throws IOException, InterruptedException, TrivyScanCouldNotRetrieveEPSSScoresException
+	@TrackExecutionTime
+    public void updateEPSSScores(Collection<? extends TrivyScanVulnerability> vulnerabilities, boolean force, LocalDate queryDate) throws TrivyScanCouldNotRetrieveEPSSScoresException
     {
         TrivyScanVulnerabilities vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();
 
@@ -378,7 +401,8 @@ public class TrivySummary {
 
 	private static final String BASE_EPSS_API_URL = "https://api.first.org/data/v1/epss";
 
-    private void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws IOException, InterruptedException, TrivyScanCouldNotRetrieveEPSSScoresException
+	@TrackExecutionTime
+    public void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws TrivyScanCouldNotRetrieveEPSSScoresException
     {
 		if (vulnerabilities == null || vulnerabilities.size() == 0) return;
 
@@ -394,9 +418,16 @@ public class TrivySummary {
             .uri(URI.create(urlString.toString()))
             .build();
 
-		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-		String responseBody = response.body();
-		if (response.statusCode() != 200)
+		HttpResponse<String> response = null;
+		try {
+			response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		} catch (IOException e) {
+			throw new TrivyScanCouldNotRetrieveEPSSScoresException("IOException thrown when calling EPSS service.", e);
+		} catch (InterruptedException e) {
+			throw new TrivyScanCouldNotRetrieveEPSSScoresException("InterruptedException thrown when calling EPSS service.", e);
+		}
+		String responseBody = response != null ? response.body() : "";
+		if (response != null && response.statusCode() != 200)
 		{
 			// An error occurred.
 			throw new TrivyScanCouldNotRetrieveEPSSScoresException(String.format("Error returned from EPSS service. Response = %s", responseBody), null);
@@ -406,19 +437,25 @@ public class TrivySummary {
 
 		for (EPSSData epssData : epssResponse.getData())
 		{
-			// We find the corresponding TrivyScanVulnerability and update the EPSS score
-			for (TrivyScanVulnerability vulnerability : vulnerabilities)
+			try(var executor = Executors.newVirtualThreadPerTaskExecutor())
 			{
-				if (vulnerability.getVulnerabilityID().equalsIgnoreCase(epssData.getVulnerabilityID()))
-				{
-					vulnerability.setEpssScore(epssData.getEpssScore());
-					break;
-				}
+				executor.submit(() -> {
+					// We find the corresponding TrivyScanVulnerability and update the EPSS score
+					for (TrivyScanVulnerability vulnerability : vulnerabilities)
+					{
+						if (vulnerability.getVulnerabilityID().equalsIgnoreCase(epssData.getVulnerabilityID()))
+						{
+							vulnerability.setEpssScore(epssData.getEpssScore());
+							break;
+						}
+					}
+				});
 			}
 		}
     }
 
-	private ReportedTreatment createReportedTreatment(String ticketURITemplate, VulnerabilityTreatment treatment)
+	@TrackExecutionTime
+	public ReportedTreatment createReportedTreatment(String ticketURITemplate, VulnerabilityTreatment treatment)
 	{
 		if (treatment == null) return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()));
 

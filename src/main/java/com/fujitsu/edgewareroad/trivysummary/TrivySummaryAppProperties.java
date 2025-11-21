@@ -1,10 +1,14 @@
 package com.fujitsu.edgewareroad.trivysummary;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
+@EnableAutoConfiguration
+@EnableAspectJAutoProxy()
 @PropertySource("classpath:application.properties")
 public class TrivySummaryAppProperties {
     @Value("${trivysummary.version}")

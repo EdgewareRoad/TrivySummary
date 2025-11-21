@@ -1,5 +1,6 @@
 package com.fujitsu.edgewareroad.trivyutils;
 
+import com.fujitsu.edgewareroad.trivyutils.performance.TrackExecutionTime;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import com.openhtmltopdf.util.Diagnostic;
@@ -20,6 +21,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -27,6 +29,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.w3c.dom.Document;
 
+@Component
 public class RenderToPDF {
 
     private Logger logger = LoggerFactory.getLogger(RenderToPDF.class);
@@ -56,8 +59,10 @@ public class RenderToPDF {
 		return templateEngine;
 	}
 
+    @TrackExecutionTime
     public File renderToPDF(Map<String, Object> variables, String templateName, Path outputPath) throws IOException
     {
+        logger.info("Rendering PDF to '{}'", outputPath.toString());
         Path tempFolder = Files.createTempDirectory("trivyanalysis");
         Path stylesAsset = Path.of(tempFolder.toString(), "styles.css");
         try(InputStream assetStream = getClass().getResourceAsStream("/templates/styles.css"))

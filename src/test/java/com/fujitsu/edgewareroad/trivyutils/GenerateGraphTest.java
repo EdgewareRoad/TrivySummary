@@ -8,7 +8,8 @@ public class GenerateGraphTest {
     @Test
     public void testSimple()
     {
-        String svg = GenerateGraph.GetSVG(null, new TrivySummary.Configuration());
+        TrivySummary worker = new TrivySummary();
+        String svg = GenerateGraph.GetSVG(null, worker.getConfiguration());
         System.out.println(svg);
     }
 }

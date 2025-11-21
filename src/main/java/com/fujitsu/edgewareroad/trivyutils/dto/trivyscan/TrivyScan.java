@@ -42,10 +42,7 @@ public class TrivyScan
         {
             for(TrivyScanResult result : results)
             {
-                for(TrivyScanPackageVulnerability vulnerability : result.getVulnerabilities())
-                {
-                    vulnerabilitiesToReturn.add(vulnerability);
-                }
+                vulnerabilitiesToReturn.addAll(result.getVulnerabilities());
             }
         }
         return vulnerabilitiesToReturn;

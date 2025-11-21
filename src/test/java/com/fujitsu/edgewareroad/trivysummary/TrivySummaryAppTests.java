@@ -119,7 +119,8 @@ class TrivySummaryAppTests {
 			{
 				for (PriorityModel priorityModel : priorityModels)
 				{
-					TrivySummary.Configuration configuration = new TrivySummary.Configuration();
+					TrivySummary worker = new TrivySummary();
+					TrivySummary.Configuration configuration = worker.getConfiguration();
 
 					configuration.setAppVersion("x.y.z");
 					configuration.setUseTodayForEPSSQuery(useTodayForEPSSQuery.booleanValue());
@@ -130,7 +131,6 @@ class TrivySummaryAppTests {
 
 					configuration.setOutputFile(outputFilePath);
 					
-					TrivySummary worker = new TrivySummary(configuration);
 					for (Path inputPath : scenario.getPaths())
 					{
 						worker.addTrivyScanFileToHistory(inputPath);
@@ -140,7 +140,8 @@ class TrivySummaryAppTests {
 
 					worker.summariseTrivyHistory(scenario.getName());
 				}
-				TrivySummary.Configuration configuration = new TrivySummary.Configuration();
+				TrivySummary worker = new TrivySummary();
+				TrivySummary.Configuration configuration = worker.getConfiguration();
 
 				configuration.setAppVersion("x.y.z");
 				configuration.setOfflineMode(true);
@@ -150,7 +151,6 @@ class TrivySummaryAppTests {
 
 				configuration.setOutputFile(outputFilePath);
 				
-				TrivySummary worker = new TrivySummary(configuration);
 				for (Path inputPath : scenario.getPaths())
 				{
 					worker.addTrivyScanFileToHistory(inputPath);

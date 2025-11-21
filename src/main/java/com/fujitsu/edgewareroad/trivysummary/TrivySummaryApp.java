@@ -55,11 +55,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 	@Autowired
 	private TrivySummaryAppProperties appProperties;
 
-	private TrivySummary.Configuration configuration = new TrivySummary.Configuration();
+	@Autowired
+	private TrivySummary worker;
 
 	@Override
 	public void run(ApplicationArguments args) {
 		Path workingDirectory = Path.of(System.getProperty("user.dir"));
+
+		TrivySummary.Configuration configuration = worker.getConfiguration();
 
 		configuration.setAppVersion(appProperties.getVersion());
 
@@ -212,8 +215,6 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				}
 			}
 		}
-
-        TrivySummary worker = new TrivySummary(configuration);
 
 		List<String> whitelistFileNames = args.getOptionValues("whitelist");
 		if (whitelistFileNames != null && whitelistFileNames.size() > 0)

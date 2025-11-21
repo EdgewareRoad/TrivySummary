@@ -8,19 +8,25 @@ public class TrivyScanWhitelistedVulnerabilities extends TrivyScanVulnerabilityS
     {
         TrivyScanVulnerabilities filteredVulnerabilities = new TrivyScanVulnerabilities();
 
-        for (TrivyScanVulnerability vulnerability : unfilteredVulnerabilities)
-        {
-            WhitelistEntry whitelistEntry = whitelistEntries.findByVulnerabilityID(vulnerability.getVulnerabilityID());
+        try(var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+            for (TrivyScanVulnerability vulnerability : unfilteredVulnerabilities)
+            {
+                executor.submit(() -> {
+                    WhitelistEntry whitelistEntry = whitelistEntries.findByVulnerabilityID(vulnerability.getVulnerabilityID());
 
-            if (whitelistEntry != null)
-            {
-                // This needs to be a whitelisted vulnerability and added to this list
-                this.add(new TrivyScanWhitelistedVulnerability(vulnerability, whitelistEntry));
-            }
-            else
-            {
-                // This is in our filter set
-                filteredVulnerabilities.add(vulnerability);
+                    if (whitelistEntry != null)
+                    {
+                        // This needs to be a whitelisted vulnerability and added to this list
+                        this.add(new TrivyScanWhitelistedVulnerability(vulnerability, whitelistEntry));
+                    }
+                    else
+                    {
+                        // This is in our filter set
+                        synchronized (filteredVulnerabilities) {
+                            filteredVulnerabilities.add(vulnerability);
+                        }
+                    }
+                } );
             }
         }
         return filteredVulnerabilities;
