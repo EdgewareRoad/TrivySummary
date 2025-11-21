@@ -42,6 +42,13 @@ later versions of Trivy (since v0.48.0).
     The required output file name. If the filename ends in .pdf then the
     output is a PDF report. If not, a JSON format is used. Defaults to
     "trivysummary.pdf" in the current working directory.
+    Please note that the --bothPDFAndJSONOutput argument can be used to 
+    output both PDF _and_ JSON
+
+  --bothPDFAndJSONOutput
+    If set, both PDF and JSON output will be created, using the --outputFile
+    argument and intelligently amending the suffix. Saves time if you need
+    both output forms.
 
   --failPriorityThreshold=...
     The priority threshold at or above which any open vulnerabilities

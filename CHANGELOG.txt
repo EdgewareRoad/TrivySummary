@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.3.1
+Release 3.3.2
 
-* Minor performance optimisations
+* Added the --bothPDFAndJSONOutput argument to output PDF and JSON in same call, saving time if you need both.
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.3.1
+
+* Minor performance optimisations
 
 Release 3.3.0
 

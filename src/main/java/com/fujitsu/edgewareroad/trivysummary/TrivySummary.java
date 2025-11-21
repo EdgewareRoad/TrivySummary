@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,7 @@ public class TrivySummary {
         private Path outputFile = Paths.get(System.getProperty("user.dir"), "output.pdf");
 	    private boolean offlineMode = false;
 	    private boolean useTodayForEPSSQuery = false;
+		private boolean bothPDFAndJSONOutput = false;
 	    private @Getter @Setter PriorityModel priorityModel = new PriorityModel();
 		private @Getter @Setter TreatmentPlan treatmentPlan = null;
         private VulnerabilityPriority failPriorityThreshold = null;
@@ -97,6 +99,13 @@ public class TrivySummary {
             this.offlineMode = offlineMode;
         }
 
+		public boolean isBothPDFAndJSONOutput() {
+			return bothPDFAndJSONOutput;
+		}
+
+		public void setBothPDFAndJSONOutput(boolean bothPDFAndJSONOutput) {
+			this.bothPDFAndJSONOutput = bothPDFAndJSONOutput;
+		}
 
         public boolean isUseTodayForEPSSQuery() {
             return useTodayForEPSSQuery;
@@ -133,6 +142,8 @@ public class TrivySummary {
     private static ObjectMapper mapper = JsonMapper.builder()
 						.configure(SerializationFeature.INDENT_OUTPUT, true)
 						.build();
+
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(TrivySummary.class);							
 
     public TrivySummary()
     {
@@ -217,9 +228,36 @@ public class TrivySummary {
 												comparison.getLaterArtefactName(),
 												comparison.getOpenVulnerabilities().getAllVulnerabilityIDs())));
 			}
-	
+
+			String outputPDFFile = null;
+			String outputJSONFile = null;
 			if (configuration.getOutputFile().toString().endsWith(".pdf"))
 			{
+				outputPDFFile = configuration.getOutputFile().toString();
+				if (configuration.isBothPDFAndJSONOutput())
+				{
+					outputJSONFile = configuration.getOutputFile().toString().substring(0, configuration.getOutputFile().toString().length() - ".pdf".length()) + ".json";
+				}
+			}
+			else 
+			{
+				outputJSONFile = configuration.getOutputFile().toString();
+				if (configuration.isBothPDFAndJSONOutput())
+				{
+					if (configuration.getOutputFile().toString().endsWith(".json"))
+					{
+						outputPDFFile = configuration.getOutputFile().toString().substring(0, configuration.getOutputFile().toString().length() - ".json".length()) + ".pdf";
+					}
+					else
+					{
+						outputPDFFile = configuration.getOutputFile().toString() + ".pdf";
+					}
+				}
+			}
+	
+			if (outputPDFFile != null)
+			{
+				logger.info("Generating PDF report at {}", outputPDFFile);
 				Map<String, Object> variables = new HashMap<>();
 				variables.put("title", comparison.getTitle());
 				variables.put("earlierArtefactName", comparison.getEarlierArtefactName());
@@ -243,11 +281,13 @@ public class TrivySummary {
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));
 
-				new RenderToPDF().renderToPDF(variables, "compareTrivyScans", configuration.getOutputFile());
+				new RenderToPDF().renderToPDF(variables, "compareTrivyScans", Path.of(outputPDFFile));
 			}
-			else
+
+			if (outputJSONFile != null)
 			{
-				Files.writeString(configuration.getOutputFile(), mapper.writeValueAsString(comparison));
+				logger.info("Generating JSON report at {}", outputJSONFile);
+				Files.writeString(Path.of(outputJSONFile), mapper.writeValueAsString(comparison));
 			}
 		}
 		else if (history.getScanHistory().size() == 1)
@@ -295,8 +335,35 @@ public class TrivySummary {
 				}
 			}
 
+			String outputPDFFile = null;
+			String outputJSONFile = null;
 			if (configuration.getOutputFile().toString().endsWith(".pdf"))
 			{
+				outputPDFFile = configuration.getOutputFile().toString();
+				if (configuration.isBothPDFAndJSONOutput())
+				{
+					outputJSONFile = configuration.getOutputFile().toString().substring(0, configuration.getOutputFile().toString().length() - ".pdf".length()) + ".json";
+				}
+			}
+			else 
+			{
+				outputJSONFile = configuration.getOutputFile().toString();
+				if (configuration.isBothPDFAndJSONOutput())
+				{
+					if (configuration.getOutputFile().toString().endsWith(".json"))
+					{
+						outputPDFFile = configuration.getOutputFile().toString().substring(0, configuration.getOutputFile().toString().length() - ".json".length()) + ".pdf";
+					}
+					else
+					{
+						outputPDFFile = configuration.getOutputFile().toString() + ".pdf";
+					}
+				}
+			}
+	
+			if (outputPDFFile != null)
+			{
+				logger.info("Generating PDF report at {}", outputPDFFile);
 				Map<String, Object> variables = new HashMap<>();
 				variables.put("title", summary.getTitle());
 				variables.put("artefactName", summary.getArtefactName());
@@ -316,11 +383,13 @@ public class TrivySummary {
                 variables.put("priorityThresholdForFailure", configuration.getFailPriorityThreshold());
                 variables.put("scanRepresentsFailureCondition", resultIsFailure(openVulnerabilities));
 
-				renderToPDF(variables, "summariseTrivyScan", configuration.getOutputFile());
+				renderToPDF(variables, "summariseTrivyScan", Path.of(outputPDFFile));
 			}
-			else
+
+			if (outputJSONFile != null)
 			{
-				Files.writeString(configuration.getOutputFile(), mapper.writeValueAsString(summary));
+				logger.info("Generating JSON report at {}", outputJSONFile);
+				Files.writeString(Path.of(outputJSONFile), mapper.writeValueAsString(summary));
 			}
 		}
 		else

@@ -83,6 +83,11 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			configuration.setOfflineMode(true);;
 		}
 
+		if (args.containsOption("bothPDFAndJSONOutput"))
+		{
+			configuration.setBothPDFAndJSONOutput(true);;
+		}
+
 		if (args.containsOption("useTodayForEPSSQuery"))
 		{
 			configuration.setUseTodayForEPSSQuery(true);;
@@ -403,6 +408,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		output("    The required output file name. If the filename ends in .pdf then the");
 		output("    output is a PDF report. If not, a JSON format is used. Defaults to");
 		output("    \"trivysummary.pdf\" in the current working directory.");
+		output("    Also you can add a --bothPDFAndJSONOutput argument to produce both.");
 		output("");
 		output("  --failPriorityThreshold=...");
 		output("    The priority threshold at or above which any open vulnerabilities");
