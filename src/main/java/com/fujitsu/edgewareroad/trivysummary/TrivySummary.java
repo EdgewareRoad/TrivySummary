@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
@@ -441,7 +440,7 @@ public class TrivySummary {
 		}
 	}
 
-	private final int MAX_SIZE_FOR_EPSS_API_CVE_LIST = 1900;	// Conservative limit on param length for CVE list in EPSS API
+    private final int MAX_BATCH_SIZE_FOR_EPSS_API = 50;
 
 	@TrackExecutionTime
     public void updateEPSSScores(Collection<? extends TrivyScanVulnerability> vulnerabilities, boolean force, LocalDate queryDate) throws TrivyScanCouldNotRetrieveEPSSScoresException
@@ -454,7 +453,7 @@ public class TrivySummary {
             {
                 vulnerabilitiesRequiringLPSSScores.add(vulnerability);
 
-                if (vulnerabilitiesRequiringLPSSScores.getCVEListCommaSeparatedLength() >= MAX_SIZE_FOR_EPSS_API_CVE_LIST)
+                if (vulnerabilitiesRequiringLPSSScores.size() >= MAX_BATCH_SIZE_FOR_EPSS_API)
                 {
                     retrieveEPSSScores(vulnerabilitiesRequiringLPSSScores, queryDate);
                     vulnerabilitiesRequiringLPSSScores = new TrivyScanVulnerabilities();
@@ -470,13 +469,24 @@ public class TrivySummary {
 
 	private static final String BASE_EPSS_API_URL = "https://api.first.org/data/v1/epss";
 
-	@TrackExecutionTime
     public void retrieveEPSSScores(TrivyScanVulnerabilities vulnerabilities, LocalDate queryDate) throws TrivyScanCouldNotRetrieveEPSSScoresException
     {
-		if (vulnerabilities == null || vulnerabilities.size() == 0) return;
+        StringBuffer urlString = null;
+        for (TrivyScanVulnerability vulnerability : vulnerabilities)
+        {
+            if (urlString == null)
+            {
+                urlString = new StringBuffer(BASE_EPSS_API_URL + "?cve=");
+                urlString.append(vulnerability.getVulnerabilityID());
+            }
+            else
+            {
+                urlString.append(",");
+                urlString.append(vulnerability.getVulnerabilityID());
+            }
+        }
 
-        StringBuffer urlString = new StringBuffer(BASE_EPSS_API_URL + "?cve=");
-		urlString.append(vulnerabilities.getCVEListCommaSeparated());
+        if (urlString == null) return;
 
 		if (queryDate != null)
 	    {
@@ -506,24 +516,18 @@ public class TrivySummary {
 
 		for (EPSSData epssData : epssResponse.getData())
 		{
-			try(var executor = Executors.newVirtualThreadPerTaskExecutor())
+			// We find the corresponding TrivyScanVulnerability and update the EPSS score
+			for (TrivyScanVulnerability vulnerability : vulnerabilities)
 			{
-				executor.submit(() -> {
-					// We find the corresponding TrivyScanVulnerability and update the EPSS score
-					for (TrivyScanVulnerability vulnerability : vulnerabilities)
-					{
-						if (vulnerability.getVulnerabilityID().equalsIgnoreCase(epssData.getVulnerabilityID()))
-						{
-							vulnerability.setEpssScore(epssData.getEpssScore());
-							break;
-						}
-					}
-				});
+				if (vulnerability.getVulnerabilityID().equalsIgnoreCase(epssData.getVulnerabilityID()))
+				{
+					vulnerability.setEpssScore(epssData.getEpssScore());
+					break;
+				}
 			}
 		}
     }
 
-	@TrackExecutionTime
 	public ReportedTreatment createReportedTreatment(String ticketURITemplate, VulnerabilityTreatment treatment)
 	{
 		if (treatment == null) return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()));

@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.3.2
+Release 3.3.3
 
-* Added the --bothPDFAndJSONOutput argument to output PDF and JSON in same call, saving time if you need both.
+* Reverted some optimisations to fix bug where, for components with high number of vulnerabilities, some EPSS scores were missing
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.3.2
+
+* Added the --bothPDFAndJSONOutput argument to output PDF and JSON in same call, saving time if you need both.
 
 Release 3.3.1
 
