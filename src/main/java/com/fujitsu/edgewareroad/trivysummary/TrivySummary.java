@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import com.fujitsu.edgewareroad.trivyutils.GenerateGraph;
+import com.fujitsu.edgewareroad.trivyutils.HttpClientWithRetries;
 import com.fujitsu.edgewareroad.trivyutils.RenderToPDF;
 import com.fujitsu.edgewareroad.trivyutils.TrivyScanLoader;
 import com.fujitsu.edgewareroad.trivyutils.TrivySummaryStringUtils;
@@ -137,7 +139,7 @@ public class TrivySummary {
 
     private Configuration configuration = new Configuration();
     private TrivyScanHistory history = new TrivyScanHistory();
-    private static HttpClient client = HttpClient.newHttpClient();
+    private static HttpClientWithRetries client = new HttpClientWithRetries(HttpClient.newHttpClient(), 3, java.time.Duration.ofSeconds(2));
     private static ObjectMapper mapper = JsonMapper.builder()
 						.configure(SerializationFeature.INDENT_OUTPUT, true)
 						.build();
@@ -495,15 +497,14 @@ public class TrivySummary {
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(urlString.toString()))
+			.timeout(Duration.ofSeconds(10))
             .build();
 
 		HttpResponse<String> response = null;
 		try {
-			response = client.send(request, HttpResponse.BodyHandlers.ofString());
-		} catch (IOException e) {
-			throw new TrivyScanCouldNotRetrieveEPSSScoresException("IOException thrown when calling EPSS service.", e);
-		} catch (InterruptedException e) {
-			throw new TrivyScanCouldNotRetrieveEPSSScoresException("InterruptedException thrown when calling EPSS service.", e);
+			response = client.sendWithRetries(request);
+		} catch (HttpClientWithRetries.HttpClientRequestExceededRetriesException e) {
+			throw new TrivyScanCouldNotRetrieveEPSSScoresException("Maximum retry attempts reached when calling EPSS service.", e);
 		}
 		String responseBody = response != null ? response.body() : "";
 		if (response != null && response.statusCode() != 200)

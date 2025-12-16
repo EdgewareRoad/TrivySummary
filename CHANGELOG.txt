@@ -1,12 +1,17 @@
 This Release
 ------------
 
-Release 3.3.3
+Release 3.4.0
 
-* Reverted some optimisations to fix bug where, for components with high number of vulnerabilities, some EPSS scores were missing
+* Added automatic retries for calls to EPSS service to address occasional connectivity issues
+* Minor bumps, mostly to openhtmltopdf
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.3.3
+
+* Reverted some optimisations to fix bug where, for components with high number of vulnerabilities, some EPSS scores were missing
 
 Release 3.3.2
 
