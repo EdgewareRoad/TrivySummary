@@ -1,13 +1,17 @@
 This Release
 ------------
 
+Release 3.4.1
+
+* Updated to Spring Boot 4.0.1
+
+Older Releases in this major version
+------------------------------------
+
 Release 3.4.0
 
 * Added automatic retries for calls to EPSS service to address occasional connectivity issues
 * Minor bumps, mostly to openhtmltopdf
-
-Older Releases in this major version
-------------------------------------
 
 Release 3.3.3
 
