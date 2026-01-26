@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.4.1
+Release 3.4.2
 
-* Updated to Spring Boot 4.0.1
+* Updated to Spring Boot 4.0.2, openhtmltopdf to 1.1.37
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.4.1
+
+* Updated to Spring Boot 4.0.1
 
 Release 3.4.0
 
