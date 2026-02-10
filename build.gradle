@@ -8,6 +8,8 @@ plugins {
 	id 'jacoco'
 }
 
+ext['assertj.version'] = '3.27.7'
+
 group = 'com.fujitsu.edgewareroad'
 
 def appProps = new Properties()
@@ -74,6 +76,9 @@ dependencies {
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.37'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.37'
 	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.37') {
+		exclude group: 'org.apache.xmlgraphics', module: 'batik-transcoder'
+		exclude group: 'org.apache.xmlgraphics', module: 'batik-codec'
+		exclude group: 'org.apache.xmlgraphics', module: 'batik-ext'
 		exclude group: 'commons-io', module: 'commons-io'
 	}
 	implementation 'commons-io:commons-io:2.21.0'
@@ -81,6 +86,10 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.22.1'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
 	implementation 'org.apache.xmlgraphics:batik-dom:1.19'
+	implementation 'org.apache.xmlgraphics:batik-codec:1.19'
+	implementation 'org.apache.xmlgraphics:batik-transcoder:1.19'
+	implementation 'org.apache.xmlgraphics:batik-ext:1.19'
+
 	implementation 'org.apache.commons:commons-lang3:3.20.0'
 
 	compileOnly 'org.projectlombok:lombok:1.18.42'
