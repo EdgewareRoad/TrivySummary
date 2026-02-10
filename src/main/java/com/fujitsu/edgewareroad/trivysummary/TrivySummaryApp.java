@@ -99,14 +99,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		{
 			output("ERROR: no input files specified");
 			displayHelp();
-			this.exitCode = -1;
+			this.exitCode = 1;
 			return;
 		}
 		if (inputFiles.size() > 2)
 		{
 			output("ERROR: too many input files specified");
 			displayHelp();
-			this.exitCode = -1;
+			this.exitCode = 1;
 			return;
 		}
 
@@ -118,7 +118,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				output("ERROR: outputFile option specified with empty path");
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			}
 			if (inputValues.size() > 1)
@@ -126,7 +126,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				output("ERROR: outputFile option specified with multiple paths");
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			}
 			configuration.setOutputFile(workingDirectory.resolve(inputValues.iterator().next()));
@@ -136,7 +136,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				output("ERROR: outputFile %s is not in a readable folder", configuration.getOutputFile().toString());
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			}
 		}
@@ -179,7 +179,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					output("ERROR: priorityModel option specified multiple times. Only zero or one value is permitted");
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 				if (priorityModelValues.size() == 1) {
@@ -189,14 +189,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 						output("ERROR: Priority model not found %s", priorityModelPath.toString());
 						output("");
 						displayHelp();
-						this.exitCode = -1;
+						this.exitCode = 1;
 						return;
 					}
 					if (!Files.isReadable(priorityModelPath)) {
 						output("ERROR: Priority model file %s is not readable", priorityModelPath.toString());
 						output("");
 						displayHelp();
-						this.exitCode = -1;
+						this.exitCode = 1;
 						return;
 					}
 
@@ -207,14 +207,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 								e.getMessage());
 						output("");
 						displayHelp();
-						this.exitCode = -1;
+						this.exitCode = 1;
 						return;
 					} catch (DatabindException e) {
 						output("ERROR: JSON Mapping exception for priority model %s: %s", priorityModelPath.toString(),
 								e.getMessage());
 						output("");
 						displayHelp();
-						this.exitCode = -1;
+						this.exitCode = 1;
 						return;
 					}
 				}
@@ -233,14 +233,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					output("ERROR: Whitelist file not found %s", whiteListFilePath.toString());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 				if (!Files.isReadable(whiteListFilePath)) {
 					output("ERROR: Whitelist file file %s is not readable", whiteListFilePath.toString());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 
@@ -252,13 +252,13 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					output("ERROR: JSON Parsing exception for whitelist file %s: %s", whiteListFilePath.toString(), e.getMessage());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				} catch (DatabindException e) {
 					output("ERROR: JSON Mapping exception for whitelist file %s: %s", whiteListFilePath.toString(), e.getMessage());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 			}
@@ -271,7 +271,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				output("ERROR: treatmentPlan option specified multiple times. Only zero or one value is permitted");
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			}
 			if (treatmentPlanValues.size() == 1) {
@@ -281,14 +281,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 					output("ERROR: Treatment plan not found %s", treatmentPlanPath.toString());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 				if (!Files.isReadable(treatmentPlanPath)) {
 					output("ERROR: Treatment plan file %s is not readable", treatmentPlanPath.toString());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 
@@ -300,14 +300,14 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 							e.getMessage());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				} catch (DatabindException e) {
 					output("ERROR: JSON Mapping exception for treatment plan %s: %s", treatmentPlanPath.toString(),
 							e.getMessage());
 					output("");
 					displayHelp();
-					this.exitCode = -1;
+					this.exitCode = 1;
 					return;
 				}
 			}
@@ -324,19 +324,19 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 				output("ERROR: Could not find input file %s", filePath.toString());
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			} catch (IOException e) {
 				output("ERROR: Could not read (%s) input file %s", e.getMessage(), filePath.toString());
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			} catch (TrivyScanHistoryMustBeForSameArtefactType e) {
 				output("ERROR: %s", e.getMessage());
 				output("");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			}
 		}
@@ -346,22 +346,22 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 
 			if (thereAreOutstandingVulnerabilitiesAboveThreshold)
 			{
-				this.exitCode = -1;
+				this.exitCode = 1;
 			}
 		} catch (IOException e) {
 			output("ERROR: Could not write (%s) output file %s", e.getMessage(), configuration.getOutputFile().toString());
 			output("");
 			displayHelp();
-			this.exitCode = -1;
+			this.exitCode = 1;
 			return;
 		} catch (TrivyScanHistoryNotDeepEnoughException e) {
 			output("ERROR: System error - Trivy Scan History not deep enough - should never reach this");
-			this.exitCode = -1;
+			this.exitCode = 1;
 			return;
 		} catch (TrivyScanCouldNotRetrieveEPSSScoresException e) {
 			output("ERROR: %s", e.getMessage());
 			output("Cause of EPSS score retrieval failure: %s: %s", e.getCause().getClass().getName(), e.getCause().getMessage());
-			this.exitCode = -1;
+			this.exitCode = 1;
 			return;
 		}
 	}
