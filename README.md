@@ -52,7 +52,7 @@ later versions of Trivy (since v0.48.0).
 
   --failPriorityThreshold=...
     The priority threshold at or above which any open vulnerabilities
-    will cause this app to return an error (returns -1, rather than 0).
+    will cause this app to return an error (returns 1, rather than 0).
     Must be one of LOW, MEDIUM, HIGH or CRITICAL.
     If unset, an error won't be returned for any set minimum priority.
 

@@ -164,7 +164,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 			{
 				output("ERROR: unknown vulnerability severity %s. Must be one of LOW, MEDIUM, HIGH or CRITICAL.");
 				displayHelp();
-				this.exitCode = -1;
+				this.exitCode = 1;
 				return;
 			}
 		}
@@ -412,7 +412,7 @@ public class TrivySummaryApp implements ApplicationRunner, ExitCodeGenerator {
 		output("");
 		output("  --failPriorityThreshold=...");
 		output("    The priority threshold at or above which any open vulnerabilities");
-		output("    will cause this app to return an error (returns -1, rather than 0).");
+		output("    will cause this app to return an error (returns 1, rather than 0).");
 		output("    Must be one of LOW, MEDIUM, HIGH or CRITICAL.");
 		output("    If unset, an error won't be returned for any set minimum priority.");
 		output("");

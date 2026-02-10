@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.4.2
+Release 3.5.0
 
-* Updated to Spring Boot 4.0.2, openhtmltopdf to 1.1.37
+* Breaking change: Setting a priority fail threshold will now return 1, not -1, in case of threshold being met, to align with Linux bash/sh 8-bit limit on return codes
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.4.2
+
+* Updated to Spring Boot 4.0.2, openhtmltopdf to 1.1.37
 
 Release 3.4.1
 
