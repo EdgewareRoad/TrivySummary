@@ -30,11 +30,11 @@ public class TreatmentPlan {
     public VulnerabilityTreatment getVulnerabilityTreatment(String artefact, Set<String> vulnerabilityIDs) {
         TreeSet<TreatmentPlanEntry> applicableTreatments = findTreatmentByArtefact(artefact);
         for (String vulnerabilityID : vulnerabilityIDs) {
-            applicableTreatments.addAll(findTreatmentByVulnerabilityId(vulnerabilityID));
+            applicableTreatments.addAll(findTreatmentByVulnerabilityId(artefact, vulnerabilityID));
         }
-        TreeSet<Note> applicableNotes = findNoteByArtefact(artefact);
+        TreeSet<Note> applicableNotes = findNote(artefact, null);
         for (String vulnerabilityID : vulnerabilityIDs) {
-            applicableNotes.addAll(findNoteByVulnerabilityId(vulnerabilityID));
+            applicableNotes.addAll(findNote(artefact, vulnerabilityID));
         }
         
         // If the vulnerability isn't mentioned in any treatment plan entry or note, return null
@@ -55,12 +55,27 @@ public class TreatmentPlan {
         return null;
     }
 
-    public TreeSet<TreatmentPlanEntry> findTreatmentByVulnerabilityId(String vulnerabilityID)
+    public TreeSet<TreatmentPlanEntry> findTreatmentByVulnerabilityId(String artefact, String vulnerabilityID)
     {
         TreeSet<TreatmentPlanEntry> result = new TreeSet<>();
+
+        if (vulnerabilityID == null) return result;
+
         for (TreatmentPlanEntry entry : treatments)
         {
-            if (entry.getVulnerabilityIDs().contains(vulnerabilityID)) result.add(entry);
+            if (entry.getVulnerabilityIDs().contains(vulnerabilityID))
+            {
+                if (entry.getAffectedArtefacts().isEmpty()) {
+                    result.add(entry);
+                } else {
+                    for (String entryArtefact : entry.getAffectedArtefacts()) {
+                        if (artefact.startsWith(entryArtefact)) {
+                            result.add(entry);
+                            break;
+                        }
+                    }
+                }
+            }
         }
         return result;
     }
@@ -80,30 +95,35 @@ public class TreatmentPlan {
         return result;
     }
 
-    public TreeSet<Note> findNoteByVulnerabilityId(String vulnerabilityID)
+    public TreeSet<Note> findNote(String artefact, String vulnerabilityID)
     {
         TreeSet<Note> result = new TreeSet<>();
         for (Note entry : notes)
         {
-            if (entry.getVulnerabilityIDs().contains(vulnerabilityID)) result.add(entry);
-        }
-        return result;
-    }
-
-    public TreeSet<Note> findNoteByArtefact(String artefact)
-    {
-        TreeSet<Note> result = new TreeSet<>();
-        for (Note entry : notes)
-        {
-            for (String entryArtefact : entry.getAffectedArtefacts()) {
-                if (artefact.startsWith(entryArtefact)) {
-                    result.add(entry);
-                    break;
+            if (vulnerabilityID == null && entry.getVulnerabilityIDs().isEmpty())
+            {
+                for (String entryArtefact : entry.getAffectedArtefacts()) {
+                    if (artefact.startsWith(entryArtefact)) {
+                        result.add(entry);
+                    }
                 }
+            }
+            else if (vulnerabilityID != null)
+            {
+                if (entry.getVulnerabilityIDs().contains(vulnerabilityID)) {
+                    if (entry.getAffectedArtefacts().isEmpty()) {
+                        result.add(entry);
+                    } else {
+                        for (String entryArtefact : entry.getAffectedArtefacts()) {
+                            if (artefact.startsWith(entryArtefact)) {
+                                result.add(entry);
+                            }
+                        }
+                    }
+                } 
             }
         }
         return result;
     }
-
 }
 
