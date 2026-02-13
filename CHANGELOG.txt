@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.5.0
+Release 3.6.0
 
-* Breaking change: Setting a priority fail threshold will now return 1, not -1, in case of threshold being met, to align with Linux bash/sh 8-bit limit on return codes
+* Potentially breaking change: Clarified treatment plans with both artefacts and vulnerability ID set, the treatment must match both.
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.5.0
+
+* Breaking change: Setting a priority fail threshold will now return 1, not -1, in case of threshold being met, to align with Linux bash/sh 8-bit limit on return codes
 
 Release 3.4.2
 

@@ -54,6 +54,11 @@ public class TreatmentPlanTests {
         note1.getAffectedArtefacts().add("mycomponent:");
         notes.add(note1);
 
+        Note note2 = new Note();
+        note2.setNoteText("This is a note for all vulnerabilities in a component");
+        note2.getAffectedArtefacts().add("mycomponent:");
+        notes.add(note2);
+
         // Test findByTicketId
         assert plan.findTreatmentByTicketId("TICKET-1") == entry1;
         assert plan.findTreatmentByTicketId("TICKET-2") == entry2;
@@ -61,10 +66,10 @@ public class TreatmentPlanTests {
         assert plan.findTreatmentByTicketId("TICKET-4") == null;
 
         // Test findByVulnerabilityId
-        assert plan.findTreatmentByVulnerabilityId("CVE-2023-0001").contains(entry1);
-        assert plan.findTreatmentByVulnerabilityId("CVE-2023-0002").contains(entry1);
-        assert plan.findTreatmentByVulnerabilityId("CVE-2023-0003").contains(entry2);
-        assert plan.findTreatmentByVulnerabilityId("CVE-2023-0004").isEmpty();
+        assert plan.findTreatmentByVulnerabilityId("mycomponent:", "CVE-2023-0001").contains(entry1);
+        assert plan.findTreatmentByVulnerabilityId("mycomponent:", "CVE-2023-0002").contains(entry1);
+        assert plan.findTreatmentByVulnerabilityId("mycomponent:", "CVE-2023-0003").contains(entry2);
+        assert plan.findTreatmentByVulnerabilityId("mycomponent:", "CVE-2023-0004").isEmpty();
 
         // Test findTreatmentByArtefact
         assert plan.findTreatmentByArtefact("mycomponent:1.0.0").contains(entry3);
@@ -73,15 +78,18 @@ public class TreatmentPlanTests {
         assert plan.findTreatmentByArtefact("othercomponent:2.0.0").isEmpty();        
 
         // Test findNoteByVulnerabilityId
-        assert plan.findNoteByVulnerabilityId("CVE-2023-0001").contains(note1);
-        assert plan.findNoteByVulnerabilityId("CVE-2023-0004").contains(note1);
-        assert plan.findNoteByVulnerabilityId("CVE-2023-0002").isEmpty();
+        assert plan.findNote("mycomponent:1", "CVE-2023-0001").contains(note1);
+        assert plan.findNote("mycomponent:1", "CVE-2023-0004").contains(note1);
+        assert plan.findNote("mycomponent:1", "CVE-2023-0002").isEmpty();
 
         // Test findNoteByArtefact
-        assert plan.findNoteByArtefact("mycomponent:1.0.0").contains(note1);
-        assert plan.findNoteByArtefact("mycomponent:1").contains(note1);
-        assert plan.findNoteByArtefact("mycomponent:").contains(note1);
-        assert plan.findNoteByArtefact("othercomponent:2.0.0").isEmpty();
+        assert !plan.findNote("mycomponent:1.0.0", null).contains(note1);
+        assert plan.findNote("mycomponent:1.0.0", null).contains(note2);
+        assert !plan.findNote("mycomponent:1", null).contains(note1);
+        assert plan.findNote("mycomponent:1", null).contains(note2);
+        assert !plan.findNote("mycomponent:", null).contains(note1);
+        assert plan.findNote("mycomponent:", null).contains(note2);
+        assert plan.findNote("othercomponent:2.0.0", null).isEmpty();
 
         VulnerabilityTreatment treatment = plan.getVulnerabilityTreatment("mycomponent:", Set.of("CVE-2023-0002"));
 
@@ -90,7 +98,7 @@ public class TreatmentPlanTests {
         assert treatment.getTreatmentPlanEntries().contains(entry1);
         assert treatment.getTreatmentPlanEntries().contains(entry3);
         assert treatment.getNotes().size() == 1;
-        assert treatment.getNotes().contains(note1);
+        assert treatment.getNotes().contains(note2);
 
         String json = mapper.writeValueAsString(plan);
         assertNotNull(json);
