@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.6.0
+Release 3.7.0
 
-* Potentially breaking change: Clarified treatment plans with both artefacts and vulnerability ID set, the treatment must match both.
+* Treatment notes may now optionally include the isAcceptedAsUnfixable boolean flag which, if set, marks the affected vulnerability/vulnerabilities as having no fix available - useful for management reporting.
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.6.0
+
+* Potentially breaking change: Clarified treatment plans with both artefacts and vulnerability ID set, the treatment must match both.
 
 Release 3.5.0
 

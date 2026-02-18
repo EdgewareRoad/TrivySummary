@@ -18,6 +18,7 @@ import org.junit.jupiter.api.io.TempDir;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistory.TrivyScanHistoryMustBeForSameArtefactType;
 import com.fujitsu.edgewareroad.trivyutils.dto.history.TrivyScanHistoryNotDeepEnoughException;
 import com.fujitsu.edgewareroad.trivyutils.dto.prioritymodel.PriorityModel;
+import com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan.TreatmentPlan;
 import com.fujitsu.edgewareroad.trivyutils.dto.whitelist.WhitelistEntries;
 
 import tools.jackson.core.exc.StreamReadException;
@@ -86,6 +87,12 @@ class TrivySummaryAppTests {
 			whitelistEntries2 = mapper.readValue(stream, WhitelistEntries.class);
 		}
 
+		TreatmentPlan treatmentPlan;
+		try(InputStream stream = classLoader.getResourceAsStream("sampleTreatments.json"))
+		{
+			treatmentPlan = mapper.readValue(stream, TreatmentPlan.class);
+		}
+
 		final List<Boolean> booleans = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
 		final List<PriorityModel> priorityModels = Arrays.asList(priorityModelElliptical, priorityModelRectangular, priorityModelSeverityOnly);
 
@@ -130,6 +137,7 @@ class TrivySummaryAppTests {
 					Path outputFilePath = tempDir.resolve(fileName);
 
 					configuration.setOutputFile(outputFilePath);
+					configuration.setTreatmentPlan(treatmentPlan);
 					
 					for (Path inputPath : scenario.getPaths())
 					{

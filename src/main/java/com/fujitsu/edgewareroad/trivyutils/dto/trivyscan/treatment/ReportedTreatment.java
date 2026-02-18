@@ -10,4 +10,5 @@ import lombok.NonNull;
 public class ReportedTreatment {
     private final @Getter @NonNull List<TicketedEntry> tickets;
     private final @Getter @NonNull List<String> notes;
+    private final @Getter boolean isAcceptedAsUnfixable;
 }

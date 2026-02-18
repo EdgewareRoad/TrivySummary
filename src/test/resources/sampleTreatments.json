@@ -1,0 +1,22 @@
+{
+  "treatments" : [ {
+    "ticketId" : "TICKET-1",
+    "affectedArtefacts" : [ "testapp/test:0.0.1" ],
+    "vulnerabilityIDs" : [ "CVE-2022-22965" ],
+    "description" : "Ticket on specific vulnerability in specific artefact"
+  }, {
+    "ticketId" : "TICKET-2",
+    "affectedArtefacts" : [ "testapp/test:0.0.1" ],
+    "description" : "Ticket on whole artefact"
+  } ],
+  "notes" : [ {
+    "noteText" : "This is a note to state that these vulnerabilities are accepted as unfixable",
+    "isAcceptedAsUnfixable": true,
+    "vulnerabilityIDs" : [ "CVE-2022-1292", "CVE-2022-0778" ]
+  }, {
+    "noteText" : "This is a note for all vulnerabilities in my other artefacts",
+    "affectedArtefacts" : [ "myOtherArtefact:v1.0.1", "myOtherOtherArtefact:v2.3.4" ]
+  } ],
+  "ticketSystemURLTemplate" : "https://example.com/tickets/{ticketId}",
+  "defaultNoteText" : "TODO - awaiting assessment"
+}

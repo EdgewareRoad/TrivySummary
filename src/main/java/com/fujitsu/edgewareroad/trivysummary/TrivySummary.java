@@ -531,7 +531,7 @@ public class TrivySummary {
 
 	public ReportedTreatment createReportedTreatment(String ticketURITemplate, VulnerabilityTreatment treatment)
 	{
-		if (treatment == null) return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()));
+		if (treatment == null) return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()), false);
 
 		java.util.List<TicketedEntry> tickets = new java.util.ArrayList<>();
 		for (var entry : treatment.getTreatmentPlanEntries())
@@ -544,11 +544,13 @@ public class TrivySummary {
 			tickets.add(new TicketedEntry(entry.getTicketId(), ticketURI, entry.getDescription()));
 		}
 		List<String> notes = new java.util.ArrayList<>();
+		boolean isAcceptedAsUnfixable = false;
 		for (var entry : treatment.getNotes())
 		{
 			notes.add(entry.getNoteText());
+			if (entry.isAcceptedAsUnfixable()) isAcceptedAsUnfixable = true;
 		}
 
-		return new ReportedTreatment(tickets, notes);
+		return new ReportedTreatment(tickets, notes, isAcceptedAsUnfixable);
 	}
 }
