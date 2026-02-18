@@ -1,5 +1,6 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.treatmentplan;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -18,6 +19,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Note implements Comparable<Note> {
     private @NonNull String noteText;
+    // This field is not used for comparison, but it is included in the JSON output
+    // It denotes if the note indicates that the vulnerability is accepted as unfixable, which can be useful for filtering and reporting purposes
+    private Optional<Boolean> isAcceptedAsUnfixable = Optional.empty();
     private @Setter(AccessLevel.NONE) final Set<String> vulnerabilityIDs = new TreeSet<>();
     private @Setter(AccessLevel.NONE) final Set<String> affectedArtefacts = new TreeSet<>();
 
@@ -33,6 +37,10 @@ public class Note implements Comparable<Note> {
         if (artefacts != null) {
             this.affectedArtefacts.addAll(artefacts);
         }
+    }
+
+    public boolean isAcceptedAsUnfixable() {
+        return isAcceptedAsUnfixable.isPresent() && isAcceptedAsUnfixable.get();
     }
     
     @Override

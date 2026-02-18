@@ -10,6 +10,7 @@
   } ],
   "notes" : [ {
     "noteText" : "This is a note for CVE-2023-0001 and CVE-2023-0004",
+    "isAcceptedAsUnfixable": true,
     "vulnerabilityIDs" : [ "CVE-2023-0001", "CVE-2023-0004" ]
   }, {
     "noteText" : "This is a note for all vulnerabilities in myArtefact:2025",

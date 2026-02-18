@@ -105,7 +105,7 @@
                                 <td><span th:text="${stringUtils.textWithDefaultOnNullOrEmpty(packageVuln.fixedVersion, 'No fixed package available')}"></span></td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table><span th:if="${vulnerability.treatment != null && vulnerability.treatment.isAcceptedAsUnfixable()}" class="unfixableNote"><br/>(Please note - accepted as unfixable - see treatment notes)</span>
                 </td>
                 <td th:if="${vulnerability.treatment != null}">
                     <table class="subTableTreatmentPlan">
