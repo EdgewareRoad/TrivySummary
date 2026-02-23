@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.7.0
+Release 3.7.1
 
-* Treatment notes may now optionally include the isAcceptedAsUnfixable boolean flag which, if set, marks the affected vulnerability/vulnerabilities as having no fix available - useful for management reporting.
+* Updated to Spring Boot 4.0.3
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.7.0
+
+* Treatment notes may now optionally include the isAcceptedAsUnfixable boolean flag which, if set, marks the affected vulnerability/vulnerabilities as having no fix available - useful for management reporting.
 
 Release 3.6.0
 
