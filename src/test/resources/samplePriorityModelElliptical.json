@@ -2,11 +2,11 @@
     "type": "ELLIPTICAL",
     "criticalPriorityThresholds": {
         "minimumCVSS": 7.0,
-        "minimumEPSS": 0.4
+        "minimumEPSS": 0.1
     },
     "highPriorityThresholds": {
         "minimumCVSS": 4.5,
-        "minimumEPSS": 0.25
+        "minimumEPSS": 0.05
     },
     "mediumPriorityThresholds": {
         "minimumCVSS": 2.0,

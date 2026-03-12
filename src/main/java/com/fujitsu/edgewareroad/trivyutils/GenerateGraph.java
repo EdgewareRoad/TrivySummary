@@ -75,10 +75,11 @@ public class GenerateGraph {
         }
     }
 
-    private double getEPSSYValue(double lpssValue, int lpssMode) {
-        if (lpssMode <= 1)
-            return lpssValue;
-        double retVal = Math.pow(lpssValue, 1.0d / lpssMode);
+    private double getEPSSYValue(double epssValue, EPSSScalingMode epssScalingMode) {
+        if (epssScalingMode == null || epssScalingMode == EPSSScalingMode.LINEAR)
+            return epssValue;
+        // Return the inverse square
+        double retVal = Math.pow(epssValue, 1.0d / 2);
         return retVal;
     }
 
@@ -100,6 +101,12 @@ public class GenerateGraph {
         }
     }
 
+    private enum EPSSScalingMode
+    {
+        LINEAR,
+        INVERSE_SQUARE_MODE
+    }
+
     private void paint(SVGGraphics2D svgGenerator, Document document, TrivyScanVulnerabilities vulnerabilities,
             TrivySummary.Configuration configuration) {
         Dimension canvasSize = svgGenerator.getSVGCanvasSize();
@@ -107,8 +114,10 @@ public class GenerateGraph {
         // Note that we can't inverse square scale the EPSS axis in ELLIPTICAL mode as
         // the ellipse will look very very weird or, worse, not match the calculated
         // value
-        final int EPSS_MODE = configuration.getPriorityModel() != null && configuration.getPriorityModel().getType().equals(PriorityModelType.ELLIPTICAL) ? 1
-                : 2;
+        final EPSSScalingMode EPSS_MODE = 
+            configuration.getPriorityModel() != null && configuration.getPriorityModel().getType().equals(PriorityModelType.ELLIPTICAL)
+                ? EPSSScalingMode.LINEAR
+                : EPSSScalingMode.INVERSE_SQUARE_MODE;
         final int DOT_RADIUS = 3;
         int graphWidth = (int) canvasSize.getWidth() - GRAPH_OFFSET;
         int graphHeight = (int) canvasSize.getHeight() - GRAPH_OFFSET;

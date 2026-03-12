@@ -29,7 +29,7 @@ public class PriorityModelTests {
 
             assertEquals(PriorityModelType.ELLIPTICAL, model.getType());
             assertEquals(VulnerabilityPriority.CRITICAL, model.getPriority(VulnerabilitySeverity.LOW, 8.0, 0.7));
-            assertEquals(VulnerabilityPriority.HIGH, model.getPriority(VulnerabilitySeverity.LOW, 8.0, 0.4));
+            assertEquals(VulnerabilityPriority.HIGH, model.getPriority(VulnerabilitySeverity.LOW, 8.0, 0.2));
             assertEquals(VulnerabilityPriority.MEDIUM, model.getPriority(VulnerabilitySeverity.LOW, 8.0, 0.1));
             assertEquals(VulnerabilityPriority.LOW, model.getPriority(VulnerabilitySeverity.CRITICAL, 8.0, 0.01));
         }

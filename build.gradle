@@ -9,6 +9,7 @@ plugins {
 }
 
 ext['assertj.version'] = '3.27.7'
+ext['jackson-bom.version'] = '3.1.0'
 
 group = 'com.fujitsu.edgewareroad'
 

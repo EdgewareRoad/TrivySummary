@@ -111,11 +111,17 @@ class TrivySummaryAppTests {
 		{
 			Files.copy(stream, pathTestApp003Scan);
 		}
+		Path pathTestscansAppScan = Path.of(tempDir.toString(), "testscans-0.0.1.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testscans-0.0.1.json"))
+		{
+			Files.copy(stream, pathTestscansAppScan);
+		}
 
 		ArrayList<TestScenario> scenarios = new ArrayList<>();
 		scenarios.add(new TestScenario("SINGLEFILE_TEST001", Arrays.asList(pathTestApp001Scan)));
 		scenarios.add(new TestScenario("SINGLEFILE_TEST002", Arrays.asList(pathTestApp002Scan)));
 		scenarios.add(new TestScenario("SINGLEFILE_TEST003", Arrays.asList(pathTestApp003Scan)));
+		scenarios.add(new TestScenario("SINGLEFILE_TESTSCANS_EXAMPLE", Arrays.asList(pathTestscansAppScan)));
 		scenarios.add(new TestScenario("COMPARE_TEST001_TEST002", Arrays.asList(pathTestApp001Scan, pathTestApp002Scan)));
 		scenarios.add(new TestScenario("COMPARE_TEST002_TEST003", Arrays.asList(pathTestApp002Scan, pathTestApp003Scan)));
 		scenarios.add(new TestScenario("COMPARE_TEST001_TEST003", Arrays.asList(pathTestApp001Scan, pathTestApp003Scan)));
