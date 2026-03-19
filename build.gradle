@@ -2,14 +2,15 @@ plugins {
 	id 'java'
 	id 'application'
 	id 'jvm-test-suite'
-	id 'org.springframework.boot' version '4.0.3' 
+	id 'org.springframework.boot' version '4.0.4' 
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'maven-publish'
 	id 'jacoco'
 }
 
-ext['assertj.version'] = '3.27.7'
-ext['jackson-bom.version'] = '3.1.0'
+//ext['assertj.version'] = '3.27.7'
+//ext['jackson-bom.version'] = '3.1.0'
+//ext['lombok.version'] = '1.18.44'
 
 group = 'com.fujitsu.edgewareroad'
 
