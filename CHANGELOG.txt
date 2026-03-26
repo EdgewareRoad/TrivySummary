@@ -1,13 +1,17 @@
 This Release
 ------------
 
+Release 3.7.3
+
+* Updated to Spring Boot 4.0.5
+
+Older Releases in this major version
+------------------------------------
+
 Release 3.7.2
 
 * Updated to Spring Boot 4.0.4
 * Minor tidy up of graphing and better, more representative, priority models in tests
-
-Older Releases in this major version
-------------------------------------
 
 Release 3.7.1
 
