@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.7.3
+Release 3.7.4
 
-* Updated to Spring Boot 4.0.5
+* Updated to Jackson 3.1.1
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.7.3
+
+* Updated to Spring Boot 4.0.5
 
 Release 3.7.2
 
