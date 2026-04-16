@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.7.4
+Release 3.7.5
 
-* Updated to Jackson 3.1.1
+* Updated to Thymeleaf 3.1.4
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.7.4
+
+* Updated to Jackson 3.1.1
 
 Release 3.7.3
 
