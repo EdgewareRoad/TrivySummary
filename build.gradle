@@ -83,7 +83,7 @@ dependencies {
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-ext'
 		exclude group: 'commons-io', module: 'commons-io'
 	}
-	implementation 'commons-io:commons-io:2.21.0'
+	implementation 'commons-io:commons-io:2.22.0'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.37'
 	implementation 'org.jsoup:jsoup:1.22.1'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
