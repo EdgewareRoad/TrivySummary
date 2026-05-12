@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.Math;
@@ -136,6 +137,8 @@ public class GenerateGraph {
         svgGenerator.setTransform(transformGraph);
         svgGenerator.drawString("EPSS", 0, -(GRAPH_OFFSET * 2 / 3));
 
+        // Clip to the graph area so that any shading or points don't overflow into the margins
+        svgGenerator.setClip(new Rectangle2D.Double(0, 0, graphHeight, graphWidth));
         if (configuration.getPriorityModel() != null && configuration.getPriorityModel().getType() == PriorityModelType.ELLIPTICAL) {
             VulnerabilityScorePriorityThresholds thresholds;
             svgGenerator.setPaint(Color.decode("#f0fff0"));
@@ -203,6 +206,7 @@ public class GenerateGraph {
             }
             svgGenerator.setPaint(Color.BLACK);
         }
+        svgGenerator.setClip(null);
 
         // Now draw the axes
         svgGenerator.drawLine(0, 0, 0, graphWidth);

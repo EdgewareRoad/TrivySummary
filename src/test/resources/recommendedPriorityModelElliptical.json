@@ -1,0 +1,15 @@
+{
+    "type": "ELLIPTICAL",
+    "criticalPriorityThresholds": {
+        "minimumCVSS": 7.0,
+        "minimumEPSS": 0.1
+    },
+    "highPriorityThresholds": {
+        "minimumCVSS": 4.5,
+        "minimumEPSS": 0.075
+    },
+    "mediumPriorityThresholds": {
+        "minimumCVSS": 2.0,
+        "minimumEPSS": -0.08
+    }
+}

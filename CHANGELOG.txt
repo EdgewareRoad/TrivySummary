@@ -1,12 +1,17 @@
 This Release
 ------------
 
-Release 3.7.5
+Release 3.7.6
 
-* Updated to Thymeleaf 3.1.4
+* Updated to Spring Boot 4.0.6.
+* Graph output now clips shaded areas to not spill into the margins, enabling models to extend band ranges below zero (see new recommended model)
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.7.5
+
+* Updated to Thymeleaf 3.1.4
 
 Release 3.7.4
 

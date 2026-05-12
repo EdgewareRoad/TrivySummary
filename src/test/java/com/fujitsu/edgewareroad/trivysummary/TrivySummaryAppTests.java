@@ -176,4 +176,93 @@ class TrivySummaryAppTests {
 			}
 		}
 	}
+
+	@Test
+	void recommendedModelContextLoads(@TempDir(cleanup = CleanupMode.NEVER) Path tempDir) throws URISyntaxException, StreamReadException, DatabindException, IOException, TrivyScanHistoryMustBeForSameArtefactType, TrivyScanHistoryNotDeepEnoughException, TrivyScanCouldNotRetrieveEPSSScoresException {
+		PriorityModel priorityModelElliptical;
+		try(InputStream stream = classLoader.getResourceAsStream("recommendedPriorityModelElliptical.json"))
+		{
+			priorityModelElliptical = mapper.readValue(stream, PriorityModel.class);
+		}
+
+		WhitelistEntries whitelistEntries1, whitelistEntries2;
+		try(InputStream stream = classLoader.getResourceAsStream("sampleWhitelist1.json"))
+		{
+			whitelistEntries1 = mapper.readValue(stream, WhitelistEntries.class);
+		}
+		try(InputStream stream = classLoader.getResourceAsStream("sampleWhitelist2.json"))
+		{
+			whitelistEntries2 = mapper.readValue(stream, WhitelistEntries.class);
+		}
+
+		TreatmentPlan treatmentPlan;
+		try(InputStream stream = classLoader.getResourceAsStream("sampleTreatments.json"))
+		{
+			treatmentPlan = mapper.readValue(stream, TreatmentPlan.class);
+		}
+
+		final List<Boolean> booleans = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
+		final List<PriorityModel> priorityModels = Arrays.asList(priorityModelElliptical);
+
+		Path pathTestApp001Scan = Path.of(tempDir.toString(), "testapp-0.0.1.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testapp-0.0.1.json"))
+		{
+			Files.copy(stream, pathTestApp001Scan);
+		}
+		Path pathTestApp002Scan = Path.of(tempDir.toString(), "testapp-0.0.2.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testapp-0.0.2.json"))
+		{
+			Files.copy(stream, pathTestApp002Scan);
+		}
+		Path pathTestApp003Scan = Path.of(tempDir.toString(), "testapp-0.0.3.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testapp-0.0.3.json"))
+		{
+			Files.copy(stream, pathTestApp003Scan);
+		}
+		Path pathTestscansAppScan = Path.of(tempDir.toString(), "testscans-0.0.1.json");
+		try(InputStream stream = classLoader.getResourceAsStream("testapp/testscans-0.0.1.json"))
+		{
+			Files.copy(stream, pathTestscansAppScan);
+		}
+
+		ArrayList<TestScenario> scenarios = new ArrayList<>();
+		scenarios.add(new TestScenario("SINGLEFILE_TEST001", Arrays.asList(pathTestApp001Scan)));
+		scenarios.add(new TestScenario("SINGLEFILE_TEST002", Arrays.asList(pathTestApp002Scan)));
+		scenarios.add(new TestScenario("SINGLEFILE_TEST003", Arrays.asList(pathTestApp003Scan)));
+		scenarios.add(new TestScenario("SINGLEFILE_TESTSCANS_EXAMPLE", Arrays.asList(pathTestscansAppScan)));
+		scenarios.add(new TestScenario("COMPARE_TEST001_TEST002", Arrays.asList(pathTestApp001Scan, pathTestApp002Scan)));
+		scenarios.add(new TestScenario("COMPARE_TEST002_TEST003", Arrays.asList(pathTestApp002Scan, pathTestApp003Scan)));
+		scenarios.add(new TestScenario("COMPARE_TEST001_TEST003", Arrays.asList(pathTestApp001Scan, pathTestApp003Scan)));
+
+		for (TestScenario scenario : scenarios)
+		{
+			for (Boolean useTodayForEPSSQuery : booleans)
+			{
+				for (PriorityModel priorityModel : priorityModels)
+				{
+					TrivySummary worker = new TrivySummary();
+					TrivySummary.Configuration configuration = worker.getConfiguration();
+
+					configuration.setAppVersion("x.y.z");
+					configuration.setUseTodayForEPSSQuery(useTodayForEPSSQuery.booleanValue());
+					configuration.setPriorityModel(priorityModel);
+
+					String fileName = String.format("trivysummary-recommendedModel-test-%s-%s-%s.pdf", scenario.getName(), priorityModel.getType().name(), useTodayForEPSSQuery ? "EPSSTODAY" : "EPSSSCANDATE");
+					Path outputFilePath = tempDir.resolve(fileName);
+
+					configuration.setOutputFile(outputFilePath);
+					configuration.setTreatmentPlan(treatmentPlan);
+					
+					for (Path inputPath : scenario.getPaths())
+					{
+						worker.addTrivyScanFileToHistory(inputPath);
+					}
+					worker.addWhitelistEntries(whitelistEntries1);
+					worker.addWhitelistEntries(whitelistEntries2);
+
+					worker.summariseTrivyHistory(scenario.getName());
+				}
+			}
+		}
+	}
 }
