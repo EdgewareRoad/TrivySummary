@@ -1,13 +1,17 @@
 This Release
 ------------
 
+Release 3.7.7
+
+* Updated to Spring Boot 4.1.0.
+
+Older Releases in this major version
+------------------------------------
+
 Release 3.7.6
 
 * Updated to Spring Boot 4.0.6.
 * Graph output now clips shaded areas to not spill into the margins, enabling models to extend band ranges below zero (see new recommended model)
-
-Older Releases in this major version
-------------------------------------
 
 Release 3.7.5
 
