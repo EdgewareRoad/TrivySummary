@@ -18,5 +18,6 @@
     "affectedArtefacts" : [ "myOtherArtefact:v1.0.1", "myOtherOtherArtefact:v2.3.4" ]
   } ],
   "ticketSystemURLTemplate" : "https://example.com/tickets/{ticketId}",
+  "ticketSearchURLTemplate" : "https://example.com/issues/?jql=text%20~%20%22{componentShortNameAndTag}%22",
   "defaultNoteText" : "TODO - awaiting assessment"
 }

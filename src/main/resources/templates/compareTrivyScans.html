@@ -64,7 +64,7 @@
 
     <p th:if="${svgGraph != ''}" class="pagebreakafter" th:utext="${svgGraph}"></p>
 
-    <table class="mainTableVulnerabilities pagebreakafter">
+    <table class="mainTableVulnerabilities${treatmentPlan != null ? 'WithTreatmentPlan' : ''} pagebreakafter">
         <caption>
             Open vulnerabilities - Details<br/>New vulnerabilities in this scan marked with <span class="newVulnerabilityMarker">&nbsp;NEW&nbsp;</span>
         </caption>
@@ -115,6 +115,9 @@
                             </tr>
                             <tr th:each="ticket : ${vulnerability.treatment.tickets}">
                                 <td><b><a th:href="${ticket.ticketURI}" th:text="${ticket.ticketId}" href="http://google.co.uk">Ticket ID</a></b><br/><span th:text="${stringUtils.getHyphenated(ticket.description)}">Description of treatment</span></td>
+                            </tr>
+                            <tr th:if="${(vulnerability.treatment.tickets == null || vulnerability.treatment.tickets.empty) && vulnerability.treatment.searchURI != null}">
+                                <td><b><a th:href="${vulnerability.treatment.searchURI}" href="http://google.co.uk">Search for tickets for this component</a></b></td>
                             </tr>
                         </tbody>
                     </table>

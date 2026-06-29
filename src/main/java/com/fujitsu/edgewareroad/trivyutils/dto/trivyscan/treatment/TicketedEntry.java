@@ -1,5 +1,7 @@
 package com.fujitsu.edgewareroad.trivyutils.dto.trivyscan.treatment;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class TicketedEntry implements Comparable<TicketedEntry> {
     private @NonNull String ticketId;
-    private @NonNull String ticketURI;
+    private @NonNull URI ticketURI;
     private@NonNull String description;
 
     @Override

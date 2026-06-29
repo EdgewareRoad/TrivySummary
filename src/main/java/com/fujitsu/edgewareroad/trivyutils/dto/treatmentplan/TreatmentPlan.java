@@ -24,6 +24,7 @@ public class TreatmentPlan {
     @JsonDeserialize(contentAs = Note.class)
     private @NonNull TreeSet<Note> notes = new TreeSet<>();
     private @NonNull String ticketSystemURLTemplate;
+    private String ticketSearchURLTemplate;
     private String defaultNoteText;
 
     public VulnerabilityTreatment getVulnerabilityTreatment(String artefact, Set<String> vulnerabilityIDs) {

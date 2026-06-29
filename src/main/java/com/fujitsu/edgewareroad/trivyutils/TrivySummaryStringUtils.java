@@ -8,12 +8,27 @@ import java.util.regex.Pattern;
 import org.springframework.util.StringUtils;
 
 public class TrivySummaryStringUtils {
-    private final Pattern whitespaceSplitter = Pattern.compile("\s+");
-    private final Pattern longWordSplitter = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])|(?<!^)(?=[:\\-/.])");
-    private final int WORD_LEN_BEFORE_HYPHENATE = 18;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+    private static final Pattern whitespaceSplitter = Pattern.compile("\s+");
+    private static final Pattern longWordSplitter = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])|(?<!^)(?=[:\\-/.])");
+    private static final int WORD_LEN_BEFORE_HYPHENATE = 18;
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
 
-    public String getHyphenated(String input)
+    public static String getShortArtefactNameWithTag(String artefactNameWithTag)
+    {
+        if (artefactNameWithTag == null) return null;
+
+        int lastSlashIndex = artefactNameWithTag.lastIndexOf('/');
+        if (lastSlashIndex >= 0 && lastSlashIndex < artefactNameWithTag.length() - 1)
+        {
+            return artefactNameWithTag.substring(lastSlashIndex + 1);
+        }
+        else
+        {
+            return artefactNameWithTag;
+        }
+    }
+
+    public static String getHyphenated(String input)
     {
         if (input == null) return null;
 
@@ -55,22 +70,22 @@ public class TrivySummaryStringUtils {
         return builder.toString();
     }
 
-    public String displayDate(LocalDate value)
+    public static String displayDate(LocalDate value)
     {
         return value != null ? value.format(dateFormatter) : "<no date specified>";
     }
 
-    public String displayTodaysDate()
+    public static String displayTodaysDate()
     {
         return LocalDate.now().format(dateFormatter);
     }
 
-    public String displayDouble(Double value)
+    public static String displayDouble(Double value)
     {
         return String.format("%f", value);
     }
 
-    public String toUpperCamelCase(String input)
+    public static String toUpperCamelCase(String input)
     {
         StringBuilder builder = new StringBuilder();
         for (String word : input.split("/s"))
@@ -80,7 +95,7 @@ public class TrivySummaryStringUtils {
         return builder.toString();
     }
 
-    public String textWithDefaultOnNullOrEmpty(String text, String defaultText)
+    public static String textWithDefaultOnNullOrEmpty(String text, String defaultText)
     {
         return StringUtils.hasText(text) ? text : defaultText;
     }

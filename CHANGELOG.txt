@@ -1,12 +1,17 @@
 This Release
 ------------
 
-Release 3.7.7
+Release 3.8.0
 
-* Updated to Spring Boot 4.1.0.
+* Optional ticketSearchURLTemplate element under Treatments JSON configuration which, when set, enables reports to kick off searches for the affected component and tag name (replacing the {componentShortNameAndTag} marker with the simple component name and tag). See src/test/resources/sampleTreatments.json for example.  The intent is to search a ticket system to see if existing tickets for this vulnerability have been already created. This is only shown for vulnerabilities where no ticket has been set.
+* Fixed bug for comparison reports where treatments were missed from the report.
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.7.7
+
+* Updated to Spring Boot 4.1.0.
 
 Release 3.7.6
 

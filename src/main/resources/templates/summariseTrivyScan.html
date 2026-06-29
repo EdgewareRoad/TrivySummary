@@ -110,6 +110,9 @@
                             <tr th:each="ticket : ${vulnerability.treatment.tickets}">
                                 <td><b><a th:href="${ticket.ticketURI}" th:text="${ticket.ticketId}" href="http://google.co.uk">Ticket ID</a></b><br/><span th:text="${stringUtils.getHyphenated(ticket.description)}">Description of treatment</span></td>
                             </tr>
+                            <tr th:if="${(vulnerability.treatment.tickets == null || vulnerability.treatment.tickets.empty) && vulnerability.treatment.searchURI != null}">
+                                <td><b><a th:href="${vulnerability.treatment.searchURI}" href="http://google.co.uk">Search for tickets for this component</a></b></td>
+                            </tr>
                         </tbody>
                     </table>
                 </td>

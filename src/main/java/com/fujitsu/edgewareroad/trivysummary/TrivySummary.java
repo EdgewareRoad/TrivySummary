@@ -225,9 +225,21 @@ public class TrivySummary {
 			}
 			if (configuration.getTreatmentPlan() != null && comparison.getOpenVulnerabilities().size() > 0)
 			{
-				comparison.setTreatment(createReportedTreatment(configuration.getTreatmentPlan().getTicketSystemURLTemplate(), configuration.getTreatmentPlan().getVulnerabilityTreatment(
+				comparison.setTreatment(createReportedTreatment(comparison.getLaterArtefactName(),
+											configuration.getTreatmentPlan().getTicketSystemURLTemplate(),
+											configuration.getTreatmentPlan().getTicketSearchURLTemplate(),
+											configuration.getTreatmentPlan().getVulnerabilityTreatment(
 												comparison.getLaterArtefactName(),
 												comparison.getOpenVulnerabilities().getAllVulnerabilityIDs())));
+
+				for (TrivyScanVulnerability trivyScanVulnerability : comparison.getOpenVulnerabilities()) {
+					trivyScanVulnerability.setTreatment(createReportedTreatment(comparison.getLaterArtefactName(),
+											configuration.getTreatmentPlan().getTicketSystemURLTemplate(),
+											configuration.getTreatmentPlan().getTicketSearchURLTemplate(),
+											configuration.getTreatmentPlan().getVulnerabilityTreatment(
+												comparison.getLaterArtefactName(),
+												Set.of(trivyScanVulnerability.getVulnerabilityID()))));
+				}
 			}
 
 			String outputPDFFile = null;
@@ -325,12 +337,19 @@ public class TrivySummary {
 			}
 			if (configuration.getTreatmentPlan() != null && summary.getOpenVulnerabilities().size() > 0)
 			{
-				summary.setTreatment(createReportedTreatment(configuration.getTreatmentPlan().getTicketSystemURLTemplate(), configuration.getTreatmentPlan().getVulnerabilityTreatment(
+				summary.setTreatment(createReportedTreatment(
+										summary.getArtefactName(),
+										configuration.getTreatmentPlan().getTicketSystemURLTemplate(),
+										configuration.getTreatmentPlan().getTicketSearchURLTemplate(),
+										configuration.getTreatmentPlan().getVulnerabilityTreatment(
 												summary.getArtefactName(),
 												summary.getOpenVulnerabilities().getAllVulnerabilityIDs())));
 
 				for (TrivyScanVulnerability trivyScanVulnerability : summary.getOpenVulnerabilities()) {
-					trivyScanVulnerability.setTreatment(createReportedTreatment(configuration.getTreatmentPlan().getTicketSystemURLTemplate(), configuration.getTreatmentPlan().getVulnerabilityTreatment(
+					trivyScanVulnerability.setTreatment(createReportedTreatment(summary.getArtefactName(),
+											configuration.getTreatmentPlan().getTicketSystemURLTemplate(),
+											configuration.getTreatmentPlan().getTicketSearchURLTemplate(),
+											configuration.getTreatmentPlan().getVulnerabilityTreatment(
 												summary.getArtefactName(),
 												Set.of(trivyScanVulnerability.getVulnerabilityID()))));
 				}
@@ -529,9 +548,19 @@ public class TrivySummary {
 		}
     }
 
-	public ReportedTreatment createReportedTreatment(String ticketURITemplate, VulnerabilityTreatment treatment)
+	public ReportedTreatment createReportedTreatment(String artefactNameWithTag, String ticketURITemplate, String searchURITemplate, VulnerabilityTreatment treatment)
 	{
-		if (treatment == null) return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()), false);
+		URI searchURI = null;
+		if (searchURITemplate != null)
+		{
+			String shortNameAndTag = TrivySummaryStringUtils.getShortArtefactNameWithTag(artefactNameWithTag);
+			searchURI = URI.create(searchURITemplate.replace("{componentShortNameAndTag}", java.net.URLEncoder.encode(shortNameAndTag, java.nio.charset.StandardCharsets.UTF_8)));
+		}
+
+		if (treatment == null)
+		{
+			return new ReportedTreatment(new java.util.ArrayList<>(), List.of(configuration.getTreatmentPlan().getDefaultNoteText()), false, searchURI);
+		}
 
 		java.util.List<TicketedEntry> tickets = new java.util.ArrayList<>();
 		for (var entry : treatment.getTreatmentPlanEntries())
@@ -539,9 +568,9 @@ public class TrivySummary {
 			String ticketURI = null;
 			if (entry.getTicketId() != null && ticketURITemplate != null)
 			{
-				ticketURI = ticketURITemplate.replace("{ticketId}", entry.getTicketId());
+				ticketURI = ticketURITemplate.replace("{ticketId}", java.net.URLEncoder.encode(entry.getTicketId(), java.nio.charset.StandardCharsets.UTF_8));
 			}
-			tickets.add(new TicketedEntry(entry.getTicketId(), ticketURI, entry.getDescription()));
+			tickets.add(new TicketedEntry(entry.getTicketId(), URI.create(ticketURI), entry.getDescription()));
 		}
 		List<String> notes = new java.util.ArrayList<>();
 		boolean isAcceptedAsUnfixable = false;
@@ -551,6 +580,11 @@ public class TrivySummary {
 			if (entry.isAcceptedAsUnfixable()) isAcceptedAsUnfixable = true;
 		}
 
-		return new ReportedTreatment(tickets, notes, isAcceptedAsUnfixable);
+		if (tickets.isEmpty() && notes.isEmpty())
+		{
+			notes.add(configuration.getTreatmentPlan().getDefaultNoteText());
+		}
+
+		return new ReportedTreatment(tickets, notes, isAcceptedAsUnfixable, searchURI);
 	}
 }
