@@ -1,7 +1,7 @@
 This Release
 ------------
 
-Release 3.8.0
+Release 3.8.1
 
 * Bumped Jackson to 3.1.5 to address MEDIUM severity CVE-2026-59889
 
