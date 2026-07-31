@@ -1,12 +1,16 @@
 This Release
 ------------
 
-Release 3.8.1
+Release 3.8.2
 
-* Bumped Jackson to 3.1.5 to address MEDIUM severity CVE-2026-59889
+* Bumped JSoup to 1.23.1
 
 Older Releases in this major version
 ------------------------------------
+
+Release 3.8.1
+
+* Bumped Jackson to 3.1.5 to address MEDIUM severity CVE-2026-59889
 
 Release 3.8.0
 
