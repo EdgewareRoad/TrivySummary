@@ -11,6 +11,9 @@ plugins {
 //ext['assertj.version'] = '3.27.7'
 ext['jackson-bom.version'] = '3.1.5'
 //ext['lombok.version'] = '1.18.44'
+ext['httpcore5.version'] = '5.4.3'
+ext['httpclient5.version'] = '5.6.3'
+ext['log4j2.version'] = '2.25.5'
 
 group = 'com.fujitsu.edgewareroad'
 
@@ -75,16 +78,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-json'
 	implementation 'org.springframework.boot:spring-boot-starter-aspectj'
 	implementation 'org.thymeleaf:thymeleaf:3.1.5.RELEASE'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.65'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.65'
-	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.65') {
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.69'
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.69'
+	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.69') {
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-transcoder'
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-codec'
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-ext'
 		exclude group: 'commons-io', module: 'commons-io'
 	}
 	implementation 'commons-io:commons-io:2.22.0'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.65'
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.69'
 	implementation 'org.jsoup:jsoup:1.23.1'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
 	implementation 'org.apache.xmlgraphics:batik-dom:1.19'
