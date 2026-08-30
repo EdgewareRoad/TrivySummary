@@ -2,18 +2,18 @@ plugins {
 	id 'java'
 	id 'application'
 	id 'jvm-test-suite'
-	id 'org.springframework.boot' version '4.1.0' 
+	id 'org.springframework.boot' version '4.1.1' 
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'maven-publish'
 	id 'jacoco'
 }
 
 //ext['assertj.version'] = '3.27.7'
-ext['jackson-bom.version'] = '3.1.5'
+//ext['jackson-bom.version'] = '3.1.5'
 //ext['lombok.version'] = '1.18.44'
-ext['httpcore5.version'] = '5.4.3'
-ext['httpclient5.version'] = '5.6.3'
-ext['log4j2.version'] = '2.25.5'
+//ext['httpcore5.version'] = '5.4.3'
+//ext['httpclient5.version'] = '5.6.3'
+//ext['log4j2.version'] = '2.25.5'
 
 group = 'com.fujitsu.edgewareroad'
 
