@@ -88,7 +88,7 @@ dependencies {
 	}
 	implementation 'commons-io:commons-io:2.22.0'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.83'
-	implementation 'org.jsoup:jsoup:1.23.1'
+	implementation 'org.jsoup:jsoup:1.23.2'
 	implementation 'org.apache.xmlgraphics:batik-svggen:1.19'
 	implementation 'org.apache.xmlgraphics:batik-dom:1.19'
 	implementation 'org.apache.xmlgraphics:batik-codec:1.19'
