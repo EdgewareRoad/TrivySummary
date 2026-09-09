@@ -4,7 +4,7 @@ This Release
 Release 3.8.4
 
 * Bumped JSoup to 1.23.2
-* Bumped openhtmltopdf to 1.1.84
+* Bumped openhtmltopdf to 1.1.85
 
 Older Releases in this major version
 ------------------------------------
