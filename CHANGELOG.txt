@@ -1,13 +1,18 @@
 This Release
 ------------
 
+Release 3.8.4
+
+* Bumped JSoup to 1.23.2
+* Bumped openhtmltopdf to 1.1.84
+
+Older Releases in this major version
+------------------------------------
+
 Release 3.8.3
 
 * Bumped Spring Boot to 4.1.1
 * Bumped openhtmltopdf to 1.1.83
-
-Older Releases in this major version
-------------------------------------
 
 Release 3.8.2
 
