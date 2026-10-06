@@ -4,7 +4,7 @@ This Release
 Release 3.8.5
 
 * Bumped lombox to 1.18.48
-* Bumped openhtmltopdf to 1.1.86
+* Bumped openhtmltopdf to 1.1.87
 * Bumped Jackson to 3.1.7 to address vulnerabilities up to HIGH severity (CVE-2026-68497)
 
 Older Releases in this major version
