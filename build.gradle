@@ -9,7 +9,7 @@ plugins {
 }
 
 //ext['assertj.version'] = '3.27.7'
-ext['jackson-bom.version'] = '3.1.7'
+ext['jackson-bom.version'] = '3.1.7' 
 ext['lombok.version'] = '1.18.48'
 //ext['httpcore5.version'] = '5.4.3'
 //ext['httpclient5.version'] = '5.6.3'
@@ -77,6 +77,9 @@ configurations {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-json'
 	implementation 'org.springframework.boot:spring-boot-starter-aspectj'
+		
+	implementation 'tools.jackson.core:jackson-core'
+	implementation 'tools.jackson.core:jackson-databind'
 	implementation 'org.thymeleaf:thymeleaf:3.1.5.RELEASE'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.87'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.87'
