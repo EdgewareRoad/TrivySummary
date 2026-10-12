@@ -81,10 +81,10 @@ dependencies {
 	implementation 'tools.jackson.core:jackson-core'
 	implementation 'tools.jackson.core:jackson-databind'
 	implementation 'org.thymeleaf:thymeleaf:3.1.5.RELEASE'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.87'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.87'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.87'
-	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.87') {
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.97'
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.97'
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.97'
+	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.97') {
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-transcoder'
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-codec'
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-ext'
