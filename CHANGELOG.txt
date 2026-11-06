@@ -1,14 +1,24 @@
 This Release
 ------------
 
+Release 3.8.6
+
+* Upgraded Spring Boot to 4.2.0
+* Upgraded Gradle to 9.8.2
+* Upgraded Batik to 1.20
+* Upgraded openhtmltopdf to 1.1.108
+* Upgraded JSoup to 1.24.1
+* Upgraded Apache Commons-lang3 to 3.21.0
+* Now uses Ben Manes' excellent Gradle versions plugin to accelerate identification of outdated dependencies
+
+Older Releases in this major version
+------------------------------------
+
 Release 3.8.5
 
 * Bumped lombox to 1.18.48
 * Bumped openhtmltopdf to 1.1.87
 * Bumped Jackson to 3.1.7 to address vulnerabilities up to HIGH severity (CVE-2026-68497)
-
-Older Releases in this major version
-------------------------------------
 
 Release 3.8.4
 
