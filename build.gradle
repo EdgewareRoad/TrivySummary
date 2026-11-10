@@ -85,7 +85,7 @@ dependencies {
 	implementation 'org.thymeleaf:thymeleaf:3.1.5.RELEASE'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.108'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.108'
-	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.108'
+	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.110'
 	implementation ('io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.108') {
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-transcoder'
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-codec'
