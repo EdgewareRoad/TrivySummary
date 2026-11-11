@@ -9,6 +9,7 @@ Release 3.8.6
 * Upgraded openhtmltopdf to 1.1.108
 * Upgraded JSoup to 1.24.1
 * Upgraded Apache Commons-lang3 to 3.21.0
+* Upgraded Thymeleaf to 3.1.6.RELEASE
 * Now uses Ben Manes' excellent Gradle versions plugin to accelerate identification of outdated dependencies
 
 Older Releases in this major version
