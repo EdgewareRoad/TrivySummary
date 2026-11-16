@@ -82,7 +82,7 @@ dependencies {
 		
 	implementation 'tools.jackson.core:jackson-core'
 	implementation 'tools.jackson.core:jackson-databind'
-	implementation 'org.thymeleaf:thymeleaf:3.1.6.RELEASE'
+	implementation 'org.thymeleaf:thymeleaf:3.1.7.RELEASE'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-core:1.1.110'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.110'
 	implementation 'io.github.openhtmltopdf:openhtmltopdf-slf4j:1.1.110'
